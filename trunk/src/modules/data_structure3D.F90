@@ -114,7 +114,7 @@ module data_structure3D
 !  .....geometry and solution degrees of freedom
         type(dof_data), pointer :: dof
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !
 !  .....error
 !       0   - scalar error
@@ -144,28 +144,28 @@ module data_structure3D
         real(8), dimension(:,:), pointer :: coord
 !
 !  .....H1 solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofH
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofE
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofV
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofV
 #endif
 !
 !  .....L2 solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofQ
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofQ
@@ -196,35 +196,35 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-      subroutine open_history_file(fp)
+   subroutine open_history_file(fp)
       character(len=*) :: fp
       open(unit=NHIST,file=fp,   &
            form='formatted',access='sequential',status='unknown')
-      end subroutine open_history_file
+   end subroutine open_history_file
 !
 !-----------------------------------------------------------------------
 !
-      subroutine close_history_file
+   subroutine close_history_file
       write(NHIST,*) '0 0'
       close(NHIST)
-      end subroutine close_history_file
+   end subroutine close_history_file
 !
 !-----------------------------------------------------------------------
 !
 !  ...determine number of dof for a higher order node
-      subroutine find_ndof(Nod, NdofH,NdofE,NdofV,NdofQ)
+   subroutine find_ndof(Nod, NdofH,NdofE,NdofV,NdofQ)
 !
       integer, intent(in)  :: Nod
       integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
 !
       call ndof_nod(NODES(Nod)%ntype,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
 !
-      end subroutine find_ndof
+   end subroutine find_ndof
 !
 !-----------------------------------------------------------------------
 !
 !  ...find number of H1,H(curl),H(div),L2 variables supported by a node
-      subroutine find_nvar(Nod, NvarH,NvarE,NvarV,NvarQ)
+   subroutine find_nvar(Nod, NvarH,NvarE,NvarV,NvarQ)
 !
       integer, intent(in)  :: Nod
       integer, intent(out) :: NvarH,NvarE,NvarV,NvarQ
@@ -243,19 +243,19 @@ module data_structure3D
         end select
       end do
 !
-      end subroutine find_nvar
+   end subroutine find_nvar
 !
 !-----------------------------------------------------------------------
 !
 !  ...determine number of sons for a higher order node
-      subroutine find_nsons(Nod, Nrsons)
+   subroutine find_nsons(Nod, Nrsons)
 !
       integer, intent(in)  :: Nod
       integer, intent(out) :: Nrsons
 !
       Nrsons = NODES(Nod)%nr_sons
 !
-      end subroutine find_nsons
+   end subroutine find_nsons
 !
 !-----------------------------------------------------------------------
 !
@@ -272,7 +272,7 @@ module data_structure3D
 !-----------------------------------------------------------------------
 !
 !  ...allocate memory for data structure
-      subroutine allocds
+   subroutine allocds
 !
       integer :: nel,nod
 !
@@ -309,7 +309,7 @@ module data_structure3D
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
         nullify (NODES(nod)%dof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         NODES(nod)%error = 0.d0
 #endif
       enddo
@@ -317,12 +317,12 @@ module data_structure3D
       NODES(MAXNODS)%bcond = 0
       NPNODS=1
 !
-      end subroutine allocds
+   end subroutine allocds
 !
 !-----------------------------------------------------------------------
 !
 !  ...deallocate data structure arrays
-      subroutine deallocds
+   subroutine deallocds
 !
       integer :: nel,nod
 !
@@ -348,12 +348,12 @@ module data_structure3D
 !
       if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
 !
-      end subroutine deallocds
+   end subroutine deallocds
 !
 !-----------------------------------------------------------------------
 !
 !  ...increase MAXNODS
-      subroutine increase_MAXNODS
+   subroutine increase_MAXNODS
 !
       type(node), allocatable :: NODES_NEW(:)
       integer :: MAXNODS_NEW,nod
@@ -390,7 +390,7 @@ module data_structure3D
         NODES_NEW(nod)%first_son = 0
         NODES_NEW(nod)%nr_sons = 0
         nullify (NODES_NEW(nod)%dof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         NODES_NEW(nod)%error = 0.d0
 #endif
       enddo
@@ -403,12 +403,12 @@ module data_structure3D
       NPNODS  = MAXNODS+1
       MAXNODS = MAXNODS_NEW
 !
-      end subroutine increase_MAXNODS
+   end subroutine increase_MAXNODS
 !
 !----------------------------------------------------------------------
 !> @brief   update global and subdomain lists of mesh elements
 !> @date    Sep 2023
-      subroutine update_ELEM_ORDER
+   subroutine update_ELEM_ORDER
 !
       integer :: iel,mdle
 !
@@ -432,12 +432,12 @@ module data_structure3D
          NRELES_SUBD = NRELES
       endif
 !
-      end subroutine update_ELEM_ORDER
+   end subroutine update_ELEM_ORDER
 !
 !-----------------------------------------------------------------------
 !
 !  ...dump out hp3d data structure
-      subroutine dumpout_hp3d(Dump_file)
+   subroutine dumpout_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
       integer :: nel,nod,nn,nn1,nn2
@@ -524,7 +524,7 @@ module data_structure3D
          else
             write(ndump,*) 0 , 0
          endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
          write(ndump,*) NODES(nod)%error
 #endif
          if (associated(NODES(nod)%dof)) then
@@ -579,11 +579,11 @@ module data_structure3D
 !
       close(ndump)
 !
-      end subroutine dumpout_hp3d
+   end subroutine dumpout_hp3d
 !
 !-----------------------------------------------------------------------
 !  ...dump in hp3d data structure
-      subroutine dumpin_hp3d(Dump_file,Delete_file)
+   subroutine dumpin_hp3d(Dump_file,Delete_file)
 !
       character(len=15), intent(in) :: Dump_file
       logical, optional, intent(in) :: Delete_file
@@ -681,7 +681,7 @@ module data_structure3D
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%coord)
         endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
         read(ndump,*) NODES(nod)%error
 #endif
 !
@@ -723,11 +723,11 @@ module data_structure3D
 !
       call update_ELEM_ORDER
 !
-      end subroutine dumpin_hp3d
+   end subroutine dumpin_hp3d
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_dirichlet_to_list(Iboundary)
+   subroutine add_dirichlet_to_list(Iboundary)
       integer, intent(in) :: Iboundary
       integer :: loc
       loc = 0
@@ -736,11 +736,11 @@ module data_structure3D
         NR_DIRICHLET_LIST = NR_DIRICHLET_LIST + 1
         DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
       end if
-      end subroutine add_dirichlet_to_list
+   end subroutine add_dirichlet_to_list
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_dirichlet_homogeneous_to_list(Iboundary)
+   subroutine add_dirichlet_homogeneous_to_list(Iboundary)
       integer, intent(in) :: Iboundary
       integer :: loc1,loc2
       loc1 = 0
@@ -757,12 +757,12 @@ module data_structure3D
           DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
         end if ! loc1
       end if !loc2
-      end subroutine add_dirichlet_homogeneous_to_list
+   end subroutine add_dirichlet_homogeneous_to_list
 !
 !-----------------------------------------------------------------------
 !
 !  ...reset visitation flags for all nodes
-      subroutine reset_visit
+   subroutine reset_visit
       integer :: i
 !
 !$OMP PARALLEL DO
@@ -771,48 +771,48 @@ module data_structure3D
       enddo
 !$OMP END PARALLEL DO
 !
-      end subroutine reset_visit
+   end subroutine reset_visit
 !
 !
 !  ...get visitation flag for a node
-      subroutine get_visit(Nod, Vis)
+   subroutine get_visit(Nod, Vis)
 !
       integer, intent(in)  :: Nod
       integer, intent(out) :: Vis
 !
       Vis = NODES(Nod)%visit
 !
-      end subroutine get_visit
+   end subroutine get_visit
 
 !  ...set visitation flag of a node
-      subroutine set_visit(Nod)
+   subroutine set_visit(Nod)
 !
       integer, intent(in) :: Nod
 !
       NODES(Nod)%visit = 1
 !
-      end subroutine set_visit
+   end subroutine set_visit
 !
 !-----------------------------------------------------------------------
 !
 !  ...get current subdomain of a node
-      subroutine get_subd(Nod, Subd)
+   subroutine get_subd(Nod, Subd)
 !
       integer, intent(in)  :: Nod
       integer, intent(out) :: Subd
 !
       Subd = NODES(Nod)%subd
 !
-      end subroutine get_subd
+   end subroutine get_subd
 !
 !  ...set new subdomain of a node
-      subroutine set_subd(Nod,Subd)
+   subroutine set_subd(Nod,Subd)
 !
       integer, intent(in) :: Nod,Subd
 !
       NODES(Nod)%subd = Subd
 !
-      end subroutine set_subd
+   end subroutine set_subd
 !
 !-----------------------------------------------------------------------
 !
@@ -931,8 +931,8 @@ module data_structure3D
       logical Is_leaf
       integer Nod
       select case(NODES(Nod)%ref_kind)
-         case(0);       Is_leaf = .TRUE.
-         case default;  Is_leaf = .FALSE.
+         case(0);       Is_leaf = .true.
+         case default;  Is_leaf = .false.
       end select
       end function Is_leaf
 !
@@ -942,9 +942,9 @@ module data_structure3D
       logical Is_root
       integer Nod
       if (NODES(Nod)%father.lt.0) then
-         Is_root = .TRUE.
+         Is_root = .true.
       else
-         Is_root = .FALSE.
+         Is_root = .false.
       endif
       end function Is_root
 !
@@ -954,8 +954,8 @@ module data_structure3D
       logical Is_middle
       integer Nod
       select case(NODES(Nod)%ntype)
-         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .TRUE.
-         case default;              Is_middle = .FALSE.
+         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .true.
+         case default;              Is_middle = .false.
       end select
       end function Is_middle
 !

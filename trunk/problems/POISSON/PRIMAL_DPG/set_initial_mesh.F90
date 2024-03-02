@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - define problem dependent data
+!> @brief         - define problem dependent data
 !                         (multiphysics, BC, approximation)
 !
 !     arguments:

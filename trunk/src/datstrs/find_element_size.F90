@@ -1,6 +1,6 @@
-!> Purpose : find out center coordinate of middle node
-!! @param[in]  Mdle - middle node
-!! @param[out] X    - center coordinate
+!> @brief find out center coordinate of middle node
+!> @param[in]  Mdle - middle node
+!> @param[out] X    - center coordinate
 subroutine find_element_size(Mdle, H)
   use data_structure3D
   implicit none

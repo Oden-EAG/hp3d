@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2019
 !
-!     purpose:          - routine returns unconstrained (ordinary)
+!> @brief         - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector
 !                         for either:
 !                         1) single step of transient heat problem
@@ -212,9 +212,9 @@ end subroutine elem
 !
 !
 !----------------------------------------------------------------------
-!  routine: compute_enriched_order
+!> @name compute_enriched_order
 !----------------------------------------------------------------------
-!  purpose: - compute enriched order vector based on input Nord
+!> @brief - compute enriched order vector based on input Nord
 !             (enriched order based on mdle order and Nord only)
 !----------------------------------------------------------------------
 subroutine compute_enriched_order(EType,Nord, Norder)

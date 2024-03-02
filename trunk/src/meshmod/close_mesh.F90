@@ -24,7 +24,7 @@ subroutine close_mesh()
    integer :: ierr
    integer :: nv,ne,nf,nve
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -51,7 +51,7 @@ subroutine close_mesh()
 !---------------------------------------------------------
 !     Step 1 : check constrained nodes
 !---------------------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
          write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
       endif
@@ -72,7 +72,7 @@ subroutine close_mesh()
       enddo
 !$OMP END DO
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
       !$OMP SINGLE
       write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
@@ -93,7 +93,7 @@ subroutine close_mesh()
          call elem_nodes(mdle, nodesl,norientl)
 !
          ntype = NODES(mdle)%ntype
-         nflag = .FALSE.
+         nflag = .false.
 !
 !        check edges
 !        ~~~~~~~~~~~~
@@ -108,7 +108,7 @@ subroutine close_mesh()
             nod = nodesl(nv+j)
             if (visited(nod)) then
                krefe(j)=1
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -119,7 +119,7 @@ subroutine close_mesh()
             nod = nodesl(nve+j)
             if (visited(nod)) then
                call get_isoref(nod, kreff(j))
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -127,7 +127,7 @@ subroutine close_mesh()
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if (nflag) then
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                !$OMP CRITICAL
                write(*,*) 'close_mesh: mdle = ', mdle
@@ -169,7 +169,7 @@ subroutine close_mesh()
 !
       call bitvisit_finalize
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if ((.not.QUIET_MODE.or.iprint.eq.2) .and. (RANK.eq.ROOT)) then
          write(*,7002) ' close_mesh : number of elements to refine = ', ic
    7002  format(A,i6)
@@ -188,7 +188,7 @@ subroutine close_mesh()
          mdle = list(1,i)
          kref = list(2,i)
          if (is_leaf(mdle)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                write(*,7001) i, mdle, S_Type(NODES(mdle)%ntype), kref
     7001       format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
@@ -214,7 +214,7 @@ subroutine close_mesh()
  2030 format(' distr_refr : ',f12.5,'  seconds')
    endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    call par_verify
 #endif
 !
@@ -250,7 +250,7 @@ subroutine close_mesh_par()
    real(8) :: start_time,end_time
    integer :: displs(NUM_PROCS), ic_procs(NUM_PROCS)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -270,7 +270,7 @@ subroutine close_mesh_par()
 !---------------------------------------------------------
 !     Step 1 : check constrained nodes
 !---------------------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
          write(*,*) 'close_mesh_par: CHECK CONSTRAINING NODES'
       endif
@@ -296,7 +296,7 @@ subroutine close_mesh_par()
 !           for now.
       call reduce_visit
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
       write(*,*) 'close_mesh_par: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
    endif
@@ -314,7 +314,7 @@ subroutine close_mesh_par()
          call elem_nodes(mdle, nodesl,norientl)
 !
          ntype = NODES(mdle)%ntype
-         nflag = .FALSE.
+         nflag = .false.
 !
 !        check edges
 !        ~~~~~~~~~~~~
@@ -329,7 +329,7 @@ subroutine close_mesh_par()
             nod = nodesl(nv+j)
             if (visited(nod)) then
                krefe(j)=1
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -340,7 +340,7 @@ subroutine close_mesh_par()
             nod = nodesl(nve+j)
             if (visited(nod)) then
                call get_isoref(nod, kreff(j))
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -348,7 +348,7 @@ subroutine close_mesh_par()
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if (nflag) then
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                !$OMP CRITICAL
                write(*,*) 'close_mesh_par: mdle = ', mdle
@@ -402,7 +402,7 @@ subroutine close_mesh_par()
          ic_glob = ic_glob + ic_procs(i)
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (RANK.eq.ROOT .and. iprint.eq.2) then
          write(*,*) 'close_mesh_par: number of elements to refine ', ic_glob
       endif
@@ -422,7 +422,7 @@ subroutine close_mesh_par()
          mdle = list_glob(1,i)
          kref = list_glob(2,i)
          if (is_leaf(mdle)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                write(*,7001) i, mdle, S_Type(NODES(mdle)%ntype), kref
     7001       format('close_mesh_par: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)

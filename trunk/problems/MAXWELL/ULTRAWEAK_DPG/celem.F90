@@ -5,25 +5,25 @@
 !  REMARK : unless you are an advanced user, there is no reason to modify this routine.
 !  REMARK : this routine is only called if ISTC_FLAG is .false. (no static condensation).
 !===============================================================================================================
-!> Purpose : routine computes modified stiffness matrix and load vector for an element
+!> @brief routine computes modified stiffness matrix and load vector for an element
 !
-!  last modified: Sept 2018
+!> @date Sept 2018
 !
-!! @param[in]  Mdle   - an element (middle node) number
-!! @param[in]  Idec   - 1 = info on nodes only ; 2 = compute element matrices as well
-!! @param[out] Nrdofs - number of element local dof for each physical attribute (needed to dimension work
+!> @param[in]  Mdle   - an element (middle node) number
+!> @param[in]  Idec   - 1 = info on nodes only ; 2 = compute element matrices as well
+!> @param[out] Nrdofs - number of element local dof for each physical attribute (needed to dimension work
 !!                      arrays in calling routines)
-!! @param[out] Nrdofm - number of modified element dof in the expanded mode (needed to dimension work arrays
+!> @param[out] Nrdofm - number of modified element dof in the expanded mode (needed to dimension work arrays
 !!                      in calling routines)
-!! @param[out] Nrdofc - number of modified element dof for the coupled problem after compression
-!! @param[out] Nodm   - actual (unconstrained) nodes in the order : middle, mid-face, mid-edge, vertex nodes
-!! @param[out] NdofmH - the corresponding number of H1      dof
-!! @param[out] NdofmE - the corresponding number of H(curl) dof
-!! @param[out] NdofmV - the corresponding number of H(div)  dof
-!! @param[out] NdofmQ - the corresponding number of L2      dof
-!! @param[out] Nrnodm - number of the modified element nodes
-!! @param[out] Bload  - 1D array containing the modified load vector
-!! @param[out] Astif  - 1D array containing the modified stiffness matrix
+!> @param[out] Nrdofc - number of modified element dof for the coupled problem after compression
+!> @param[out] Nodm   - actual (unconstrained) nodes in the order : middle, mid-face, mid-edge, vertex nodes
+!> @param[out] NdofmH - the corresponding number of H1      dof
+!> @param[out] NdofmE - the corresponding number of H(curl) dof
+!> @param[out] NdofmV - the corresponding number of H(div)  dof
+!> @param[out] NdofmQ - the corresponding number of L2      dof
+!> @param[out] Nrnodm - number of the modified element nodes
+!> @param[out] Bload  - 1D array containing the modified load vector
+!> @param[out] Astif  - 1D array containing the modified stiffness matrix
 !---------------------------------------------------------------------------------------------------------------
 subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
 !

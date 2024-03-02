@@ -1,8 +1,8 @@
 !-------------------------------------------------------------------------------
 !> @brief      routine determines BC flags for faces of an element
 !!
-!! @param[in]  Mdle - middle node
-!! @param[out] Ibc  - BC flags; for each variable component ivar supported by
+!> @param[in]  Mdle - middle node
+!> @param[out] Ibc  - BC flags; for each variable component ivar supported by
 !!                    the element (and its initial mesh ancestor), and iface;
 !!             Ibc(iface,ivar) = 0 if the face is interior to the domain,
 !!                             = the corresponding flag (1-9) for the element
@@ -27,7 +27,7 @@ subroutine find_bc(Mdle, Ibc)
    integer :: nrve,nrf
    integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -36,7 +36,7 @@ subroutine find_bc(Mdle, Ibc)
 !
    Ibc = 0
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010) Mdle
    7010 format(' find_bc: Mdle = ',i8)
@@ -49,7 +49,7 @@ subroutine find_bc(Mdle, Ibc)
      nod = NODES(nod)%father
    enddo
    iel = -nod
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7020) iel
  7020 format('find_bc: iel = ',i5)
@@ -87,7 +87,7 @@ subroutine find_bc(Mdle, Ibc)
             call locate(nod,ELEMS(iel)%nodes(nrve_iel+1:nrve_iel+nrf_iel),nrf_iel, loc)
             do ivar=1,nvar
                call decodg(ELEMS(iel)%bcond(ivar),10,nrf_iel, ibc_iel)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                if (iprint.eq.1) then
              7030 format('find_bc: BC FOR iel=',i8,' AND ivar=',i2,': ',6i2)
                   write(*,7030) ivar,ibc_iel(1:nrf_iel)
@@ -114,7 +114,7 @@ subroutine find_bc(Mdle, Ibc)
 !..end loop through element faces
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          do ivar=1,nvar
        7100 format('          ivar=',i2,',  Ibc = ',6(i1,2x))

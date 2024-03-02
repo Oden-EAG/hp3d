@@ -1,10 +1,10 @@
 !-------------------------------------------------------------------------------
-!>@brief       Set isotropic polynomial order for all initial mesh elements
-!>@param[in]   Order     - polynomial order: 1,...,MAXP
-!>@param[out]  ElemOrder - list of "anisotropic" element orders:
+!> @brief       Set isotropic polynomial order for all initial mesh elements
+!> @param[in]   Order     - polynomial order: 1,...,MAXP
+!> @param[out]  ElemOrder - list of "anisotropic" element orders:
 !!                            TETR:  1*Order; PYRA:   1*Order;
 !!                            PRIS: 11*Order; HEXA: 111*Order.
-!>@date        Sep 2023
+!> @date        Sep 2023
 !-------------------------------------------------------------------------------
 subroutine set_order(Order, ElemOrder)
 !
@@ -28,13 +28,13 @@ end subroutine set_order
 
 
 !-------------------------------------------------------------------------------
-!>@brief       Set isotropic polynomial order for an initial mesh element
-!>@param[in]   Iel       - initial mesh element: 1,...,NRELIS
-!>@param[in]   Order     - polynomial order: 1,...,MAXP
-!>@param[out]  ElemOrder - "anisotropic" element order:
+!> @brief       Set isotropic polynomial order for an initial mesh element
+!> @param[in]   Iel       - initial mesh element: 1,...,NRELIS
+!> @param[in]   Order     - polynomial order: 1,...,MAXP
+!> @param[out]  ElemOrder - "anisotropic" element order:
 !!                            TETR:  1*Order; PYRA:   1*Order;
 !!                            PRIS: 11*Order; BRIC: 111*Order.
-!>@date        Sep 2023
+!> @date        Sep 2023
 !-------------------------------------------------------------------------------
 subroutine set_order_elem(Iel,Order, ElemOrder)
 !

@@ -1,5 +1,5 @@
 !> @brief Saves common variables used in frontal solver
-!> @date Mar 2023
+!> @date Feb 2024
 module surfsc1
 !
    implicit none
@@ -13,20 +13,30 @@ module surfsc1
               IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE, &
               IPFSBF, IPFSBK, IPFSXX
 !
-#if C_MODE
-   integer :: IDUMPWR
+#if HP3D_COMPLEX
+   integer    :: IDUMPWR
 #endif
+!
+   contains
+!
+   integer function modr(I,J)
+!
+      integer, intent(in) :: I,J
+!
+      modr = I - (I/J)*J
+!
+   end function modr
 !
 end module surfsc1
 
 ! DESCRIPTION OF VARIABLES
 !
 !      COMMON /SURFC1/ ISYM, NUMELM, IRESOL, NRHS, MA, IWRT,
-!     .                IASSEM, IERR, NNEGP, NPOSP, IPRSTR,
-!     .                IPRPIV, IPRDES, NFSOUT, NICMUL,
-!     .                IPFSDB, IPFSS1, IPFSST, IPFSLH, IPFSRH,
-!     .                IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE,
-!     .                IPFSBF, IPFSBK, IPFSXX
+!                      IASSEM, IERR, NNEGP, NPOSP, IPRSTR,
+!                      IPRPIV, IPRDES, NFSOUT, NICMUL,
+!                      IPFSDB, IPFSS1, IPFSST, IPFSLH, IPFSRH,
+!                      IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE,
+!                      IPFSBF, IPFSBK, IPFSXX
 !
 ! Frontal Solver Common Block
 ! ---------------------------

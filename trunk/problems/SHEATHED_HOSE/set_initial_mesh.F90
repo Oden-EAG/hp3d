@@ -6,7 +6,7 @@
 !
 !     latest revision   - May 2022
 !
-!     purpose:          - define problem dependent data
+!> @brief         - define problem dependent data
 !                         (multiphysics, BC, approximation)
 !
 !     arguments:
@@ -19,7 +19,6 @@ subroutine set_initial_mesh(Nelem_order)
    use GMP
    use data_structure3D
    use common_prob_data, only : IBC_PROB,IP
-   use mpi_param, only: RANK,ROOT
 !------------------------------------------------------------------------------------
    implicit none
 !

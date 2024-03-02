@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : driver for writing vector attribute to .h5 file
+!> @brief driver for writing vector attribute to .h5 file
 !!
 !> @param[in] Id  - integer to be converted to file postfix
 !> @param[in] Idx - integer identifying vector attribute
@@ -65,7 +65,7 @@ subroutine paraview_attr_vector(Id, Idx)
 !
    50 continue
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 !  -- IMAGINARY PART --
    if (.not. PARAVIEW_COMP_IMAG(jcomp)) goto 70

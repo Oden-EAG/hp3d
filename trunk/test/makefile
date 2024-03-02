@@ -7,8 +7,12 @@ info :
 
 include ../m_options
 
-HP3D_MPIRUN ?= mpirun
-HP3D_MPI_NP ?= 2
+HP3D_MPIEXEC    ?= mpirun
+HP3D_MPIEXEC_NP ?= -np
+HP3D_MPI_NP     ?= 2
+
+HP3D_MPI_SEQ ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) 1
+HP3D_MPI_PAR ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) $(HP3D_MPI_NP)
 
 OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
@@ -34,7 +38,7 @@ SRC_FILE     = attr_to_index.F90         \
                near.F90                  \
                parameters.F90            \
                real_imag.F90
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 SRC_FILE    += conv_maxw.F90             \
                dump_maxw.F90             \
                poly_maxw.F90
@@ -68,7 +72,7 @@ TEST_SEQ = attr_to_index             \
 TEST_PAR = hexa_adapt_h_aniso        \
            hexa_adapt_h_case1        \
            hexa_adapt_h_iso
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 TEST_SEQ+= conv_maxw                 \
            dump_maxw                 \
            poly_maxw
@@ -110,7 +114,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 seq :
 	@seq_pass=0; seq_fail=0; \
 	for e in $(TEST_SEQ) ; do \
-		pass=1; make one run TEST=$$e || pass=0; \
+		pass=1; $(MAKE) one run TEST=$$e || pass=0; \
 		if [ $$((pass)) -eq 1 ]; then \
 			seq_pass=$$((seq_pass+1)); \
 		else \
@@ -134,7 +138,7 @@ seq :
 par :
 	@par_pass=0; par_fail=0; \
 	for e in $(TEST_PAR) ; do \
-		pass=1; make one run-par TEST=$$e || pass=0; \
+		pass=1; $(MAKE) one run-par TEST=$$e || pass=0; \
 		if [ $$((pass)) -eq 1 ]; then \
 			par_pass=$$((par_pass+1)); \
 		else \
@@ -177,7 +181,7 @@ all : seq par
 .PHONY : run
 run : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; $(HP3D_MPIRUN) -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPI_SEQ) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
 		printf "          test_"$(TEST)" PASSED\n\n"; \
 		true; \
@@ -191,7 +195,7 @@ run : one
 .PHONY : run-par
 run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; $(HP3D_MPIRUN) -np $(HP3D_MPI_NP) ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPI_PAR) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
 		printf "          test_"$(TEST)" PASSED\n\n"; \
 		true; \

@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
-!> Purpose : for an ACTIVE element Mdle, routine finds a big neighbor
+!> @brief for an ACTIVE element Mdle, routine finds a big neighbor
 !!           Neig across face Iface
 !!
-!! @param[in]  Mdle  - middle node
-!! @param[in]  Iface - face number
-!! @param[out] Neig  - equal or bigger neighbor across face
+!> @param[in]  Mdle  - middle node
+!> @param[in]  Iface - face number
+!> @param[out] Neig  - equal or bigger neighbor across face
 !!                     (0 if no such neighbor exists)
 !!
-!! @revision : May 12
+!> @date May 12
 !-----------------------------------------------------------------------
 subroutine big_neig_across_face(Mdle,Iface, Neig)
   use data_structure3D

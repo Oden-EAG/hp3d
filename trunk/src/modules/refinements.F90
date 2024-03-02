@@ -34,24 +34,24 @@ module refinements
   integer, parameter :: PYRAM_REF(1) = (/10/)
   integer, parameter :: BRICK_REF(7) = (/111,110,101,011,100,010,001/)
 !
-  logical :: ISO_ONLY = .FALSE.
+  logical :: ISO_ONLY = .false.
 !
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   interface elem_show
      !
      !< @date Mar 2023
-     subroutine elem_show_var1(Mdle)
+      subroutine elem_show_var1(Mdle)
        integer, intent(in) :: Mdle
-     end subroutine elem_show_var1
+      end subroutine elem_show_var1
      !
      !< @date Mar 2023
-     subroutine elem_show_var2(Mdle, Ntype, Nodesl, Norientl)
+      subroutine elem_show_var2(Mdle, Ntype, Nodesl, Norientl)
        integer, intent(in) :: Mdle, Ntype
        integer, intent(in) :: Nodesl(27), Norientl(27)
-     end subroutine elem_show_var2
+      end subroutine elem_show_var2
      !
   end interface elem_show
 #endif
@@ -63,13 +63,13 @@ module refinements
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   subroutine disable_iso_only
-    ISO_ONLY = .FALSE.
+    ISO_ONLY = .false.
   end subroutine disable_iso_only
 !
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   subroutine enable_iso_only
-    ISO_ONLY = .TRUE.
+    ISO_ONLY = .true.
   end subroutine enable_iso_only
 !
 !-----------------------------------------------------------------------
@@ -398,45 +398,45 @@ module refinements
     case(MEDG)
        select case(Kref)
          case(1)     ; Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLT)
        select case(Kref)
          case(1)    ; Nrsons=7
          case(2,3,4); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLQ)
        select case(Kref)
          case(11)   ; Nrsons=9
          case(10,01); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLB)
        select case(Kref)
          case(111)        ; Nrsons=27
          case(110,101,011); Nrsons=9
          case(100,010,001); Nrsons=9
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLP)
        select case(Kref)
          case(11); Nrsons=21
          case(10); Nrsons=7
          case(01); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLN)
        select case(Kref)
          case(11,12,13)         ; Nrsons=17
          case(21,22,23,24,25,26); Nrsons=7
          case(31,32,33,34)      ; Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLD)
        select case(Kref)
          case(10,01) ; Nrsons=7
-         case default; go to 10
+         case default; goto 10
        end select
     end select
     !

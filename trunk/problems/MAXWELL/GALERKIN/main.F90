@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - main driver for MPI Test Program
+!> @brief         - main driver for MPI Test Program
 !                         Maxwell Galerkin implementation
 !
 !----------------------------------------------------------------------
@@ -70,10 +70,10 @@ program main
       write(6,*) '// --  MPI MAXWELL GALERKIN  -- //'
       write(6,*) '//                              //'
       write(6,*)
-#if DEBUG_MODE
-      write(*,*) '    =========================    '
-      write(*,*) '      RUNNING in DEBUG_MODE      '
-      write(*,*) '    =========================    '
+#if HP3D_DEBUG
+      write(*,*) '    ===================================    '
+      write(*,*) '      RUNNING with HP3D_DEBUG enabled      '
+      write(*,*) '    ===================================    '
 #endif
    endif
    flush(6)
@@ -87,10 +87,10 @@ program main
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
          write(6,1020) "Master proc [",RANK,"] on node [",trim(pname),"]: initialize..."
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
          write(6,1020) "Worker proc [",RANK,"] on node [",trim(pname),"]: initialize..."
-         QUIET_MODE = .TRUE.
+         QUIET_MODE = .true.
       endif
    enddo
  1020 format (A,I4,A,A,A)
@@ -177,10 +177,10 @@ subroutine master_main()
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-#if DEBUG_MODE
-   write(*,*) '========================='
-   write(*,*) '  RUNNING in DEBUG_MODE  '
-   write(*,*) '========================='
+#if HP3D_DEBUG
+   write(*,*) '    ===================================    '
+   write(*,*) '      RUNNING with HP3D_DEBUG enabled      '
+   write(*,*) '    ===================================    '
 #endif
 !
 !

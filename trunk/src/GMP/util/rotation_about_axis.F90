@@ -8,7 +8,7 @@
 !> @param[inout] R          - point to be rotated / rotated point
 !> @param[out]   dR_dAlpha  - derivative
 !
-!> @revision Feb 13
+!> @date Feb 13
 !----------------------------------------------------------------------
 !
 subroutine rotation_about_axis(Ax,Pt,Alpha, R,dR_dAlpha)

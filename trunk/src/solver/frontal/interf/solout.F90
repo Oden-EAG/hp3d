@@ -64,7 +64,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    integer :: i,j,k,il,iphys,icomp,ivar,load,mdle,nn,nod
    VTYPE   :: zvoid1(1),zvoid2(1)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -101,7 +101,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                  zvoid1,zvoid2)
    endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.ge.1) then
         write(*,7001) Iel,mdle,nodm(1:nrnodm)
  7001   format(' solout: Iel,mdle = ',i8,i10,' nodm = ',10(/,10i10))
@@ -156,9 +156,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H1 variables for the node
+!      ..compute the number of active H1 variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,7100) nod,index(1:NRINDEX)
  7100       format('solout: nod,index = ',i8,2x,20i2)
@@ -178,7 +178,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarH.eq.0) cycle
 !
-!     ...loop through the nodal dof (potentially NONE)
+!      ..loop through the nodal dof (potentially NONE)
          do j=1,ndofmH(i)/nvarH
             ivar=mvarH(i); k=0
 !
@@ -203,7 +203,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%dof%zdofH(ivar,j,N_COMS) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
   7006                  format('solout: nn,load,Zele(nn) = ',i4,i3,1x,2e13.5)
@@ -218,10 +218,10 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
 !
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarH(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -235,9 +235,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H(curl) variables for the node
+!      ..compute the number of active H(curl) variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
 #endif
          nvarE=0; k=NRHVAR
@@ -254,7 +254,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarE.eq.0) cycle
 !
-!     ...loop through the nodal dof
+!      ..loop through the nodal dof
          do j=1,ndofmE(i)/nvarE
             ivar=mvarE(i); k=NRHVAR
 !
@@ -278,7 +278,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%dof%zdofE(ivar,j,N_COMS) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
                         write(*,7009)   nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)
@@ -292,9 +292,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarE(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -308,9 +308,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H(div) variables for the node
+!      ..compute the number of active H(div) variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
 #endif
          nvarV=0; k=nrVarHE
@@ -327,7 +327,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarV.eq.0) cycle
 !
-!     ...loop through the nodal dof
+!      ..loop through the nodal dof
          do j=1,ndofmV(i)/nvarV
 !
 !        ...loop through the components
@@ -353,7 +353,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%dof%zdofV(ivar,j,N_COMS) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
                         write(*,7010)   nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)
@@ -367,9 +367,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarV(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -403,10 +403,10 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !  ...loop through the nodal dof
       do j=1,ndofmQ(i)/nvarQ
 !
-!     ...loop through the components
+!      ..loop through the components
          ivar=mvarQ; k=nrVarHEV
 !
-!     ...loop through physics variables
+!      ..loop through physics variables
          do iphys=nrPhysHEV+1,NR_PHYSA
             il = NR_COMP(iphys)
             if (index(k+1) .eq. 0) then
@@ -426,7 +426,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !              ...copy the dof
                   NODES(nod)%dof%zdofQ(ivar,j,N_COMS) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) then
                      write(*,7006) nn,load,Zele(nn)
                      write(*,7011)   nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)
@@ -437,7 +437,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                end select
 !        ...end loop over components
             enddo
-!     ...end loop over physics variables
+!      ..end loop over physics variables
          enddo
 !  ...end loop over nodal dof
       enddo
@@ -445,7 +445,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       mvarQ = ivar
  500  continue
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call pause
 #endif
 !

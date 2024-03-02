@@ -1,13 +1,13 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !------------------------------------------------------------------------
-!> Purpose : calculate H1- or L2-norm of the PB interpolation error
+!> @brief calculate H1- or L2-norm of the PB interpolation error
 !            for GMP parametrizations in reference coordinates
 !!
-!! @param[out] Err   - norm of the error
-!! @param[out] Rnorm - norm of the exact geometry map
+!> @param[out] Err   - norm of the error
+!> @param[out] Rnorm - norm of the exact geometry map
 !!
-!! @date Dec 14
+!> @date Dec 14
 !------------------------------------------------------------------------
 !  REMARK
 !
@@ -209,7 +209,7 @@ end subroutine geometry_error
 !
 !
 !-------------------------------------------------------------------------
-!> Purpose : evaluate element PB interpolation error (squared) for
+!> @brief evaluate element PB interpolation error (squared) for
 !            the exact geometry map (in reference coordinates)
 !!
 !> @param[in   ] Mdle  - middle node number

@@ -1,6 +1,6 @@
 !------------------------------------------------------------------------------------------
-!> Purpose : element stiffness matrix and load vector for primal DPG elasticity problem
-!! @param[in]  Mdle      - middle node number
+!> @brief element stiffness matrix and load vector for primal DPG elasticity problem
+!> @param[in]  Mdle      - middle node number
 !------------------------------------------------------------------------------------------
 !
 !   3 equations.
@@ -22,7 +22,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       use element_data
       use sheathed_isotropic_materials
       use assembly, only: ALOC,BLOC,NR_RHS
-      use common_prob_data, only: SYMMETRY_TOL, TEST_NORM
+      use common_prob_data, only: TEST_NORM
 
       ! use m_assembly, only:  mdle_list,norderList,nedge_orientList,nface_orientList,xnodList
 
@@ -48,50 +48,50 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !  ...SHAPE FUNCTIONS
 !     H1
-      real*8, dimension(  MAXbrickH)  :: shapH
-      real*8, dimension(3,MAXbrickH)  :: gradH
+      real(8), dimension(  MAXbrickH)  :: shapH
+      real(8), dimension(3,MAXbrickH)  :: gradH
       integer                         :: nrdofH
 !     discontinuous H1
-      real*8, dimension(  MAXbrickHH) :: shapHH
-      real*8, dimension(3,MAXbrickHH) :: gradHH
+      real(8), dimension(  MAXbrickHH) :: shapHH
+      real(8), dimension(3,MAXbrickHH) :: gradHH
       integer                         :: nrdofHH
 !     H(div)
-      real*8, dimension(3,MAXbrickV)  :: shapV
-      real*8, dimension(  MAXbrickV)  :: divV ! never used
+      real(8), dimension(3,MAXbrickV)  :: shapV
+      real(8), dimension(  MAXbrickV)  :: divV ! never used
       integer                         :: nrdofV
 !  ...flux
-      real*8, dimension(  MAXbrickV)  :: shapV_n
+      real(8), dimension(  MAXbrickV)  :: shapV_n
 ! !
 ! !  ...load vector for the enriched space
-!       real*8, dimension(3*MAXbrickHH,NRRHS) :: EnrLoad
+!       real(8), dimension(3*MAXbrickHH,NRRHS) :: EnrLoad
 !
 !  ...geometry
-      real*8, dimension(3,MAXbrickH) :: xnod
-      real*8, dimension(3)           :: xi,x,rn
-      real*8, dimension(3,3)         :: dxdxi,dxidx
-      real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3)           :: xi,x,rn
+      real(8), dimension(3,3)         :: dxdxi,dxidx
+      real(8), dimension(2)           :: t
+      real(8), dimension(3,2)         :: dxidt,dxdt
 !
 !  ...stiffness tensors in master coordinates and physical coordinates
-      real*8, dimension(3,3,3,3) :: C,Symm !,CC
+      real(8), dimension(3,3,3,3) :: C,Symm !,CC
 !
 !  ...source term (don't need Neumann term)
-      real*8, dimension(3,NRRHS) :: fval
+      real(8), dimension(3,NRRHS) :: fval
 !
 !  ...3D quadrature data
-      real*8, dimension(3,MAXNINT3ADD) :: xiloc
-      real*8, dimension(MAXNINT3ADD)   :: wxi
+      real(8), dimension(3,MAXNINT3ADD) :: xiloc
+      real(8), dimension(MAXNINT3ADD)   :: wxi
 !
 !  ...2D quadrature data for boundary terms
-      real*8, dimension(2,MAXNINT2ADD) :: tloc
-      real*8, dimension(MAXNINT2ADD)   :: wt
+      real(8), dimension(2,MAXNINT2ADD) :: tloc
+      real(8), dimension(MAXNINT2ADD)   :: wt
 !
 !  ...miscellaneous
       integer :: i,j,k,l,m,n,k1,k2,k3,m1,m2,m3,n1,n2,ipt,icomp,jcomp,  &
                  nint,ifc,nsign,iprint,iflag,info,info1,   &
                  enrdof,kmin,kmax
       integer :: ndofphysics(2)
-      real*8  :: weight,wa,rjac,brjac,tmp
+      real(8)  :: weight,wa,rjac,brjac,tmp
 !
 !  ...LAPACK stuff
       character :: uplo,transa,transb

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2021
 !
-!     purpose:          - return Neumann BC value at a point X
+!> @brief         - return Neumann BC value at a point X
 !
 !     arguments:
 !

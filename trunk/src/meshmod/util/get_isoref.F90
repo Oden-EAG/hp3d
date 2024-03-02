@@ -1,8 +1,8 @@
 !---------------------------------------------------------------------------------
 !> @brief return isotropic refinement flag
 !!
-!! @param[in ] Nod  - a node number
-!! @param[out] Kref - isotropic refinement flag
+!> @param[in ] Nod  - a node number
+!> @param[out] Kref - isotropic refinement flag
 !!
 !> @date Feb 2023
 !---------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ subroutine get_isoref(Nod, Kref)
             reshape( (/1,6, 3,5, 4,2/), (/2,3/) )
       integer :: iflag, no, i,j,k, loc
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -86,7 +86,7 @@ subroutine get_isoref(Nod, Kref)
 !  .....selec appropriate refinement kind
         Kref = 10 + loc
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)

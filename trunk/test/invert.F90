@@ -7,7 +7,7 @@ program test_invert
 !
    real(8)    :: A(3,3),invA(3,3),detA
    real(8)    :: mat(3,3),det
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: B(3,3),invB(3,3),detB
    complex(8) :: zmat(3,3),zdet
 #else
@@ -37,7 +37,7 @@ program test_invert
                   ,(/ 3,3 /))
    detA = 7.d0
 !
-#if C_MODE
+#if HP3D_COMPLEX
    B    = reshape( (/ ( 1.d0, 1.d0), (-1.d0, 1.d0), (3.d0, 0.d0),   &
                       (-2.d0,-1.d0), ( 2.d0, 2.d0), (1.d0, 0.d0),   &
                       (-1.d0,-1.d0), ( 0.d0, 3.d0), (3.d0,-2.d0) /) &

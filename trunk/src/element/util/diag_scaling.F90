@@ -7,7 +7,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
@@ -31,7 +31,8 @@
 !
       integer, intent(in)       :: m, n
       integer                   :: i,j,k
-#if C_MODE
+!
+#if HP3D_COMPLEX
       complex(8), intent(inout) :: GP(m*(m+1)/2)
       complex(8), intent(inout) :: B(m,n)
 #else
@@ -80,7 +81,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
@@ -104,7 +105,7 @@
 
       integer, intent(in)       :: m, n
       integer                   :: i,j
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8), intent(inout) :: GP(m,m)
       complex(8), intent(inout) :: B(m,n)
 #else
@@ -149,7 +150,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         SA   ---> D^-1/2 * SA * D^-1/2
 !                         Rhs  ---> D^-1/2 * Rhs
@@ -176,7 +177,7 @@
 
       integer, intent(in)       :: n, Nrhs, Nz, IA(Nz), JA(Nz)
       integer                   :: i,j,k
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8), intent(in)    :: DA(n)
       complex(8), intent(inout) :: SA(Nz), Rhs(n,Nrhs)
 #else

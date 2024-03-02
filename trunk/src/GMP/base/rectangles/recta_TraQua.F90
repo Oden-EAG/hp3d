@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of
+!> @brief routine evaluates physical coordinates and derivatives of
 !!           a transfinite interpolation rectangle
 !!
-!! @param[in]  No     - rectangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in]  No     - rectangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !-----------------------------------------------------------------------
 !
 subroutine recta_TraQua(No,Eta, X,Dxdeta)
@@ -163,7 +163,7 @@ end subroutine recta_TraQua
 !
 !-----------------------------------------------------------------------
 !
-      subroutine recta_blend(Eta, Val,Dval)
+   subroutine recta_blend(Eta, Val,Dval)
 !
       implicit none
 !
@@ -228,4 +228,4 @@ end subroutine recta_TraQua
       Dval(2,k) =  0.d0
 !
 !
-      end subroutine recta_blend
+   end subroutine recta_blend

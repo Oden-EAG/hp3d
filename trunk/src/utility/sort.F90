@@ -31,7 +31,7 @@ subroutine sort(List,Val,N)
    real(8) :: valmax,valaux
    integer :: i,imax,j,laux
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 !
@@ -63,7 +63,7 @@ subroutine sort(List,Val,N)
 !..end loop through elements
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'SORTED OUT, N=', N
       do i=1,N

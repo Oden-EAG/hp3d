@@ -1,8 +1,8 @@
 !> @brief      find out the minimum refinement for closing
-!! @param[in]  Ntype - middle node type
-!! @param[in]  Kreff - refinement flags for faces
-!! @param[in]  Krefe - refinement flags for edges
-!! @param[out] Kref  - refinement flag for the middle node
+!> @param[in]  Ntype - middle node type
+!> @param[in]  Kreff - refinement flags for faces
+!> @param[in]  Krefe - refinement flags for edges
+!> @param[out] Kref  - refinement flag for the middle node
 !> @date       Feb 2023
 subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
   use refinements
@@ -22,7 +22,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 
   integer :: i, j, isum, ipass, iref, kref_trial
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -68,7 +68,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
      endif
   enddo
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7001) S_Type(Ntype)
      write(*,7002) Kreff(1:nface(Ntype))

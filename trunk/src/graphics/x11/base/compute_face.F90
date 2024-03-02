@@ -58,7 +58,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
 !
       integer :: i, j, ntype
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -71,7 +71,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
       call soleval(Mdle,xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ, &
                    Numlev, X,dxdxi,zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ            )
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !     printing
       if (iprint.eq.1) then
         write(*,*)'compute_face:'
@@ -94,7 +94,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !     printing
       if (iprint.eq.1) then
         do i=1,2

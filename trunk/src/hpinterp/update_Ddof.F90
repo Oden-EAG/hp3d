@@ -62,7 +62,7 @@ subroutine update_Ddof
 !           verification
    logical :: USE_THREADED = .false.
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -93,7 +93,7 @@ subroutine update_Ddof
       nod_flg = .false.
 !
 !  ...loop through active elements
-      do 100 iel=1,NRELES_SUBD
+      do iel=1,NRELES_SUBD
 !
          mdle = ELEM_SUBD(iel)
 !
@@ -138,7 +138,7 @@ subroutine update_Ddof
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%visit.eq.1)                 cycle
             if (is_Dirichlet_attr(nod,CONTIN)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
 #endif
@@ -165,7 +165,7 @@ subroutine update_Ddof
             if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7020) mdle,ie,nod
              7020 format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
@@ -179,7 +179,7 @@ subroutine update_Ddof
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7030) mdle,ie,nod
              7030 format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
@@ -209,7 +209,7 @@ subroutine update_Ddof
             if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7040) mdle,ifc,nod
              7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
@@ -223,7 +223,7 @@ subroutine update_Ddof
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7050) mdle,ifc,nod
              7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
@@ -237,7 +237,7 @@ subroutine update_Ddof
             if (is_Dirichlet_attr(nod,NORMAL)) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7060) mdle,ifc,nod
              7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
@@ -254,7 +254,7 @@ subroutine update_Ddof
          NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
- 100  continue
+ 100  enddo
 !
       if (nr_up_elem.eq.0) exit
 !
@@ -536,7 +536,7 @@ subroutine update_Ddof_omp
    VTYPE :: tempE(MAXEQNE,MAXquadE)
    VTYPE :: tempV(MAXEQNV,MAXquadV)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
@@ -655,7 +655,7 @@ subroutine update_Ddof_omp
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%visit.eq.1) cycle
             if (is_Dirichlet_attr(nod,CONTIN)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
 #endif
@@ -694,7 +694,7 @@ subroutine update_Ddof_omp
             if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7020) mdle,ie,nod
              7020 format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
@@ -722,7 +722,7 @@ subroutine update_Ddof_omp
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7030) mdle,ie,nod
              7030 format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
@@ -765,7 +765,7 @@ subroutine update_Ddof_omp
             if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7040) mdle,ifc,nod
              7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
@@ -792,7 +792,7 @@ subroutine update_Ddof_omp
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7050) mdle,ifc,nod
              7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
@@ -819,7 +819,7 @@ subroutine update_Ddof_omp
             if (is_Dirichlet_attr(nod,NORMAL)) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (iprint.eq.1) write(*,7060) mdle,ifc,nod
              7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif

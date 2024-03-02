@@ -156,7 +156,7 @@ end subroutine set_2D_int_DPG
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine sets up quadrature data for a 2D
+!> @brief         - routine sets up quadrature data for a 2D
 !                         element, accounting for different element
 !                         types and orders of approximation
 !

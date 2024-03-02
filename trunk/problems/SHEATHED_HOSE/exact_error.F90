@@ -1,8 +1,8 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : computes norm of the error and the exact solution
+!> @brief computes norm of the error and the exact solution
 !!
-!! @param[out]  Err   - norm of the error
-!! @param[out]  Rnorm - norm of the exact solution
+!> @param[out]  Err   - norm of the error
+!> @param[out]  Rnorm - norm of the exact solution
 !---------------------------------------------------------------------------------------
 subroutine exact_error
   use control          , only : NEXACT
@@ -14,10 +14,10 @@ subroutine exact_error
 
   integer, dimension(NR_PHYSA) :: flag
 !
-  real*8 :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
-  real*8 :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
-  real*8 :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
-  real*8 :: rateH,rateE,rateQ,rateHEVQ
+  real(8) :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
+  real(8) :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
+  real(8) :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
+  real(8) :: rateH,rateE,rateQ,rateHEVQ
 !
   integer, parameter :: nin = 13
   integer, parameter :: maxvis =2000
@@ -26,8 +26,8 @@ subroutine exact_error
   integer :: ndofH,ndofE,ndofV,ndofQ
   integer, save :: ivis = 0
   integer, save :: nrdof_tot_save
-  real*8 , save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
-  real*8 , dimension(maxvis,10), save :: rwork
+  real(8) , save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
+  real(8) , dimension(maxvis,10), save :: rwork
   integer, dimension(maxvis,10), save :: iwork
 !
 ! miscellaneous
@@ -44,9 +44,9 @@ subroutine exact_error
 !
   select case(IERROR_PROB)
   case(IERROR_L2)
-    L2PROJ = .TRUE.
+    L2PROJ = .true.
   case(IERROR_NATURAL)
-    L2PROJ = .FALSE.
+    L2PROJ = .false.
   case default
     write(*,*) 'exact_error : Error calculation type not supported'
   end select
@@ -161,7 +161,7 @@ subroutine exact_error
       rateHEVQ=0.d0 ; rateH=0.d0 ; rateE=0.d0 ; rateQ=0.d0
       if (ivis /= 0) then
         if (nrdof_tot > nrdof_tot_save) then
-          rateHEVQ = (log(errorHEVQ_save/errorHEVQ))/log(float(nrdof_tot_save)/float(nrdof_tot))
+          rateHEVQ = (log(errorHEVQ_save/errorHEVQ))/log(real(nrdof_tot_save)/real(nrdof_tot))
       endif ; endif
 !
 !     save quantities
@@ -172,7 +172,7 @@ subroutine exact_error
 !     raise visitation flag
       ivis=ivis+1
 !
-IF (.NOT. QUIET_MODE) THEN
+if (.not. QUIET_MODE) then
 !
 !     check
       if (ivis > maxvis) then
@@ -189,7 +189,7 @@ IF (.NOT. QUIET_MODE) THEN
       rwork(ivis, 6)=rateHEVQ
       iwork(ivis, 1)=IERROR_ATTR
 !
-ENDIF
+endif
 !
 !     printing
 !
@@ -204,11 +204,11 @@ ENDIF
         endif
 !
 !       print header
-IF (.NOT. L2PROJ) THEN
+if (.not. L2PROJ) then
         write(nin,*)'-- Error Report --'
 ELSE
         write(nin,*)'-- Error Report (L2 only)--'
-ENDIF
+endif
         write(nin,9998)
  9998   format('             H1            //', &
                            ' H(curl)       //', &
@@ -234,15 +234,15 @@ ENDIF
  9999 format(1x,i6,' ; ',2x,5(e12.5,' ; ',2x),f9.6,' ; ',3x,i8)
 !
 !     print to screen
-IF (.NOT.QUIET_MODE) THEN ; write(*,*)''
-IF (.NOT. L2PROJ   ) THEN ; write(*,*)'-- Error Report --'
+if (.not.QUIET_MODE) then ; write(*,*)''
+if (.not. L2PROJ   ) then ; write(*,*)'-- Error Report --'
 ELSE                      ; write(*,*)'-- Error Report (L2 only)--'
-ENDIF
+endif
                             write(*,9998)
       do i=1,ivis         ; write(*,9999)i,rwork(i,1:6),iwork(i,1)
       enddo
                             write(*,*)''
-ENDIF
+endif
 !
 !     close file
       close(unit=nin,iostat=ic)

@@ -6,18 +6,18 @@
 !!             PB interpolation; NOTE: the interpolation (projection)
 !!             is done in the reference space
 !!
-!! @param[in]  Iflag        - a flag specifying which of the objects the
+!> @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation
-!! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number
-!! @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation
+!> @param[in]  Norder       - element order
+!> @param[in]  Iface        - face number
+!> @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
 !!
-!! @param[out] Xdof         - geometry dof for the face
+!> @param[out] Xdof         - geometry dof for the face
 !!
 !> @date       Feb 2023
 !-----------------------------------------------------------------------
@@ -84,7 +84,7 @@
   integer :: nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -93,7 +93,7 @@
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Iface,S_Type(Ntype)
 7010 format('hpface: Mdle,Iflag,No,Iface,Type = ',4i4,2x,a4)
@@ -123,7 +123,7 @@
   enddo
   norder_1(nre+Iface) = Norder(nre+Iface)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('hpface: norder_1 = ',20i4)
@@ -233,7 +233,7 @@
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'hpface: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_face = ',ndofH_face
@@ -266,7 +266,7 @@
   call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, uu,naH)
   call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, uu,naH)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'hpface: k,uu(k) = '
    do k=1,ndofH_face

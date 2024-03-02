@@ -10,7 +10,7 @@
 !           The remaining fields are assumed not to be used,
 !           since the corresponding attributes are deactivated via PHYSAm.
 !-------------------------------------------------------------------------------
-!> Purpose : exact (manufactured) solution
+!> @brief exact (manufactured) solution
 !> last mod: June 2021
 !
 !> @param[in]  X      - a point in physical space

@@ -26,8 +26,8 @@
 
 !-----------------------------------------------------------------------
 !> @brief instantiate Indmap, mapping items in list to index in list
-!! @param[in]  list - list of items to map
-!! @param[in]  n    - number of items in list
+!> @param[in]  list - list of items to map
+!> @param[in]  n    - number of items in list
 !> @date  Feb 2023
 !-----------------------------------------------------------------------
       function Index_map_init(list,n)
@@ -70,7 +70,7 @@
             enddo
          endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !     ...check that list is sorted
          if(n.gt.1) then
            do i=1,n-1
@@ -89,10 +89,10 @@
 
 !-----------------------------------------------------------------------
 !> @brief destroy an instance of Indmap
-!! @param[in]  this - Indmap instance to destroy
+!> @param[in]  this - Indmap instance to destroy
 !> @date  Feb 2023
 !-----------------------------------------------------------------------
-      subroutine Index_map_finalize(this)
+   subroutine Index_map_finalize(this)
 !
          type(Indmap) :: this
 !
@@ -101,14 +101,14 @@
             deallocate(this%sorted_list, this%index)
          endif
 !
-      end subroutine Index_map_finalize
+   end subroutine Index_map_finalize
 
 
 
 !-----------------------------------------------------------------------
 !> @brief      gets index of item in sorted array (using binary search)
-!! @param[in]  this - Indmap instance to search
-!! @param[in]  item - item to search for
+!> @param[in]  this - Indmap instance to search
+!> @param[in]  item - item to search for
 !> @date  Feb 2023
 !-----------------------------------------------------------------------
       function map_index(this,item)

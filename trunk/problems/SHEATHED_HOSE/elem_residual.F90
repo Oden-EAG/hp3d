@@ -1,12 +1,12 @@
 !--------------------------------------------------------------------------
-!> Purpose : return stiffness matrix and Residual vector for element
+!> @brief return stiffness matrix and Residual vector for element
 !!
-!! @param[in]  Mdle      - an element (middle node) number
-!! @param[out] Resid     - element residual (squared)
-!! @param[out] Nref_flag - suggested h-refinement flag
+!> @param[in]  Mdle      - an element (middle node) number
+!> @param[out] Resid     - element residual (squared)
+!> @param[out] Nref_flag - suggested h-refinement flag
 !--------------------------------------------------------------------------
 !
-      subroutine elem_residual(Mdle, Resid,Nref_flag)
+   subroutine elem_residual(Mdle, Resid,Nref_flag)
 !
       use control, only : INTEGRATION
       use uweak_module, only : Gram
@@ -14,11 +14,11 @@
       use element_data
       use data_structure3D
       use sheathed_isotropic_materials
-      use common_prob_data, only: SYMMETRY_TOL, TEST_NORM
+      use common_prob_data, only: TEST_NORM
 !------------------------------------------------------------------------------------------
       implicit none
       integer, intent(in)  :: Mdle
-      real*8,  intent(out) :: Resid
+      real(8),  intent(out) :: Resid
       integer, intent(out) :: Nref_flag
 !------------------------------------------------------------------------------------------
 !  ...element and face type
@@ -41,70 +41,70 @@
 !
 !  ...SHAPE FUNCTIONS
 !     H1  (geometry and trial)
-      real*8, dimension(  MAXbrickH)  :: shapH
-      real*8, dimension(3,MAXbrickH)  :: gradH
+      real(8), dimension(  MAXbrickH)  :: shapH
+      real(8), dimension(3,MAXbrickH)  :: gradH
       integer                         :: nrdofH
 !     H1   (test)
-      real*8, dimension(  MAXbrickHH) :: shapHH
-      real*8, dimension(3,MAXbrickHH) :: gradHH
+      real(8), dimension(  MAXbrickHH) :: shapHH
+      real(8), dimension(3,MAXbrickHH) :: gradHH
       integer                         :: nrdofHH
 !     H(div)  (test)
-      real*8, dimension(3,MAXbrickVV) :: shapVV
-      real*8, dimension(  MAXbrickVV) :: divVV
-      real*8, dimension(  MAXbrickVV) :: shapVV_n
+      real(8), dimension(3,MAXbrickVV) :: shapVV
+      real(8), dimension(  MAXbrickVV) :: divVV
+      real(8), dimension(  MAXbrickVV) :: shapVV_n
       integer                         :: nrdofVV
 !
 !  ...geometry
-      real*8, dimension(3,MAXbrickH) :: xnod
-      real*8, dimension(3)           :: xi,x,rn
-      real*8, dimension(3,3)         :: dxdxi,dxidx
-      real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3)           :: xi,x,rn
+      real(8), dimension(3,3)         :: dxdxi,dxidx
+      real(8), dimension(2)           :: t
+      real(8), dimension(3,2)         :: dxidt,dxdt
       integer                        :: nsign
 !
 !  ...Resid vector for the enriched space
-      real*8, dimension(3*MAXbrickVV+3*MAXbrickHH) :: EnrResid,EnrResidc
-      ! real*8, dimension((3*MAXbrickVV+3*MAXbrickHH)*(3*MAXbrickVV+3*MAXbrickHH+1)/2) :: Gram
+      real(8), dimension(3*MAXbrickVV+3*MAXbrickHH) :: EnrResid,EnrResidc
+      ! real(8), dimension((3*MAXbrickVV+3*MAXbrickHH)*(3*MAXbrickVV+3*MAXbrickHH+1)/2) :: Gram
 !
 !  ...tensors in physical coordinates
-      real*8, dimension(3,3,3,3) :: A,AA,Symm,Skew
+      real(8), dimension(3,3,3,3) :: A,AA,Symm,Skew
 !
 !  ...source term (don't need Neumann term)
-      real*8, dimension(3,NRRHS) :: fval
+      real(8), dimension(3,NRRHS) :: fval
 !
 !  ...3D quadrature data
-      real*8, dimension(3,MAXNINT3ADD) :: xiloc
-      real*8, dimension(MAXNINT3ADD)   :: wxi
+      real(8), dimension(3,MAXNINT3ADD) :: xiloc
+      real(8), dimension(MAXNINT3ADD)   :: wxi
 !
 !  ...2D quadrature data for boundary terms
-      real*8, dimension(2,MAXNINT2ADD) :: tloc
-      real*8, dimension(MAXNINT2ADD)   :: wt
+      real(8), dimension(2,MAXNINT2ADD) :: tloc
+      real(8), dimension(MAXNINT2ADD)   :: wt
 !
 !  ...approximate solution
-      real*8, dimension(MAXEQNH,MAXbrickH) :: dofH
-      real*8, dimension(MAXEQNE,MAXbrickE) :: dofE
-      real*8, dimension(MAXEQNV,MAXbrickV) :: dofV
-      real*8, dimension(MAXEQNQ,MAXbrickQ) :: dofQ
-      real*8, dimension(  MAXEQNH  )       :: solH
-      real*8, dimension(  MAXEQNH,3)       :: dsolH
-      real*8, dimension(3,MAXEQNE  )       :: solE
-      real*8, dimension(3,MAXEQNE  )       :: curlE
-      real*8, dimension(3,MAXEQNV  )       :: solV
-      real*8, dimension(  MAXEQNV  )       :: divV
-      real*8, dimension(  MAXEQNQ  )       :: solQ
+      real(8), dimension(MAXEQNH,MAXbrickH) :: dofH
+      real(8), dimension(MAXEQNE,MAXbrickE) :: dofE
+      real(8), dimension(MAXEQNV,MAXbrickV) :: dofV
+      real(8), dimension(MAXEQNQ,MAXbrickQ) :: dofQ
+      real(8), dimension(  MAXEQNH  )       :: solH
+      real(8), dimension(  MAXEQNH,3)       :: dsolH
+      real(8), dimension(3,MAXEQNE  )       :: solE
+      real(8), dimension(3,MAXEQNE  )       :: curlE
+      real(8), dimension(3,MAXEQNV  )       :: solV
+      real(8), dimension(  MAXEQNV  )       :: divV
+      real(8), dimension(  MAXEQNQ  )       :: solQ
 !     displacement
-      real*8, dimension(3)                 :: u
+      real(8), dimension(3)                 :: u
 !     stress
-      real*8, dimension(3,3)               :: sigma
-      real*8, dimension(3)                 :: sigma_n
+      real(8), dimension(3,3)               :: sigma
+      real(8), dimension(3)                 :: sigma_n
 !     lagrange multiplier
-      real*8, dimension(3,3)               :: omega
+      real(8), dimension(3,3)               :: omega
 !
 !  ...miscellaneous
       integer :: i,j,k,m,n,k1,k2,m1,m2,ipt,kcomp,lcomp,  &
                  nint,ifc,iprint,iload,iflag,info,info1,nordtmp,  &
                  weightedWeakSymmetryConstraint
-      real*8  :: weight,wa,rjac,brjac,tmp,tmp2,DDOT,omegaWeight,l2Weight,l2StressWeight
+      real(8)  :: weight,wa,rjac,brjac,tmp,tmp2,DDOT,omegaWeight,l2Weight,l2StressWeight
 !
 !  ...LAPACK stuff
       character :: uplo
@@ -570,14 +570,14 @@
 !  ...if anisotropic h refinements -> missing
 !
 !
-      end subroutine elem_residual
+   end subroutine elem_residual
 
 !--------------------------------------------------------------------------
-!> Purpose : returns global residual
+!> @brief returns global residual
 !!
 !--------------------------------------------------------------------------
 !
-      subroutine compute_residual
+   subroutine compute_residual
 !
       use data_structure3D
       use environment, only : QUIET_MODE
@@ -588,10 +588,10 @@
       integer :: mdle
 !
 !  ...residual
-      real*8 :: resid,residual
+      real(8) :: resid,residual
 !
 !  ...rate
-      real*8 :: rate
+      real(8) :: rate
 !
 !  ...number of dof for higher order node
       integer :: ndofH,ndofE,ndofV,ndofQ
@@ -610,10 +610,10 @@
       integer, save :: nrdof_total_old
 !
 !  ...residual for the old mesh
-      real*8,  save :: residual_old
+      real(8),  save :: residual_old
 !
 !  ...residuals and rates to display
-      real*8 , dimension(2,10), save :: rwork
+      real(8) , dimension(2,10), save :: rwork
 !
 !  ...number of dof to display
       integer , dimension(10), save :: iwork
@@ -660,7 +660,7 @@
       if (ivis.ne.0) then
         if (nrdof_total.gt.nrdof_total_old) then
           rate = log(residual_old/residual)  &
-                /log(float(nrdof_total_old)/float(nrdof_total))
+                /log(real(nrdof_total_old)/real(nrdof_total))
         endif
       endif
 !
@@ -675,7 +675,7 @@
       rwork(2,ivis) = rate
 !
 !  ...display the convergence history
-      if (.NOT. QUIET_MODE) then
+      if (.not. QUIET_MODE) then
         write(*,*)''
         write(*,*)'         -- Error Report --'
         write(*,7100)
@@ -688,4 +688,4 @@
       endif
 !
 !
-      end subroutine compute_residual
+   end subroutine compute_residual

@@ -16,10 +16,10 @@ module sorts
 !
    contains
 !
-!> Purpose - permute index such that Array(Index) is ascending
-!! @param[in]   n     - size of Array
-!! @param[in]   Array - list of integers to sort
-!! @param[out]  Index - permutation of sort
+!> @brief - permute index such that Array(Index) is ascending
+!> @param[in]   n     - size of Array
+!> @param[in]   Array - list of integers to sort
+!> @param[out]  Index - permutation of sort
 !-----------------------------------------------------------------------
    subroutine sortIndex(n,Array,Index)
 !
@@ -106,14 +106,14 @@ module sorts
       end do
 
 
-   CONTAINS
+   contains
 
 
-!> Purpose - sorts two elements
-!! @param[inout]  i - first index
-!! @param[inout]  j - second index
+!> @brief - sorts two elements
+!> @param[inout]  i - first index
+!> @param[inout]  j - second index
 !-----------------------------------------------------------------------
-     subroutine exchangeIndex(i,j)
+      subroutine exchangeIndex(i,j)
 !
          implicit none
 !
@@ -126,13 +126,13 @@ module sorts
              j=swp
          end if
 !
-     end subroutine exchangeIndex
+      end subroutine exchangeIndex
 
 
 
-!> Purpose - swaps two indices
-!! @param[inout]  a - first index
-!! @param[inout]  b - second index
+!> @brief - swaps two indices
+!> @param[inout]  a - first index
+!> @param[inout]  b - second index
 !-----------------------------------------------------------------------
      pure elemental subroutine swap(a,b)
 !
@@ -145,7 +145,7 @@ module sorts
          a=b
          b=dum
 !
-     end subroutine swap
+      end subroutine swap
 !
    end subroutine sortIndex
 
@@ -155,12 +155,12 @@ module sorts
 ! Note this routine has similar function to sortIndex but also reorders
 ! real array (as opposed to integers).
 !
-!> Purpose - sorts an array of duplets (iel,residual)
-!! @param[inout] Iel_array - Index array for permutation
-!! @param[inout] Residuals - array to sort
-!! @param[in]    N         - list of integers to sort
-!! @param[in]    First     - first index of current partition (needs to be 1 on initial call)
-!! @param[in]    Last      - last index of current partition (needs to be N on initial call)
+!> @brief - sorts an array of duplets (iel,residual)
+!> @param[inout] Iel_array - Index array for permutation
+!> @param[inout] Residuals - array to sort
+!> @param[in]    N         - list of integers to sort
+!> @param[in]    First     - first index of current partition (needs to be 1 on initial call)
+!> @param[in]    Last      - last index of current partition (needs to be N on initial call)
    recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
 !
       implicit none
@@ -204,14 +204,14 @@ module sorts
 
 ! Note: qsort_triplet functions used to assemble compressed sparse formats
 !
-!> Purpose - sorts an array of triplets (IA,JA,Val) with
+!> @brief - sorts an array of triplets (IA,JA,Val) with
 !!           IA (major), JA (minor), in ascending order
-!! @param[inout] ia    - integer array (row indices)
-!! @param[inout] ja    - integer array (colun indices)
-!! @param[inout] xa    - array of values
-!! @param[in]    n     - list of integers to sort
-!! @param[in]    first - first index of current partition (1 on initial call)
-!! @param[in]    last  - last index of current partition (N on initial call)
+!> @param[inout] ia    - integer array (row indices)
+!> @param[inout] ja    - integer array (colun indices)
+!> @param[inout] xa    - array of values
+!> @param[in]    n     - list of integers to sort
+!> @param[in]    first - first index of current partition (1 on initial call)
+!> @param[in]    last  - last index of current partition (N on initial call)
    recursive subroutine qsort_triplet(ia,ja,xa,n,first,last)
 !
       implicit none
@@ -219,7 +219,7 @@ module sorts
 !..declare variables
       integer     , intent(in)    :: n,first,last
       integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8)  , intent(inout) :: xa(n)
       complex(8)                  :: x
 #else
@@ -254,14 +254,14 @@ module sorts
 
 
 
-!> Purpose - partitions triplet array around a pivot
-!! @param[in]    ip    - first index of current partition
-!! @param[in]    jp    - last index of current partition
-!! @param[in]    n     - list of integers to sort
-!! @param[out]   k     - pivot
-!! @param[inout] ia    - integer array (row indices)
-!! @param[inout] ja    - integer array (colun indices)
-!! @param[inout] xa    - array of values
+!> @brief - partitions triplet array around a pivot
+!> @param[in]    ip    - first index of current partition
+!> @param[in]    jp    - last index of current partition
+!> @param[in]    n     - list of integers to sort
+!> @param[out]   k     - pivot
+!> @param[inout] ia    - integer array (row indices)
+!> @param[inout] ja    - integer array (colun indices)
+!> @param[inout] xa    - array of values
    recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
 !
       implicit none
@@ -270,7 +270,7 @@ module sorts
       integer    , intent(in)     :: ip,jp,n
       integer    , intent(out)    :: k
       integer    , intent(inout)  :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8) , intent(inout)  :: xa(n)
       complex(8)                  :: xaux
 #else
@@ -327,7 +327,7 @@ end subroutine partition_triplet_omp
 
 
 
-!> Purpose - Threaded version of qsort_triplet
+!> @brief - Threaded version of qsort_triplet
 recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !
    implicit none
@@ -335,7 +335,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !..declare variables
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: xa(n)
 #else
    real(8)    , intent(inout) :: xa(n)
@@ -386,14 +386,14 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 
 !  Note: This array is similar to qsort_duplet but sorts by index, instead of value
 !
-!> Purpose - sorts duplet (ia,val) by index
+!> @brief - sorts duplet (ia,val) by index
    recursive subroutine qsort_double(ia,val,n,first, last)
 !
       implicit none
 !
       integer     :: i, j, n, k, l
       integer     :: ia(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8)  :: val(n), x
 #else
       real(8)     :: val(n), x

@@ -63,7 +63,7 @@ subroutine nodcor_vert(Mdle, Xnod)
 !
 !..loop through nodes
    do j=1,nrnodm
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (.not. associated(NODES(nodm(j))%dof)) then
          write(*,*) 'nodcor_vert: dof not associated.'
          stop

@@ -74,7 +74,7 @@
          enddo
 !     ...back substitution
          ! if (dznrm2(nrdof,zxp,1) .gt. 1e-5) then
-#if C_MODE
+#if HP3D_COMPLEX
             call ZPPTRS('U',nrdof,1,GRID(Igrid)%ptch(i)%zAp,zxp,nrdof,info)
 #else
             call DPPTRS('U',nrdof,1,GRID(Igrid)%ptch(i)%zAp,zxp,nrdof,info)

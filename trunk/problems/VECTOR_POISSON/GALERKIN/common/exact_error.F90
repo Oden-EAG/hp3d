@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - compute and print exact error
+!> @brief         - compute and print exact error
 !
 !----------------------------------------------------------------------
 subroutine exact_error

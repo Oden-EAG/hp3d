@@ -156,7 +156,7 @@
 
    allocate(A12(n1,n2))
 !..compute r1 = r1 -A12*A22^(-1)*r2
-#if C_MODE
+#if HP3D_COMPLEX
    A12 = transpose(conjg(GRID(Igrid)%sch(iel)%A21))
    call ZGEMV('N',n1,n2,-ZONE,A12,n1,r2,1,ZONE,r1,1)
 #else

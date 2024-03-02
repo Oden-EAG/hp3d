@@ -4,9 +4,9 @@
 !
 !--------------------------------------------------------------------
 !
-!     last revision:    - Oct 2019
+!> @date                - Oct 2019
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief               - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to
@@ -225,11 +225,11 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    case default
       rate_mesh(istep) =  &
       log(residual_mesh(istep-1)/residual_mesh(istep))/  &
-      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(error_mesh(istep-1)/error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
    end select
 !
@@ -432,7 +432,7 @@ end subroutine refine_DPG
 !
 !
 !-----------------------------------------------------------------------
-! subroutine: href_solve (uniform refinements and solve)
+!> @name href_solve (uniform refinements and solve)
 !-----------------------------------------------------------------------
 subroutine href_solve(Nflag,PhysNick, Nstop)
 !
@@ -462,8 +462,8 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
          read(*,*) nsteps
       enddo
    else
-      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
- 405  format(A,I4,A,A)
+!      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
+! 405  format(A,I4,A,A)
    endif
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
@@ -507,13 +507,13 @@ end subroutine href_solve
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_duplet
+!> @name                - qsort_duplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Oct 2019
+!> @date                - Oct 2019
 !
-!    purpose:           - sorts an array of duplets (iel,residual) with
+!> @brief               - sorts an array of duplets (iel,residual) with
 !                         residual (sort key) in descending order
 !                         (initial call needs: First = 1, Last = N)
 !

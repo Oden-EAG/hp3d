@@ -1,5 +1,5 @@
-!> Purpose : Define problem specific parameters and constants
-!! @rev - Feb.2012
+!> @brief Define problem specific parameters and constants
+!> @rev - Feb.2012
 !------------------------------------------------------------------------------
 module common_prob_data
 !
@@ -37,9 +37,9 @@ module common_prob_data
   integer :: IMAX
 
 ! pi for sinusoidal solution
-  real*8,  parameter :: PI = 4.d0*datan(1.d0)
+  real(8),  parameter :: PI = 4.d0*datan(1.d0)
 ! tolerance for singular solution
-  real*8,  parameter :: EPS = 1.d-10
+  real(8),  parameter :: EPS = 1.d-10
 
 !------------------------------------------------------------------------------
 ! ERROR (exact_error.F90)
@@ -71,15 +71,15 @@ module common_prob_data
 
 ! control variables/parameters of geometrical transformation on
 ! point coordinates
-  logical :: COORD_TRANS        = .FALSE.
-  logical :: COORD_TRANS_TRAS   = .FALSE.
-  logical :: COORD_TRANS_ROT    = .TRUE.
-  logical :: COORD_TRANS_SCAL   = .FALSE.
+  logical :: COORD_TRANS        = .false.
+  logical :: COORD_TRANS_TRAS   = .false.
+  logical :: COORD_TRANS_ROT    = .true.
+  logical :: COORD_TRANS_SCAL   = .false.
   double precision, dimension(3):: TRAS_VECTOR = (/1.d0,1.d0,1.d0/)
   double precision, dimension(3):: ROT_ANGLES = (/10.d0,45.d0,60.d0/)
 
 !------------------------------------------------------------------------------
 ! ELEMENT CALCULATIONS (elem.F90)
-  real*8,  parameter :: SYMMETRY_TOL = 1.d-9
+  real(8),  parameter :: SYMMETRY_TOL = 1.d-9
 !
 end module common_prob_data

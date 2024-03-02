@@ -20,7 +20,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine curve_QuaEl2(No,Eta, X,Dxdeta)
+   subroutine curve_QuaEl2(No,Eta, X,Dxdeta)
 !
       use GMP
       implicit none
@@ -145,4 +145,4 @@
  7004   format(' Dxdeta = ',3(e12.5,2x))
       endif
 !
-      end subroutine curve_QuaEl2
+   end subroutine curve_QuaEl2

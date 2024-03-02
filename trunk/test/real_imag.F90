@@ -5,24 +5,25 @@ program real_imag
 !
    integer :: NPASS
 !
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: a
 #else
    real(8)    :: a
 #endif
 !
-   real(8), external :: dreal_part,dimag_part
+   real(8), parameter :: eps = 1.0d-15
+   real(8), external  :: dreal_part,dimag_part
 !
    NPASS = 1
 !
-#if C_MODE
+#if HP3D_COMPLEX
    a = (1.d0, 2.d0)
-   if (dreal_part(a) .ne. 1.d0) NPASS = 0
-   if (dimag_part(a) .ne. 2.d0) NPASS = 0
+   if (dabs(dreal_part(a) - 1.d0) > eps) NPASS = 0
+   if (dabs(dimag_part(a) - 2.d0) > eps) NPASS = 0
 #else
    a = 1.d0
-   if (dreal_part(a) .ne. 1.d0) NPASS = 0
-   if (dimag_part(a) .ne. 0.d0) NPASS = 0
+   if (dabs(dreal_part(a) - 1.d0) > eps) NPASS = 0
+   if (dabs(dimag_part(a) - 0.d0) > eps) NPASS = 0
 #endif
 !
 !

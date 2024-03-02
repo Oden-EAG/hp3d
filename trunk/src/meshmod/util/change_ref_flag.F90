@@ -28,7 +28,7 @@ subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
            = reshape( (/1,2,3, 2,3,1, 3,1,2, 1,3,2, 2,1,3, 3,2,1/), &
            (/3,6/) )
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -83,7 +83,7 @@ subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
 !
       endselect
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...printing
       if (iprint.eq.1) then
          write(*,7001) How,S_Type(Ntype),Kref,Nort,Krefm

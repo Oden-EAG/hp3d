@@ -655,7 +655,7 @@ subroutine par_nested(mtype)
    mumps_bub%JOB = 1
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_bub)
 #else
    call dmumps(mumps_bub)
@@ -681,7 +681,7 @@ subroutine par_nested(mtype)
    mumps_bub%JOB = 2
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_bub)
 #else
    call dmumps(mumps_bub)
@@ -709,7 +709,7 @@ subroutine par_nested(mtype)
    mumps_bub%JOB = 3
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_bub)
 #else
    call dmumps(mumps_bub)
@@ -753,7 +753,7 @@ subroutine par_nested(mtype)
    call MPI_BARRIER(mumps_comm, ierr); time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
-#if C_MODE
+#if HP3D_COMPLEX
    mkl_stat = MKL_SPARSE_Z_CREATE_COO(Aib_sparse,              &
                                       SPARSE_INDEX_BASE_ONE,   &
                                       ni,nb,nnz_ib,            &

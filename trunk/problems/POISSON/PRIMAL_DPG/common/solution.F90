@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - compute all relevant quantities of the exact solutions
+!> @brief         - compute all relevant quantities of the exact solutions
 !
 !     arguments:
 !        in:

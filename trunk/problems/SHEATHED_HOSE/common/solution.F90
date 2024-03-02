@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------------------
-!> Purpose : compute all relevant quantities of the exact solution for the
+!> @brief compute all relevant quantities of the exact solution for the
 !            linear elasticty problem
 !!
-!! @param[in]  X        - a point in physical space
-!! @param[out] U        - value of the solution displacement
-!! @param[out] GradU    - corresponding first derivatives
-!! @param[out] Epsilon  - value of the solution strain
-!! @param[out] Sigma    - value of the solution stress
-!! @param[out] DivSigma - divergence of the solution stress
+!> @param[in]  X        - a point in physical space
+!> @param[out] U        - value of the solution displacement
+!> @param[out] GradU    - corresponding first derivatives
+!> @param[out] Epsilon  - value of the solution strain
+!> @param[out] Sigma    - value of the solution stress
+!> @param[out] DivSigma - divergence of the solution stress
 !-----------------------------------------------------------------------------------
 !
 subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
@@ -15,16 +15,16 @@ subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
   use sheathed_isotropic_materials
   implicit none
 !-----------------------------------------------------------------------------------
-  real*8, dimension(3),   intent(in)  :: X
-  real*8, dimension(3),   intent(out) :: U
-  real*8, dimension(3,3), intent(out) :: GradU
-  real*8, dimension(3,3), intent(out) :: Epsilon
-  real*8, dimension(3,3), intent(out) :: Sigma
-  real*8, dimension(3),   intent(out) :: DivSigma
+  real(8), dimension(3),   intent(in)  :: X
+  real(8), dimension(3),   intent(out) :: U
+  real(8), dimension(3,3), intent(out) :: GradU
+  real(8), dimension(3,3), intent(out) :: Epsilon
+  real(8), dimension(3,3), intent(out) :: Sigma
+  real(8), dimension(3),   intent(out) :: DivSigma
 !-----------------------------------------------------------------------------------
 ! local variables
   integer :: ndom
-  real*8  :: r
+  real(8)  :: r
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |
 !-----------------------------------------------------------------------------------
@@ -43,13 +43,13 @@ subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
 end subroutine elast_solution
 
 !-----------------------------------------------------------------------------------
-!> Purpose : evaluate an exact solution for the sheathed materials problem
+!> @brief evaluate an exact solution for the sheathed materials problem
 !!
-!! @param[in]  X       - a point in physical space
-!! @param[out] U       - value of the solution displacement
-!! @param[out] GradU   - corresponding first derivatives
-!! @param[out] Epsilon - value of the solution strain
-!! @param[out] Sigma   - value of the solution stress
+!> @param[in]  X       - a point in physical space
+!> @param[out] U       - value of the solution displacement
+!> @param[out] GradU   - corresponding first derivatives
+!> @param[out] Epsilon - value of the solution strain
+!> @param[out] Sigma   - value of the solution stress
 !
 !-----------------------------------------------------------------------------------
 !
@@ -59,18 +59,18 @@ end subroutine elast_solution
   use sheathed_isotropic_materials
   implicit none
 !-----------------------------------------------------------------------------------
-  real*8, dimension(3),   intent(in)  :: X
+  real(8), dimension(3),   intent(in)  :: X
   integer,                intent(in)  :: Ndom
-  real*8, dimension(3),   intent(out) :: U
-  real*8, dimension(3,3), intent(out) :: GradU
-  real*8, dimension(3,3), intent(out) :: Epsilon
-  real*8, dimension(3,3), intent(out) :: Sigma
+  real(8), dimension(3),   intent(out) :: U
+  real(8), dimension(3,3), intent(out) :: GradU
+  real(8), dimension(3,3), intent(out) :: Epsilon
+  real(8), dimension(3,3), intent(out) :: Sigma
 !-----------------------------------------------------------------------------------
   integer :: iprint,itest,i,j,k,l,icomp
-  real*8 :: y,z,r,c1,c2,p,denom,theta,drdy,drdz,dthetady,dthetadz,   &
+  real(8) :: y,z,r,c1,c2,p,denom,theta,drdy,drdz,dthetady,dthetadz,   &
             ur,urdr,trr,tthetatheta,diffmax,dmax,tol
-  real*8, dimension(3,3,3,3) :: A
-  real*8, dimension(3,3)     :: tmpTensor
+  real(8), dimension(3,3,3,3) :: A
+  real(8), dimension(3,3)     :: tmpTensor
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |

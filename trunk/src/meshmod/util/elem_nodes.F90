@@ -1,7 +1,7 @@
 !> @brief Return nodal connectivity
-!! @param[in]  Mdle     - middle node number
-!! @param[out] Nodesl   - element nodes
-!! @param[out] Norientl - their orientations
+!> @param[in]  Mdle     - middle node number
+!> @param[out] Nodesl   - element nodes
+!> @param[out] Norientl - their orientations
 !> @date Feb 2023
 !-----------------------------------------------------------------------
 subroutine elem_nodes(Mdle, Nodesl,Norientl)
@@ -20,7 +20,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
    integer :: nodesl_fath(27),norientl_fath(27)
    integer :: igen,nfath,nod,nson,nrgen,nrsons
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: n_nodes
    integer :: iprint
    iprint=0
@@ -28,7 +28,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
 !
 !-----------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) '------------------------------------------------'
       write(*,*) 'elem_nodes: Collecting ancestors FOR Mdle = ', Mdle
@@ -63,7 +63,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
    enddo
    nrgen = igen
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       do igen=1,nrgen
          write(*,7011) igen, nfathl(igen), isonl(igen)
@@ -77,7 +77,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
 !  nson is the top level element
    call elem_dump(nson, nodesl_fath,norientl_fath)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       call elem_show(nson)
    endif
@@ -98,7 +98,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
       endif
       nodesl_fath = Nodesl; norientl_fath = Norientl
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*) 'igen = ', igen
          call elem_show(nod,NODES(nod)%ntype,Nodesl,Norientl)
@@ -107,7 +107,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
 !
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) call pause
    if ((iprint.eq.2).and.(INFO_CONSTRAINTS.eq.1)) then
       write(*,7200) Mdle

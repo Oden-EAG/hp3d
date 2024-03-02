@@ -1,10 +1,10 @@
 !----------------------------------------------------------------------------
-!> Purpose : define options for main file specific to the problem. These can
+!> @brief define options for main file specific to the problem. These can
 !!           be consulted with the -help option when running the executable.
 !!           It is especially important to define the global environment
 !!           variables in module/environment.
 !!           The other options are problem specific.
-!! @date Jun 15
+!> @date Jun 15
 !----------------------------------------------------------------------------
 subroutine set_environment
   use environment
@@ -32,8 +32,8 @@ subroutine set_environment
   call get_option_string('-file-vis-upscale','Visualization upscale file location','../../files/vis'   ,FILE_VIS          )
   call get_option_string('-vis-level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL            )
   call get_option_string('-dir-paraview'    ,'Paraview root directory'            ,'./output/figures/' ,PARAVIEW_DIR      )
-  call get_option_bool(  '-paraview-geom'   ,'Dump geom at every Paraview call'   ,.TRUE.              ,PARAVIEW_DUMP_GEOM)
-  call get_option_bool(  '-paraview-attr'   ,'Dump solution to Paraview'          ,.TRUE.              ,PARAVIEW_DUMP_ATTR)
+  call get_option_bool(  '-paraview-geom'   ,'Dump geom at every Paraview call'   ,.true.              ,PARAVIEW_DUMP_GEOM)
+  call get_option_bool(  '-paraview-attr'   ,'Dump solution to Paraview'          ,.true.              ,PARAVIEW_DUMP_ATTR)
 !
 ! LOCAL variables relevant to the problem - see ../module/common_prob_data
 !                        option label       // explanation                                   // default      // parameter

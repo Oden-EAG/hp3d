@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - driver for the element routine
+!> @brief         - driver for the element routine
 !
 !     arguments:
 !        in:

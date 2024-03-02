@@ -1,10 +1,10 @@
 !------------------------------------------------------------------------------------
 !> @brief Controls parametrization of prisms
 !!
-!! @param[in ] No     - prism number
-!! @param[in ] Eta    - reference coordinates of a point in the reference prism
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - prism number
+!> @param[in ] Eta    - reference coordinates of a point in the reference prism
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
 !> @date Mar 2023
 !------------------------------------------------------------------------------------
@@ -72,19 +72,19 @@ subroutine prism(No,Eta, X,Dxdeta)
       endselect
 !
 !
-      end subroutine prism
+   end subroutine prism
 !
 !
 !
 !------------------------------------------------------------------------------------
 !> @brief Transfinite interpolation prism
 !!
-!! @param[in] No     - prism number
-!! @param[in] Eta    - reference coordinates of a point in the reference prism
-!! @param[in] X      - physical coordinates of the point
-!! @param[in] Dxdeta - derivatives of the physical coordinates
+!> @param[in] No     - prism number
+!> @param[in] Eta    - reference coordinates of a point in the reference prism
+!> @param[in] X      - physical coordinates of the point
+!> @param[in] Dxdeta - derivatives of the physical coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !------------------------------------------------------------------------------------
 !
 subroutine prism_TI(No,Eta, X,Dxdeta)

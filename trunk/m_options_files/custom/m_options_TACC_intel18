@@ -7,8 +7,8 @@ HP3D_BASE_PATH  = ${WORK}/hp3d/trunk
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-COMPLEX  ?= 0
-DEBUG    ?= 0
+HP3D_COMPLEX ?= 0
+HP3D_DEBUG   ?= 0
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
@@ -43,12 +43,12 @@ ifeq ($(HP3D_USE_OPENMP),1)
 endif
 
 # Optimization flags
-ifeq ($(DEBUG),0)
+ifeq ($(HP3D_DEBUG),0)
   FFLAGS += -O3 -xCORE-AVX512
 endif
 
 # Debug flags
-ifeq ($(DEBUG),1)
+ifeq ($(HP3D_DEBUG),1)
   FFLAGS += -O0 -g -traceback -check all -debug all
   FFLAGS += -check noarg_temp_created -assume noprotect_constants
 endif
@@ -92,7 +92,7 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/lib
   TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/include
   TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/lib
@@ -143,7 +143,7 @@ SRC_PATH          = src
 MODULE_PATH       = module
 LIB_PATH          = lib
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   HP3D_PATH       = $(HP3D_PATH_COMPLEX)
   OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
@@ -174,7 +174,6 @@ HP3D_LINK_LIBS    = -Wl,--start-group \
 #HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
 HP3D_LINK_LIBS   += -Wl,--end-group
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
-                    -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -217,7 +216,7 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # are preprocessed according to certain directives
 
 HP3D_USE_INTEL_MKL = 1
-PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)" \
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+                -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

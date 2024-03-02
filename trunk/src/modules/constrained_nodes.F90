@@ -117,10 +117,10 @@ module constrained_nodes
    contains
 !
 !----------------------------------------------------------------------
-!>@brief rotate vertex nodes on a constraining edge to fit edge
+!> @brief rotate vertex nodes on a constraining edge to fit edge
 !!       global coordinate
-!>@date  Feb 2023
-      subroutine rotate_edge_nodes(Norient,J)
+!> @date  Feb 2023
+   subroutine rotate_edge_nodes(Norient,J)
          integer,intent(in) :: Norient,J
          integer :: nloc(2)
          integer :: i,i1
@@ -134,13 +134,13 @@ module constrained_nodes
            enddo
          case(0)
          end select
-      end subroutine rotate_edge_nodes
+   end subroutine rotate_edge_nodes
 !
 !----------------------------------------------------------------------
-!>@brief rotate edge and vertex nodes on a constraining triangular face
+!> @brief rotate edge and vertex nodes on a constraining triangular face
 !!       to fit face global coordinates
-!>@date  Feb 2023
-      subroutine rotate_trian_nodes(Norient,J)
+!> @date  Feb 2023
+   subroutine rotate_trian_nodes(Norient,J)
          integer, intent(in) :: Norient,J
          integer :: nloc(8),nedg(3,0:5),nvrt(3,0:5)
          integer :: i,i1
@@ -155,13 +155,13 @@ module constrained_nodes
            i1 = nvrt(i,Norient)
            NFACE_CONS(4+i,J) = nloc(4+i1)
          enddo
-      end subroutine rotate_trian_nodes
+   end subroutine rotate_trian_nodes
 !
 !----------------------------------------------------------------------
-!>@brief rotate edge and vertex nodes on a constraining rectangular face
+!> @brief rotate edge and vertex nodes on a constraining rectangular face
 !!       to fit face global coordinates
-!>@date  Feb 2023
-      subroutine rotate_quadr_nodes(Norient,J)
+!> @date  Feb 2023
+   subroutine rotate_quadr_nodes(Norient,J)
          integer, intent(in) :: Norient,J
          integer :: nloc(8),nedg(4,0:7),nvrq(4,0:7)
          integer :: i,i1
@@ -177,6 +177,6 @@ module constrained_nodes
            i1 = nvrq(i,Norient)
            NFACE_CONS(4+i,J) = nloc(4+i1)
          enddo
-      end subroutine rotate_quadr_nodes
+   end subroutine rotate_quadr_nodes
 !
 end module constrained_nodes

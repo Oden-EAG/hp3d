@@ -61,7 +61,7 @@
       integer :: kH,kE,kV,kQ,j,l,kp,ivar,nrnodm
       integer :: nvarH,nvarE,nvarV
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: nvarQ
       integer :: iprint
       iprint=0
@@ -72,7 +72,7 @@
 !  ...determine element order of approximation
       call find_order(Mdle, norder)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.ge.1) then
          write(*,7000) Mdle
          call print_order(NODES(Mdle)%ntype,norder)
@@ -103,11 +103,11 @@
          call dof_out(nodm(j),Ncoms, kH,kE,kV,kQ,zvalH,zvalE,zvalV,ZdofQ)
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    7000 format(' solelm: Mdle = ',i10)
    7001 format(' solelm: nac    = ',10i10)
    7002 format(' solelm: constr = ',10(2x,f8.3))
-#if C_MODE
+#if HP3D_COMPLEX
    7003 format(' solelm: ivar,zval = ',i2,', ',10(2e12.5,2x))
    7004 format(' solelm: ZdofH = ',10(2e12.5,2x))
    7005 format(' solelm: ZdofE = ',10(2e12.5,2x))
@@ -134,7 +134,7 @@
 !  ...loop through the local dof
       do kH=1,nrdoflH
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,*) 'solelm: kH = ',kH
             write(*,7001) (   nacH(l,kH),l=1,nrconH(kH))
@@ -153,7 +153,7 @@
             enddo
          enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,7004) ZdofH(1:nvarH,kH)
          endif
@@ -172,7 +172,7 @@
 !  ...loop through the local dof
       do kE=1,nrdoflE
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.2) then
             write(*,*) 'solelm: kE =',kE
             write(*,7001) (   nacE(l,kE),l=1,nrconE(kE))
@@ -191,7 +191,7 @@
             enddo
          enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.2) then
             write(*,7005) ZdofE(1:nvarE,kE)
          endif
@@ -210,7 +210,7 @@
 !  ...loop through the local dof
       do kV=1,nrdoflV
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.3) then
             write(*,*) 'solelm: kV = ',kV
             write(*,7001) (   nacV(l,kV),l=1,nrconV(kV))
@@ -229,7 +229,7 @@
             enddo
          enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.3) then
             write(*,7006) ZdofV(1:nvarV,kV)
          endif
@@ -244,7 +244,7 @@
 !     L2 DOF'S , nothing to do...
 !-----------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.4) then
          nvarQ = NRQVAR*NRRHS
          if (nvarQ > 0) then

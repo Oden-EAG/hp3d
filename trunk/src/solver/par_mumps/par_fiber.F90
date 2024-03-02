@@ -50,7 +50,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
    implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
    type (ZMUMPS_STRUC), intent(inout) :: mumps
    type (ZMUMPS_STRUC) :: mumps_sub, mumps_int
 #else
@@ -484,7 +484,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    call MPI_BARRIER(mpi_comm_int, ierr); time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
-#if C_MODE
+#if HP3D_COMPLEX
    mkl_stat = MKL_SPARSE_Z_CREATE_COO(Aib_sparse,              &
                                       SPARSE_INDEX_BASE_ONE,   &
                                       ni,nb,nnz_ib,            &
@@ -644,7 +644,7 @@ subroutine par_fiber(mumps,nrdof,nproc,level)
    use mpi_param , only: RANK,ROOT
    use par_mumps
    implicit none
-#if C_MODE
+#if HP3D_COMPLEX
    type (ZMUMPS_STRUC), intent(inout) :: mumps
 #else
    type (DMUMPS_STRUC), intent(inout) :: mumps

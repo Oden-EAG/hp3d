@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2019
 !
-!     purpose:          - routine returns element Gram matrix
+!> @brief         - routine returns element Gram matrix
 !                         for the ultraweak Maxwell formulation
 !                         using fast integration for prism/hexa
 !
@@ -143,6 +143,7 @@
    integer, allocatable :: mapEE(:)
 !
    integer, external :: ij_upper_to_packed
+   logical, external :: dnear
 !
    integer, dimension(3,3) :: deltak
 !
@@ -438,7 +439,7 @@
             endif
 !
 !        ...update background polarization with thermal perturbation
-            if(delta_n .ne. 0.d0) then
+            if(.not. dnear(delta_n,0.d0)) then
                call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
             endif
 !

@@ -23,8 +23,8 @@ program test_poly_maxw
 !..initialize MPI environment
    call mpi_w_init
 !
-#if C_MODE==0
-   write(*,*) 'test_poly_maxw: C_MODE=0'
+#if HP3D_COMPLEX==0
+   write(*,*) 'test_poly_maxw: HP3D_COMPLEX=0'
    NPASS = 1; goto 99
 #endif
 !
@@ -353,7 +353,7 @@ end subroutine elem_maxwell
 !> @brief Returns Dirichlet data
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-   use parameters, only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
+   use parameters, only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ
 !
    implicit none
 !

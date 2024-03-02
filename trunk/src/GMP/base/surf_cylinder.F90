@@ -1,14 +1,14 @@
 !------------------------------------------------------------------------------------
-!> Purpose : cylinder parameterization
+!> @brief cylinder parameterization
 !!
-!! @param[in]  X     - physical coordinates of a point
-!! @param[in]  Point - a point on the axis
-!! @param[in]  Cvect - direction vector
-!! @param[in]  Rad   - radius
-!! @param[out] Fval  - function value
-!! @param[out] Dfdx  - function gradient
+!> @param[in]  X     - physical coordinates of a point
+!> @param[in]  Point - a point on the axis
+!> @param[in]  Cvect - direction vector
+!> @param[in]  Rad   - radius
+!> @param[out] Fval  - function value
+!> @param[out] Dfdx  - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)

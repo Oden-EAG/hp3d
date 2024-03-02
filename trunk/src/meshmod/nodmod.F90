@@ -1,6 +1,16 @@
 !
 #include "typedefs.h"
 !
+#if HP3D_DEBUG
+!> @brief This module replaces obsolete common blocks
+!> @date Mar 2024
+   module meshmod_common
+      integer :: iprint_copy_dofG,                    &
+                 iprint_copy_dofH,iprint_copy_dofE,   &
+                 iprint_copy_dofV,iprint_copy_dofQ
+   end module meshmod_common
+#endif
+!
 !---------------------------------------------------------------------
 !
 !   routine name       - nodmod
@@ -20,23 +30,16 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine nodmod(Nod,Nordn)
+   subroutine nodmod(Nod,Nordn)
 !
       use data_structure3D
       use mpi_param, only: RANK
       use par_mesh , only: DISTRIBUTED
+#if HP3D_DEBUG
+      use meshmod_common
+#endif
 !
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofG/ iprint_copy_dofG
-      common /ccopy_dofH/ iprint_copy_dofH
-      common /ccopy_dofE/ iprint_copy_dofE
-      common /ccopy_dofV/ iprint_copy_dofV
-      common /ccopy_dofQ/ iprint_copy_dofQ
-      integer :: iprint_copy_dofG,iprint_copy_dofH,iprint_copy_dofE, &
-                 iprint_copy_dofV,iprint_copy_dofQ
-#endif
 !
       integer, intent(in)   :: Nod,Nordn
 !
@@ -56,7 +59,7 @@
                  ndofH ,ndofE ,ndofV ,ndofQ,    &
                  ndofHo,ndofEo,ndofVo,ndofQo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       iprint_copy_dofG=iprint
@@ -69,7 +72,7 @@
       ntype = NODES(Nod)%ntype
       nordo = NODES(Nod)%order
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) Nod,S_Type(ntype),nordo,icase
  7010    format('nodmod: Nod,type,order,icase = ',i6,2x,a5,2x,2i3)
@@ -172,7 +175,7 @@
 !  ...calculate the new number of dof for the node
       call ndof_nod(ntype,Nordn, ndofH,ndofE,ndofV,ndofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7015) ndofH,ndofE,ndofV,ndofQ
  7015    format('nodmod: ndofH,ndofE,ndofV,ndofQ = ',4i5)
@@ -262,7 +265,7 @@
       if (allocated(zdofV)) deallocate(zdofV)
       if (allocated(zdofQ)) deallocate(zdofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7020) Nod
  7020    format('nodmod: Nod = ',i6,' HAS BEEN UPDATED ')
@@ -272,7 +275,7 @@
 #endif
 !
 !
-      end subroutine nodmod
+   end subroutine nodmod
 !
 !---------------------------------------------------------------------
 !
@@ -295,17 +298,12 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn, &
+   subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn, &
                            Xnodo,Xnodn)
 !
       use node_types
       use parameters, only: NDIMEN
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofG/ iprint
-      integer :: iprint
-#endif
 !
       integer :: Ntype,Nordo,Nordn,NdofGo,NdofGn
       real(8) :: Xnodo(NDIMEN,NdofGo)
@@ -314,7 +312,9 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofGo,NdofGn
  7010    format(' copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ', &
@@ -351,12 +351,12 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofG: DONE'
 #endif
 !
 !
-      end subroutine copy_dofG
+   end subroutine copy_dofG
 !
 !---------------------------------------------------------------------
 !
@@ -380,16 +380,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
+   subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
                            NvarH,ZdofHo,ZdofHn)
 !
       use node_types
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofH/ iprint
-      integer :: iprint
-#endif
 !
       integer :: Ntype,Nordo,Nordn,NdofHo,NdofHn,NvarH
       VTYPE   :: ZdofHo(NvarH,NdofHo)
@@ -398,7 +393,9 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofHo,NdofHn
  7010    format(' copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ', &
@@ -436,12 +433,12 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofH: DONE'
 #endif
 !
 !
-      end subroutine copy_dofH
+   end subroutine copy_dofH
 !
 !---------------------------------------------------------------------
 !
@@ -465,16 +462,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
+   subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
                            NvarE,ZdofEo,ZdofEn)
 !
       use node_types
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofE/ iprint
-      integer :: iprint
-#endif
 !
       integer :: Ntype
       integer :: Nordo,Nordn,NdofEo,NdofEn,NvarE
@@ -485,7 +477,9 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofEo,NdofEn
  7010    format(' copy_dofE: Ntype,Nordo,Nordn,NdofEo,NdofEn = ', &
@@ -631,12 +625,12 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofE: DONE'
 #endif
 !
 !
-      end subroutine copy_dofE
+   end subroutine copy_dofE
 !
 !---------------------------------------------------------------------
 !
@@ -660,16 +654,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
+   subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
                            NvarV,ZdofVo,ZdofVn)
 !
       use node_types
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofV/ iprint
-      integer :: iprint
-#endif
 !
       integer :: Ntype,Nordo,Nordn,NdofVo,NdofVn,NvarV
       VTYPE   :: ZdofVo(NvarV,NdofVo)
@@ -679,7 +668,9 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofVo,NdofVn
  7010    format(' copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ', &
@@ -819,12 +810,12 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofV: DONE'
 #endif
 !
 !
-      end subroutine copy_dofV
+   end subroutine copy_dofV
 !
 !---------------------------------------------------------------------
 !
@@ -848,16 +839,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
+   subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
                            NvarQ,ZdofQo,ZdofQn)
 !
       use node_types
       implicit none
-!
-#if DEBUG_MODE
-      common /ccopy_dofQ/ iprint
-      integer :: iprint
-#endif
 !
       integer :: Ntype,Nordo,Nordn,NdofQo,NdofQn,NvarQ
       VTYPE   :: ZdofQo(NvarQ,NdofQo)
@@ -866,7 +852,9 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofQo,NdofQn
  7010    format(' copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ', &
@@ -907,16 +895,16 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofQ: DONE'
 #endif
 !
 !
-      end subroutine copy_dofQ
+   end subroutine copy_dofQ
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_1array(M,A,Ia, B,Ib)
+   subroutine copy_1array(M,A,Ia, B,Ib)
 !
       use parameters, only: ZERO
       implicit none
@@ -928,11 +916,11 @@
       i = min(Ia,Ib)
       B(1:M,1:i) = A(1:M,1:i)
 !
-      end subroutine copy_1array
+   end subroutine copy_1array
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_2array(M,A,Ia,Ja, B,Ib,Jb)
+   subroutine copy_2array(M,A,Ia,Ja, B,Ib,Jb)
 !
       use parameters, only: ZERO
       implicit none
@@ -945,11 +933,11 @@
       j = min(Ja,Jb)
       B(1:M,1:i,1:j) = A(1:M,1:i,1:j)
 !
-      end subroutine copy_2array
+   end subroutine copy_2array
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_3array(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+   subroutine copy_3array(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
 !
       use parameters, only: ZERO
       implicit none
@@ -963,11 +951,11 @@
       k = min(Ka,Kb)
       B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
 !
-      end subroutine copy_3array
+   end subroutine copy_3array
 
 !-----------------------------------------------------------------------
 !
-      subroutine copy_1array_r(M,A,Ia, B,Ib)
+   subroutine copy_1array_r(M,A,Ia, B,Ib)
 !
       implicit none
       integer :: M,Ia,Ib,i
@@ -978,11 +966,11 @@
       i = min(Ia,Ib)
       B(1:M,1:i) = A(1:M,1:i)
 !
-      end subroutine copy_1array_r
+   end subroutine copy_1array_r
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_2array_r(M,A,Ia,Ja, B,Ib,Jb)
+   subroutine copy_2array_r(M,A,Ia,Ja, B,Ib,Jb)
 !
       implicit none
       integer :: M,Ia,Ja,Ib,Jb,i,j
@@ -994,11 +982,11 @@
       j = min(Ja,Jb)
       B(1:M,1:i,1:j) = A(1:M,1:i,1:j)
 !
-      end subroutine copy_2array_r
+   end subroutine copy_2array_r
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_3array_r(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+   subroutine copy_3array_r(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
 !
       implicit none
       integer :: M,Ia,Ja,Ka,Ib,Jb,Kb,i,j,k
@@ -1011,5 +999,5 @@
       k = min(Ka,Kb)
       B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
 !
-      end subroutine copy_3array_r
+   end subroutine copy_3array_r
 

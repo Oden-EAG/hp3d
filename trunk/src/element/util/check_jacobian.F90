@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 subroutine check_jacobian
 

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2022
 !
-!     purpose:          - main driver for sheathed hose application
+!> @brief         - main driver for sheathed hose application
 !
 !----------------------------------------------------------------------
 !
@@ -72,10 +72,10 @@ program main
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
          write(6,1020) "Master proc [", RANK, "], initialize.."
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
          write(6,1020) "Worker proc [", RANK, "], initialize.."
-         QUIET_MODE = .TRUE.
+         QUIET_MODE = .true.
       endif
    enddo
  1020 format (A,I3,A)
@@ -164,10 +164,10 @@ subroutine master_main()
     flush(6)
     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-#if DEBUG_MODE
-    write(*,*) '========================='
-    write(*,*) '  RUNNING in DEBUG_MODE  '
-    write(*,*) '========================='
+#if HP3D_DEBUG
+    write(*,*) '    ===================================    '
+    write(*,*) '      RUNNING with HP3D_DEBUG enabled      '
+    write(*,*) '    ===================================    '
 #endif
 !
 !..display menu in infinite loop
@@ -369,11 +369,11 @@ subroutine worker_main()
      idec = 1
      do while(idec /= 0)
   !
-        write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+        !write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
         count = 1; src = ROOT
         call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-        write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
-   9010 format(A,I3,A,A,I3)
+        !write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+   !9010 format(A,I3,A,A,I3)
   !
         select case(idec)
   !     ...QUIT

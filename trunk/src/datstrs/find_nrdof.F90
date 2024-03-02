@@ -1,15 +1,15 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !------------------------------------------------------------------------------
-!> Purpose : total number of H1,H(curl),H(div),L2 dof for a SINGLE
+!> @brief total number of H1,H(curl),H(div),L2 dof for a SINGLE
 !!           component
 !!
-!! @param[out] NrdofH - total number of H1      dof for a single component
-!! @param[out] NrdofE - total number of H(curl) dof for a single component
-!! @param[out] NrdofV - total number of H(div)  dof for a single component
-!! @param[out] NrdofQ - total number of L2      dof for a single component
+!> @param[out] NrdofH - total number of H1      dof for a single component
+!> @param[out] NrdofE - total number of H(curl) dof for a single component
+!> @param[out] NrdofV - total number of H(div)  dof for a single component
+!> @param[out] NrdofQ - total number of L2      dof for a single component
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------
 !  REMARK : the number of geometry dof is equal to the total number of H1 dof
 !           for a single component

@@ -1,6 +1,6 @@
 !> @brief find order of approximation for Mdle. It calls elem_nodes
-!! @param[in]  Mdle   - middle node number
-!! @param[out] Norder - order of approximation
+!> @param[in]  Mdle   - middle node number
+!> @param[out] Norder - order of approximation
 !> @date Feb 2023
 subroutine find_order(Mdle, Norder)
   use element_data
@@ -11,7 +11,7 @@ subroutine find_order(Mdle, Norder)
 !
   integer, dimension(27) :: nodesl, norientl
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -20,7 +20,7 @@ subroutine find_order(Mdle, Norder)
   call elem_nodes(Mdle, nodesl,norientl)
   call find_order_from_list(NODES(Mdle)%Ntype,nodesl, Norder)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7001) Mdle,S_Type(NODES(Mdle)%Ntype)
 7001 format('find_order: Mdle = ',i8,' Mdle type = ',a5)
@@ -34,9 +34,9 @@ end subroutine find_order
 !--------------------------------------------------------------------------
 !
 !> @brief find order of approximation from the list of nodes
-!! @param[in]  Ntype  - element type
-!! @param[in]  Nodesl - middle node number
-!! @param[out] Norder - order of approximation
+!> @param[in]  Ntype  - element type
+!> @param[in]  Nodesl - middle node number
+!> @param[out] Norder - order of approximation
 !> @date Feb 2023
 subroutine find_order_from_list(Ntype,Nodesl, Norder)
   use element_data
@@ -60,10 +60,10 @@ end subroutine find_order_from_list
 !--------------------------------------------------------------------------
 !
 !> @brief find order of approximation in the element system of coords
-!! @param[in]  Ntype        - element type
-!! @param[in]  Norder       - order of approximation
-!! @param[in]  Norient_face - orientation of element faces
-!! @param[out] Norder_loc   - order of approx in element system of coords
+!> @param[in]  Ntype        - element type
+!> @param[in]  Norder       - order of approximation
+!> @param[in]  Norient_face - orientation of element faces
+!> @param[out] Norder_loc   - order of approx in element system of coords
 !> @date Feb 2023
 subroutine find_order_loc(Ntype,Norder,Norient_face, Norder_loc)
   use element_data, only: NFAXES
@@ -104,8 +104,8 @@ end subroutine find_order_loc
 !--------------------------------------------------------------------------
 !
 !> @brief print order with format
-!! @param[in]  Ntype  - element type
-!! @param[in]  Norder - order of approximation
+!> @param[in]  Ntype  - element type
+!> @param[in]  Norder - order of approximation
 !> @date Feb 2023
 subroutine print_order(Ntype,Norder)
   use element_data

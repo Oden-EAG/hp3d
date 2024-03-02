@@ -6,7 +6,7 @@
 !
 !     latest revision:     - June 2021
 !
-!     purpose:             - routine returns element residual (squared)
+!> @brief            - routine returns element residual (squared)
 !                            for UW time-harmonic Maxwell equation
 !
 !     arguments:
@@ -163,16 +163,18 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer :: dom_flag
 !
    integer, external :: ij_upper_to_packed
+   logical, external :: dnear
 !
 !..timer
    !real(8) :: start_time,end_time
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
 !
 !--------------------------------------------------------------------------
+!
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
@@ -280,7 +282,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !  ...determine element H1 shape functions
       call shape3DH(etype,xi,norder,norient_edge,norient_face,  &
                     nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofH) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
          stop
@@ -289,7 +291,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !  ...determine element H(curl) shape functions
       call shape3DE(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapE,curlE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofE) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofE. stop.'
          stop
@@ -297,7 +299,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 #endif
 !  ...determine element L2 shape functions
       call shape3DQ(etype,xi,norder, nrdof,shapQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofQ) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofQ. stop.'
          stop
@@ -305,7 +307,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 #endif
 !  ...determine discontinuous H(curl) shape functions
       call shape3EE(etype,xi,nordP, nrdof,shapEE,curlEE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofEE) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofEE. stop.'
          stop
@@ -360,7 +362,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          endif
 !
 !     ...update background polarization with thermal perturbation
-         if(delta_n .ne. 0.d0) then
+         if(.not. dnear(delta_n,0.d0)) then
             call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
          endif
 !
@@ -703,7 +705,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
             stop
@@ -713,7 +715,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !     ...determine element H(curl) shape functions (for fluxes)
          call shape3DE(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapE,curlE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofE) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofE. stop.'
             stop
@@ -827,7 +829,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       enddo
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.gt.0) then
       write(*,7015) bload_E(1:2*NrdofEE)
  7015 format('elem_residual_maxwell: FINAL bload_E = ',10(/,6(2e12.5,2x)))
@@ -883,7 +885,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       case(MDLN,MDLD); Nref_flag = 1
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_maxwell: Mdle, Resid = ',i5,3x,e12.5)

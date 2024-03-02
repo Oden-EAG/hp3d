@@ -65,7 +65,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       integer :: iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ,ntype
       real(8) :: rjac
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -111,7 +111,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xi(1:3)
 7001    format('soleval: Mdle,Xi = ',i8,2x,3f8.3)
@@ -119,7 +119,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 7002    format('         X = ',3f8.3)
         do ivar=1,MAXEQNH
           write(*,7003) ivar,ZsolH(ivar),ZgradH(ivar,1:3)
-#if C_MODE
+#if HP3D_COMPLEX
 7003     format('         ivar, ZsolH(ivar) = ',i2,2x,2e12.5,2x,3(2e12.5,2x))
 #else
 7003     format('         ivar, ZsolH(ivar) = ',i2,2x,e12.5,3(e12.5,2x))
@@ -155,13 +155,13 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
          enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.2) then
          write(*,7001) Mdle,Xi(1:3)
          write(*,7002) X(1:3)
          do ivar=1,MAXEQNE
             write(*,7004) ivar,ZsolE(1:3,ivar),ZcurlE(1:3,ivar)
-#if C_MODE
+#if HP3D_COMPLEX
 7004        format('         ivar, ZsolE(1:3,ivar) = ',i2,2x,3(2e12.5,2x), &
                    ' ZcurlE(1:3,ivar) = ',2x,3(2e12.5,2x))
 #else
@@ -200,13 +200,13 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.2) then
         write(*,7001) Mdle,Xi(1:3)
         write(*,7002) X(1:3)
         do ivar=1,MAXEQNV
           write(*,7005) ivar,ZsolV(1:3,ivar),ZdivV(ivar)
-#if C_MODE
+#if HP3D_COMPLEX
 7005      format('         ivar, ZsolV(1:3,ivar) = ',i2,2x,3(2e12.5,2x), &
                ' ZdivV(ivar) = ',2x,2(e12.5))
 #else
@@ -236,13 +236,13 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.2) then
         write(*,7001) Mdle,Xi(1:3)
         write(*,7002) X(1:3)
         do ivar=1,MAXEQNQ
           write(*,7006) ivar,ZsolQ(ivar)
-#if C_MODE
+#if HP3D_COMPLEX
 7006      format('         ivar, ZsolQ(ivar) = ',i2,2x,2e12.5,2x)
 #else
 7006      format('         ivar, ZsolV(ivar) = ',i2,2x,e12.5,2x)

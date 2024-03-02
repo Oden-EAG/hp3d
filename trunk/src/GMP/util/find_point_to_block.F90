@@ -30,7 +30,7 @@ subroutine find_point_to_block(Np,Maxbl, Nrbl,Neigbl)
 !
       integer :: ic,if,is,nc,nf,num,lab
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -87,7 +87,7 @@ subroutine find_point_to_block(Np,Maxbl, Nrbl,Neigbl)
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) Np, Neigbl(1:Nrbl)
  7002   format('find_point_to_block: Np, Neigbl = ',i5,10i6)

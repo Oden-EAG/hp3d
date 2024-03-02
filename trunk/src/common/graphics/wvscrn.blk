@@ -1,7 +1,0 @@
-        common /wvscrn/ MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
-
-        integer MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
-c
-c  explanation of variables:
-c
-c       Screen sizes and max color (0 if in text mode!)

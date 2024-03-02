@@ -52,13 +52,13 @@ Note: PETSc can also install MPI libraries if needed,
 e.g. `--download-openmpi=yes` or `--download-mpich=yes`.
 
 ## Compiler options
-Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
-- `COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
-- `COMPLEX = 1` , stiffness matrix, load vector(s) and solution DOFs are complex-valued
-- `DEBUG   = 0` , compiler uses optimization flags, and the library performs only minimal checks during the computation
-- `DEBUG   = 1` , compiler uses debug flags, and the library performs additional checks during the computation
+Compilation is governed by preprocessing flags `HP3D_COMPLEX` and `HP3D_DEBUG`.
+- `HP3D_COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
+- `HP3D_COMPLEX = 1` , stiffness matrix, load vector(s) and solution DOFs are complex-valued
+- `HP3D_DEBUG   = 0` , compiler uses optimization flags, and the library performs only minimal checks during the computation
+- `HP3D_DEBUG   = 1` , compiler uses debug flags, and the library performs additional checks during the computation
 
-Library will be created under either `hp3d/complex/` or `hp3d/real/`.
+Library will be created under either `hp3d/trunk/complex/` or `hp3d/trunk/real/`.
 
 Additional preprocessing flags for enabling/disabling dependencies on third-party libraries:
 - `HP3D_USE_INTEL_MKL = 0/1` , disable/enable dependency on Intel MKL package

@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_block
-!     purpose:    set up block partition load balancer
+!> @name    zoltan_lb_param_block
+!> @brief   set up block partition load balancer
 !
 !     The following parameters [default values] are available:
 !        none
@@ -29,8 +29,8 @@ end subroutine zoltan_lb_param_block
 !
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_random
-!     purpose:    set up random partition load balancer
+!> @name    zoltan_lb_param_random
+!> @brief   set up random partition load balancer
 !
 !     The following parameters [default values] are available:
 !        RANDOM_MOVE_FRACTION [1.0]
@@ -65,8 +65,8 @@ end subroutine zoltan_lb_param_random
 !
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_rcb
-!     purpose:    set up recursive coordinate bisection load balancer
+!> @name    zoltan_lb_param_rcb
+!> @brief   set up recursive coordinate bisection load balancer
 !
 !     The following parameters [default values] are available:
 !        RCB_OVERALLOC [1.2]
@@ -136,8 +136,8 @@ end subroutine zoltan_lb_param_rcb
 !
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_rib
-!     purpose:    set up recursive intertial bisection load balancer
+!> @name    zoltan_lb_param_rib
+!> @brief   set up recursive intertial bisection load balancer
 !
 !     The following parameters [default values] are available:
 !        RIB_OVERALLOC [1.2]
@@ -184,8 +184,8 @@ end subroutine zoltan_lb_param_rib
 !
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_hsfc
-!     purpose:    set up Hilbert space filling curve load balancer
+!> @name    zoltan_lb_param_hsfc
+!> @brief   set up Hilbert space filling curve load balancer
 !
 !     The following parameters [default values] are available:
 !        KEEP_CUTS [0]
@@ -215,8 +215,8 @@ end subroutine zoltan_lb_param_hsfc
 !
 !----------------------------------------------------------------------
 !
-!     routine:    zoltan_lb_param_hsfc
-!     purpose:    set up Hilbert space filling curve load balancer
+!> @name    zoltan_lb_param_hsfc
+!> @brief   set up Hilbert space filling curve load balancer
 !
 !     The following parameters [default values] are available:
 !        GRAPH_PACKAGE [PHG]

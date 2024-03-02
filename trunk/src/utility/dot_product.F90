@@ -39,7 +39,7 @@ end subroutine dot_product
 !
 !     latest revision:  - May 2020
 !
-!     purpose:          - compute dot product of real and
+!> @brief         - compute dot product of real and
 !                         (possibly) complex valued vector
 !
 !---------------------------------------------------------------------

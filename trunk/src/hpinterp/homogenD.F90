@@ -5,12 +5,12 @@
 !> @brief Routine determines whether for a node case, all supported
 !!        variable components of a specific variable type with
 !!        Dirichlet flags have homogeneous BC data
-!! @param[in]  Dtype   - discretization type
-!! @param[in]  Icase   - encoded nodal case number
-!! @param[in]  Bcond   - encoded nodal BC flag
-!! @param[out] Is_homD - true/false
-!! @param[out] Ncase   - decoded nodal case numbers
-!! @param[out] Ibcnd   - decoded nodal BC flags
+!> @param[in]  Dtype   - discretization type
+!> @param[in]  Icase   - encoded nodal case number
+!> @param[in]  Bcond   - encoded nodal BC flag
+!> @param[out] Is_homD - true/false
+!> @param[out] Ncase   - decoded nodal case numbers
+!> @param[out] Ibcnd   - decoded nodal BC flags
 !
 !> @date Mar 2023
 !-----------------------------------------------------------------------

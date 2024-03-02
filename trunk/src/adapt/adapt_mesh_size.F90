@@ -1,12 +1,12 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !-----------------------------------------------------------------------
-!> Purpose : routine employs the greedy strategy to perform adaptive
+!> @brief routine employs the greedy strategy to perform adaptive
 !!           h-refinements
 !!
 !> @param[in] Idom  - target domain, if 0, examine all elements
 !> @param[in] H     - control element size
-!> rev@Dec 13
+!> @date Dec 2013
 !-----------------------------------------------------------------------
 subroutine adapt_mesh_size(Idom,Hmax)
   !

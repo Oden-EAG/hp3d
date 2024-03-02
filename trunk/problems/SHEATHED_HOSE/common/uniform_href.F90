@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - performs single uniform h-refinement
+!> @brief         - performs single uniform h-refinement
 !
 !     arguments:
 !        in:
@@ -125,7 +125,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
    end select
 !
@@ -226,8 +226,8 @@ subroutine href_solve()
          read(*,*) nsteps
       enddo
    else
-      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
- 405  format(A,I4,A,A)
+!      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
+! 405  format(A,I4,A,A)
    endif
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)

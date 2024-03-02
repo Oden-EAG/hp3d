@@ -8,8 +8,8 @@
 # This m_options file uses compiler settings, library paths, and
 # include paths directly from the PETSc configuration.
 
-COMPLEX ?= 0
-DEBUG   ?= 0
+HP3D_COMPLEX ?= 0
+HP3D_DEBUG   ?= 0
 
 # Optional dependencies
 HP3D_USE_INTEL_MKL = 0
@@ -24,7 +24,7 @@ HP3D_USE_X11       = 0
 HP3D_BASE_PATH = /Users/user/hp3D/LIBS/hp3d/trunk
 
 PETSC_DIR ?= /Users/user/hp3D/LIBS/petsc
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   PETSC_ARCH ?= arch-darwin-complex
 else
   PETSC_ARCH ?= arch-darwin-real
@@ -53,18 +53,23 @@ else
 endif
 
 # Optimization flags
-ifeq ($(DEBUG),0)
+ifeq ($(HP3D_DEBUG),0)
   FFLAGS += -O3
 endif
 
 # Debug flags
-ifeq ($(DEBUG),1)
+ifeq ($(HP3D_DEBUG),1)
   FFLAGS += -Og -g -fbacktrace -fcheck=all
 endif
 
 # Preprocessor defs to call Fortran from C
 # (-DAdd_ or -DAdd__ or -DUPPER)
 CDEFS   = -DAdd_
+
+# Utility used to launch MPI jobs
+HP3D_MPIEXEC    = $(MPIEXEC)
+HP3D_MPIEXEC_NP = -np
+HP3D_MPI_NP     = 2
 
 #------------------------------------------------------------------
 # LINKING
@@ -87,7 +92,7 @@ SRC_PATH          = src
 MODULE_PATH       = module
 LIB_PATH          = lib
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   HP3D_PATH       = $(HP3D_PATH_COMPLEX)
   OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
@@ -111,7 +116,6 @@ HP3D_LIB_EXTRA_INCS = $(CPPFLAGS)
 
 HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
-                    -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,8 +131,8 @@ PROB_INCS   += $(HP3D_LINK_INCS)   \
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
-PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)" \
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+                -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
                 -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \

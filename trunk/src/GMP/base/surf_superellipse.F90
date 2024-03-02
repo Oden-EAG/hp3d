@@ -1,18 +1,18 @@
 !------------------------------------------------------------------------------------
-!> Purpose : superellipse parameterization
+!> @brief superellipse parameterization
 !!
-!! @param[in]  X     - physical coordinates of a point
-!! @param[in]  Point - a point on the axis
-!! @param[in]  Axis1 - first semiaxis vector
-!! @param[in]  Axis2 - second semiaxis vector
-!! @param[in]  Rs1   - first semiaxis radius
-!! @param[in]  Rs2   - second semiaxis radius
-!! @param[in]  Pw1   - power of first coordinate
-!! @param[in]  Pw2   - power of second coordinate
-!! @param[out] Fval  - function value
-!! @param[out] Dfdx  - function gradient
+!> @param[in]  X     - physical coordinates of a point
+!> @param[in]  Point - a point on the axis
+!> @param[in]  Axis1 - first semiaxis vector
+!> @param[in]  Axis2 - second semiaxis vector
+!> @param[in]  Rs1   - first semiaxis radius
+!> @param[in]  Rs2   - second semiaxis radius
+!> @param[in]  Pw1   - power of first coordinate
+!> @param[in]  Pw2   - power of second coordinate
+!> @param[out] Fval  - function value
+!> @param[out] Dfdx  - function gradient
 !!
-!! @revision Feb 18
+!> @date Feb 18
 !------------------------------------------------------------------------------------
 subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !

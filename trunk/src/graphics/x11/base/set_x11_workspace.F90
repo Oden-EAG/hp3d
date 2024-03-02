@@ -1,9 +1,9 @@
 !-------------------------------------------------------------------------------
-!> Purpose : set the
+!> @brief set the
 !!
-!! @param[in]  Nxigtr
-!! @param[in]  Nxigstr
-!! @param[in]  Nxrgtrz
+!> @param[in]  Nxigtr
+!> @param[in]  Nxigstr
+!> @param[in]  Nxrgtrz
 !!
 !-------------------------------------------------------------------------------
 !
@@ -23,7 +23,7 @@ subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
   MXIGSTR = Nxigstr
   MXRGTRZ = Nxrgtrz
 
-  INITIALIZED = .TRUE.
+  INITIALIZED = .true.
 
 end subroutine set_x11_workspace
 

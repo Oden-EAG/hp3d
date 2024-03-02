@@ -174,7 +174,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
    integer :: nint,iflag,l,i,j,ibeg1,ibeg2,icomp,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !
@@ -220,7 +220,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,*)' get_elem_L2NormDiff: Mdle,ndom,rjac = ', Mdle,ndom,rjac
@@ -407,7 +407,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
    integer :: nint,iflag,l,i,ibeg,icomp,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !
@@ -452,7 +452,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,*)' get_elem_L2NormAttr: Mdle,ndom,rjac = ', Mdle,ndom,rjac
@@ -485,9 +485,9 @@ end subroutine get_elem_L2NormAttr
 !
 !
 !-------------------------------------------------------------------
-!  routine: get_Norm
+!> @name get_Norm
 !
-!  purpose: evaluates the norm of specified physical attributes
+!> @brief evaluates the norm of specified physical attributes
 !           and specified component by integrating the current
 !           solution over the entire domain
 !
@@ -599,9 +599,9 @@ end subroutine get_Norm
 !
 !-------------------------------------------------------------------
 !
-!  routine: get_elem_Norm
+!> @name get_elem_Norm
 !
-!  purpose: evaluates the magnitude of a physical attribute and
+!> @brief evaluates the magnitude of a physical attribute and
 !           component by integrating the current solution over a
 !           given middle node
 !
@@ -662,7 +662,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    integer :: nint,iattr,l,i,j,ibeg,iflag,icomp,ivar,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !
@@ -715,7 +715,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -765,7 +765,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -815,7 +815,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -864,7 +864,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac

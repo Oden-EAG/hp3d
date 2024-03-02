@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------
-!> Purpose : source term
+!> @brief source term
 !!
-!! @param[in]  Mdle  - element (middle node) number
-!! @param[in]  X     - physical coordinates
-!! @param[out] Fval  - rhs
+!> @param[in]  Mdle  - element (middle node) number
+!> @param[in]  X     - physical coordinates
+!> @param[out] Fval  - rhs
 !------------------------------------------------------------------------------
 !
 subroutine getf(Mdle,X, Fval)
@@ -12,15 +12,15 @@ subroutine getf(Mdle,X, Fval)
   implicit none
 !------------------------------------------------------------------------------
   integer,                       intent(in)  :: Mdle
-  real*8, dimension(3),          intent(in)  :: X
-  real*8, dimension(1:3,NR_RHS), intent(out) :: Fval
+  real(8), dimension(3),          intent(in)  :: X
+  real(8), dimension(1:3,NR_RHS), intent(out) :: Fval
 !------------------------------------------------------------------------------
 ! solution variables
-  real*8, dimension(3)   :: u
-  real*8, dimension(3,3) :: gradu
-  real*8, dimension(3,3) :: epsilon
-  real*8, dimension(3,3) :: sigma
-  real*8, dimension(3)   :: divsigma
+  real(8), dimension(3)   :: u
+  real(8), dimension(3,3) :: gradu
+  real(8), dimension(3,3) :: epsilon
+  real(8), dimension(3,3) :: sigma
+  real(8), dimension(3)   :: divsigma
 ! counters
   integer :: iload
 !------------------------------------------------------------------------------
@@ -57,13 +57,13 @@ endsubroutine getf
 !
 !
 !------------------------------------------------------------------------------
-!> Purpose : Neumann load
+!> @brief Neumann load
 !!
-!! @param[in]  Mdle  - element (middle node) number
-!! @param[in]  Ibc   - boundary conditions
-!! @param[in]  X     - physical coordinates
-!! @param[in]  Rn    - outward unit vector
-!! @param[out] Gval  - Neumann loads
+!> @param[in]  Mdle  - element (middle node) number
+!> @param[in]  Ibc   - boundary conditions
+!> @param[in]  X     - physical coordinates
+!> @param[in]  Rn    - outward unit vector
+!> @param[out] Gval  - Neumann loads
 !------------------------------------------------------------------------------
 !
 subroutine getg(Mdle,Ibc,X,Rn, Gval)
@@ -72,16 +72,16 @@ subroutine getg(Mdle,Ibc,X,Rn, Gval)
   implicit none
 !------------------------------------------------------------------------------
   integer,                     intent(in)  :: Mdle
-  real*8, dimension(3),        intent(in)  :: X,Rn
+  real(8), dimension(3),        intent(in)  :: X,Rn
   integer,                     intent(in)  :: Ibc
-  real*8, dimension(3,NR_RHS), intent(out) :: Gval
+  real(8), dimension(3,NR_RHS), intent(out) :: Gval
 !------------------------------------------------------------------------------
 ! solution variables
-  real*8, dimension(3)   :: u
-  real*8, dimension(3,3) :: gradu
-  real*8, dimension(3,3) :: epsilon
-  real*8, dimension(3,3) :: sigma
-  real*8, dimension(3)   :: divsigma
+  real(8), dimension(3)   :: u
+  real(8), dimension(3,3) :: gradu
+  real(8), dimension(3,3) :: epsilon
+  real(8), dimension(3,3) :: sigma
+  real(8), dimension(3)   :: divsigma
 ! counters
   integer :: iload,j
 !------------------------------------------------------------------------------

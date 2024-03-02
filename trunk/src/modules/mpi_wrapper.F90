@@ -2,8 +2,8 @@
 #include "typedefs.h"
 !
 !----------------------------------------------------------------------
-!     module:              mpi_wrapper
-!     last modified:       Feb 2024
+!> @name       mpi_wrapper
+!> @date       Feb 2024
 !----------------------------------------------------------------------
 module mpi_wrapper
 !
@@ -22,8 +22,8 @@ module mpi_wrapper
    contains
 !
 !----------------------------------------------------------------------
-!     routine:    mpi_w_init
-!     purpose:    initialize MPI environment, and set parameters
+!> @name    mpi_w_init
+!> @brief   initialize MPI environment, and set parameters
 !----------------------------------------------------------------------
    subroutine mpi_w_init()
 !
@@ -68,8 +68,8 @@ module mpi_wrapper
 !
 !
 !----------------------------------------------------------------------
-!     routine:    mpi_w_finalize
-!     purpose:    close MPI environment
+!> @name    mpi_w_finalize
+!> @brief   close MPI environment
 !----------------------------------------------------------------------
    subroutine mpi_w_finalize()
       integer :: ierr
@@ -91,8 +91,8 @@ module mpi_wrapper
    end subroutine mpi_w_finalize
 !
 !----------------------------------------------------------------------
-!     routine:    mpi_w_handle_err
-!     purpose:    handle error code returned by an MPI function
+!> @name    mpi_w_handle_err
+!> @brief   handle error code returned by an MPI function
 !----------------------------------------------------------------------
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr
@@ -108,10 +108,10 @@ module mpi_wrapper
 end module mpi_wrapper
 
 !----------------------------------------------------------------------
-!     module:              mpif90_wrapper
-!     purpose:             MPI wrapper module using F90 MPI binding
+!> @name       mpif90_wrapper
+!> @brief            MPI wrapper module using F90 MPI binding
 !                          (some dependencies require F90 MPI)
-!     last modified:       Feb 2024
+!> @date       Feb 2024
 !----------------------------------------------------------------------
 module mpif90_wrapper
 !
@@ -124,8 +124,8 @@ module mpif90_wrapper
    contains
 !
 !----------------------------------------------------------------------
-!     routine:    mpif90_w_handle_err
-!     purpose:    handle error code returned by an MPI function
+!> @name    mpif90_w_handle_err
+!> @brief   handle error code returned by an MPI function
 !----------------------------------------------------------------------
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr

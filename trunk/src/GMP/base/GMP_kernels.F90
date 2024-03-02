@@ -1,11 +1,11 @@
 !----------------------------------------------------------------------
 !> @brief Curve kernel parametrization
 !!
-!! @param[in ] No      - curve number
-!! @param[in ] T       - local curve coordinate
-!! @param[in ] Norient - curve orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - curve number
+!> @param[in ] T       - local curve coordinate
+!> @param[in ] Norient - curve orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
 !> @date Mar 2023
@@ -47,16 +47,16 @@ end subroutine curveK
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : curve bubble parametrization
+!> @brief curve bubble parametrization
 !!
-!! @param[in ] No      - curve number
-!! @param[in ] T       - local curve coordinate
-!! @param[in ] Norient - curve orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - curve number
+!> @param[in ] T       - local curve coordinate
+!> @param[in ] Norient - curve orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine curveB(No,T,Norient, X,Dxdt)
 !
@@ -117,16 +117,16 @@ end subroutine curveB
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : triangle kernel parameterization
+!> @brief triangle kernel parameterization
 !!
-!! @param[in ] No      - triangle number
-!! @param[in ] T       - local triangle coordinates
-!! @param[in ] Norient - triangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - triangle number
+!> @param[in ] T       - local triangle coordinates
+!> @param[in ] Norient - triangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine trianK(No,T,Norient, X,Dxdt)
 !
@@ -164,16 +164,16 @@ end subroutine trianK
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : triangle bubble parameterization
+!> @brief triangle bubble parameterization
 !!
-!! @param[in ] No      - triangle number
-!! @param[in ] T       - local triangle coordinates
-!! @param[in ] Norient - triangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - triangle number
+!> @param[in ] T       - local triangle coordinates
+!> @param[in ] Norient - triangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine trianB(No,T,Norient, X,Dxdt)
 !
@@ -376,16 +376,16 @@ end subroutine trianB
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : rectangle bubble parameterization
+!> @brief rectangle bubble parameterization
 !!
-!! @param[in ] No      - rectangle number
-!! @param[in ] T       - local rectangle coordinates
-!! @param[in ] Norient - rectangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - rectangle number
+!> @param[in ] T       - local rectangle coordinates
+!> @param[in ] Norient - rectangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine rectaB(No,T,Norient, X,Dxdt)
 !
@@ -797,7 +797,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !----------------------------------------------------------------------
 !       2nd TERM OF COMPARISON: xw, dxwdse                            !
 !  .....evaluate local edge parameterization of master triangle       !
-        call edge_param(QUAD,ie,se, sw,dswdse)                      !
+        call edge_param(QUAD,ie,se, sw,dswdse)                        !
 !  .....evaluate rectangle parameterization                           !
         call recta(No,sw, xw,dxwds)                                   !
 !  .....compute derivative wrt edge parameter                         !
@@ -805,7 +805,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !  .....evaluate the edge bubble                                      !
         xw(1:3) = xw(1:3)                           &                 !
                 - (xv(1:3,iv1)*(1.d0 - se) + xv(1:3,iv2)*se)          !
-        dxwdse(1:3) = dxwdse(1:3)                            &         !
+        dxwdse(1:3) = dxwdse(1:3)                            &        !
                 - (xv(1:3,iv2) -  xv(1:3,iv1))                        !
 !----------------------------------------------------------------------
 !       COMPARE                                                       !
@@ -814,17 +814,17 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
           smax = max(smax,abs(xw(ivar) - xc(ivar)))                   !
           dmax = max(dmax,abs(dxcdse(ivar) - dxwdse(ivar)))           !
         enddo                                                         !
-        if ((smax.gt.GEOM_TOL).or.(dmax.gt.GEOM_TOL)) then      !
+        if ((smax.gt.GEOM_TOL).or.(dmax.gt.GEOM_TOL)) then            !
           write(*,7002) No,ie,smax,dmax                               !
  7002     format(' rectaB: No,ie,smax,dmax = ',i5,i2,2e12.5)          !
-!c          call pause                                                  !
-!cc          if (iprint .eq. 1) call my_tests                            !
-!cc          iprint = 1                                                  !
-!cc          write(*,9000) No                                            !
- 9000     format(' trianB: rerunning rountine for triangle No = ',I6, &!
-      ' with printing flag on.')                                      !
-!cc          call pause                                                  !
-!cc          go to 10                                                    !
+!!          call pause                                                !
+!!!          if (iprint .eq. 1) call my_tests                         !
+!!!          iprint = 1                                               !
+!!!          write(*,9000) No                                         !
+ 9000     format(' trianB: rerunning rountine for triangle No = ', &  !
+                           I6,' with printing flag on.')              !
+!!!          call pause                                               !
+!!!          goto 10                                                 !
         endif                                                         !
 !======================================================================
 !

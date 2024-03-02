@@ -1,9 +1,9 @@
 #include "typedefs.h"
 
 !> @brief   copy local dof into datastructure
-!! @param[in] Nod                     - a node number
-!! @param[in] Ncoms                   - solution component set: 1,...,NRCOMS
-!! @param[in] ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
+!> @param[in] Nod                     - a node number
+!> @param[in] Ncoms                   - solution component set: 1,...,NRCOMS
+!> @param[in] ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
 !!                                      for the node in the expanded mode
 !> @date    Sep 2023
 subroutine dof_in(Nod,Ncoms,ZvalH,ZvalE,ZvalV,ZvalQ)

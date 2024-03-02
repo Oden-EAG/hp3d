@@ -7,7 +7,7 @@
 !
 !     latest revision:  - Mar 2019
 !
-!     purpose:          - routine returns unconstrained DPG
+!> @brief         - routine returns unconstrained DPG
 !                         stiffness matrix and load vector
 !                         for the primal DPG formulation for a single
 !                         step of the transient heat equation
@@ -168,7 +168,7 @@ subroutine elem_heat(Mdle,                   &
 !
    integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: icomp,iphys
    integer :: ibc(6,NRINDEX)
 !..Set iprint = 0/1 (Non-/VERBOSE)
@@ -180,7 +180,9 @@ subroutine elem_heat(Mdle,                   &
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
+!..Set iprint = 0/1 (Non-/VERBOSE)
+   iprint = 0
    if (iprint.eq.1) then
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
@@ -247,7 +249,7 @@ subroutine elem_heat(Mdle,                   &
          stop
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..get the element boundary conditions flags
    call find_bc(Mdle, ibc)
    if (iprint.eq.1) then
@@ -293,7 +295,7 @@ subroutine elem_heat(Mdle,                   &
 !  ...H1 shape functions
       call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofH) then
          write(*,*) 'elem_heat: INCONSISTENCY NrdofH. stop.'
          stop
@@ -302,7 +304,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !  ...discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofHH) then
          write(*,*) 'elem_heat: INCONSISTENCY NrdofHH. stop.'
          stop
@@ -439,7 +441,7 @@ subroutine elem_heat(Mdle,                   &
 !..end loop through integration points
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..printing Gram matrix
 !   iprint = 0
 !   if (iprint.eq.1) then
@@ -489,7 +491,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !     ...determine discontinuous H1 shape functions
          call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofHH) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofHH. stop.'
             stop
@@ -499,7 +501,7 @@ subroutine elem_heat(Mdle,                   &
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofH. stop.'
             stop
@@ -510,7 +512,7 @@ subroutine elem_heat(Mdle,                   &
 !     ...for interfaces only (no bubbles)
          call shape3DV(etype,xi,norderi,norient_face, &
                        nrdof,shapV,divV)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofVi) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofV. stop.'
             stop

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - driver for the element routine
+!> @brief         - driver for the element routine
 !
 !     arguments:
 !        in:
@@ -100,7 +100,7 @@ end subroutine elem
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - compute element stiffness and load
+!> @brief         - compute element stiffness and load
 !
 !     arguments:
 !        in:
@@ -475,9 +475,9 @@ subroutine elem_poisson(Mdle,                   &
 end subroutine elem_poisson
 
 !----------------------------------------------------------------------
-!  routine: compute_enriched_order
+!> @name compute_enriched_order
 !----------------------------------------------------------------------
-!  purpose: - compute enriched order vector based on input Nord
+!> @brief - compute enriched order vector based on input Nord
 !             (enriched order based on mdle order and Nord only)
 !----------------------------------------------------------------------
 subroutine compute_enriched_order(EType,Nord, Norder)

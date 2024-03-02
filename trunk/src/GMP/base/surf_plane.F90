@@ -1,13 +1,13 @@
 !------------------------------------------------------------------------------------
-!> Purpose : plane parameterization
+!> @brief plane parameterization
 !!
-!! @param[in]    X    - physical coordinates of a point
-!! @param[in]    X0   - a point on the plane
-!! @param[inout] Rn   - normal to the plane
-!! @param[out]   Fval - function value
-!! @param[out]   Dfdx - function gradient
+!> @param[in]    X    - physical coordinates of a point
+!> @param[in]    X0   - a point on the plane
+!> @param[inout] Rn   - normal to the plane
+!> @param[out]   Fval - function value
+!> @param[out]   Dfdx - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine plane1(X,X0,Rn, Fval,Dfdx)
@@ -23,15 +23,15 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
 !------------------------------------------------------------------------------------
 !
       dRn=0.d0
-      do 10 i=1,3
+      do i=1,3
         dRh = Rn(i)*Rn(i)
         dRn = dRn+dRh
- 10   continue
+      enddo
 !
       dRn = dsqrt(dRn)
-      do 20 i=1,3
+      do i=1,3
         Rn(i) = Rn(i)/dRn
- 20   continue
+      enddo
 !
 !  ...caculate coefficients of the plane
       d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) )
@@ -47,14 +47,14 @@ end subroutine plane1
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : plane parameterization
+!> @brief plane parameterization
 !!
-!! @param[in]  X       - physical coordinates of a point
-!! @param[in]  X1,2,3  - 3 points defining the plane
-!! @param[out] Fval    - function value
-!! @param[out] Dfdx    - function gradient
+!> @param[in]  X       - physical coordinates of a point
+!> @param[in]  X1,2,3  - 3 points defining the plane
+!> @param[out] Fval    - function value
+!> @param[out] Dfdx    - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
@@ -97,13 +97,13 @@ end subroutine plane2
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : routine determines a unit vector orthogonal to a plane that passes
+!> @brief routine determines a unit vector orthogonal to a plane that passes
 !!           through a point X and is at a minimum distance from points Y1,2,3
 !!
-!! @param[in ] X,Y  - coordinates of points
-!! @param[out] Rn   - unit normal to the plane
+!> @param[in ] X,Y  - coordinates of points
+!> @param[out] Rn   - unit normal to the plane
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 subroutine determine_plane1(X,Y, Rn)
 !
@@ -168,13 +168,13 @@ end subroutine determine_plane1
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : routine determines a unit vector orthogonal to a plane that passes
+!> @brief routine determines a unit vector orthogonal to a plane that passes
 !!           through points X1,2 and is at a minimum distance from points Y1,2
 !!
-!! @param[in ] X,Y  - coordinates of points
-!! @param[out] Rn   - unit normal to the plane
+!> @param[in ] X,Y  - coordinates of points
+!> @param[out] Rn   - unit normal to the plane
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 subroutine determine_plane2(X,Y, Rn)
 !
@@ -291,7 +291,7 @@ subroutine determine_plane2(X,Y, Rn)
       endif
       rlambda = w(1)
 !wr10.05.05
-!cccc x1(1:3) = b(1:3,1)
+!!!!! x1(1:3) = b(1:3,1)
       x1(1:2) = b(1:2,1)
 !
       if (iprint.eq.1) then

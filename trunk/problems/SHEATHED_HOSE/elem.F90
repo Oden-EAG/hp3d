@@ -1,14 +1,13 @@
 !------------------------------------------------------------------------------------
-!> Purpose : return stiffness matrix and load vector for element
+!> @brief return stiffness matrix and load vector for element
 !!
-!! @param[in]  Mdle   - an element (middle node) number
-!! @param[out] Nrdof  - number of dof for a single component
-!! @param[out] Itest  - index for assembly
-!! @param[out] Itrial - index for assembly
+!> @param[in]  Mdle   - an element (middle node) number
+!> @param[out] Nrdof  - number of dof for a single component
+!> @param[out] Itest  - index for assembly
+!> @param[out] Itrial - index for assembly
 !------------------------------------------------------------------------------------
 !
 subroutine elem(Mdle, Itest,Itrial)
-  use parameters, only : ZERO
   use physics   , only : NR_PHYSA
   use data_structure3D
 !------------------------------------------------------------------------------------

@@ -1,13 +1,13 @@
 !------------------------------------------------------------------------------------
-!> Purpose : ellipsoid parameterization
+!> @brief ellipsoid parameterization
 !!
-!! @param[in]  X       - physical coordinates of a point
-!! @param[in]  Center  - center
-!! @param[in]  Rs1,2,3 - semiaxis
-!! @param[out] Fval    - function value
-!! @param[out] Dfdx    - function gradient
+!> @param[in]  X       - physical coordinates of a point
+!> @param[in]  Center  - center
+!> @param[in]  Rs1,2,3 - semiaxis
+!> @param[out] Fval    - function value
+!> @param[out] Dfdx    - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine ellipsoid(X,Center,Rs1,Rs2,Rs3,  Fval,Dfdx)

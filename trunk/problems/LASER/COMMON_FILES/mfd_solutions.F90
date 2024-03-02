@@ -1,5 +1,5 @@
 !--------------------------------------------------------------------------------
-!> Purpose : exact (manufactured) solution
+!> @brief exact (manufactured) solution
 !
 !> @param[in]  Xp  - a point in physical space
 !> @param[in]  Fld - 0: pump field, 1: signal field
@@ -46,6 +46,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
    VTYPE :: E01,E11a,E11b,E21a,E21b,E02
    VTYPE :: dE01(3),dE11a(3),dE11b(3),dE21a(3),dE21b(3),dE02(3)
+!
+   logical, external :: dnear
 !
 !--------------------------------------------------------------------------------
 !
@@ -232,7 +234,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !        note OMEGA must be set correctly in set_env routine
          nn = 1
 !
-      if (nn .eq. 1 .or. nn .eq. 3) then
+      if (int(nn).eq.1 .or. int(nn).eq.3) then
 !     ...fundamental mode TE10
          gammaTE10 = sqrt(1.d0-(PI**2)/(OMEGA**2))
 !
@@ -278,7 +280,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          d2E(3,2) =  d2E(2,3)
          d2E(3,3) =   f_x *   f_y * ddf_z
       endif
-      if (nn .eq. 2 .or. nn .eq. 3) then
+      if (int(nn).eq.2 .or. int(nn).eq.3) then
 !
 !     ...next higher mode (TE20, same cutoff as TE01)
          gammaTE20 = sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2))
@@ -410,18 +412,18 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          ampl =  1.0d0
          ! Signal laser frequency (active gain)
          if (LAMBDA_SIGNAL .eq. 1064.0d-9/L_0) then
-            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+            if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.  &
+                (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
                k    = 85.6833d0
                gamm =  1.53131d0
                beta =  3.12978d0
-            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+            else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.1520d0) .and. dnear(CLAD_NX,1.1500d0)) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.1520d0) .and. dnear(CLAD_NY,1.1500d0))) then
                k    = 68.0103d0
                gamm =  1.57221d0
                beta =  3.68554d0
-            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+            else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.6510d0) .and. dnear(CLAD_NX,1.6500d0)) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0))) then
                k    = 97.4838d0
                gamm =  1.52302d0
                beta =  3.03177d0
@@ -431,7 +433,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
          ! Signal Raman frequency
          else if (LAMBDA_SIGNAL .eq. 1116.0d-9/L_0) then
-            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+            if (ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) then
                k    = 81.6899d0
                gamm =  1.51632d0
                beta =  2.95571d0
@@ -450,8 +452,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          ampl =  2.0d0
          ! Pump frequency (active gain)
          if (LAMBDA_PUMP .eq. 976.0d-9/L_0) then
-            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+            if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.   &
+                (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
                k    = 93.4108d0
                gamm =  1.55709d0
                beta =  3.46466d0
@@ -461,7 +463,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
          ! Pump frequency (Raman gain)
          else if (LAMBDA_PUMP .eq. 1064.0d-9/L_0) then
-            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+            if (ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) then
                k    = 85.6833d0
                gamm =  1.53131d0
                beta =  3.12978d0
@@ -492,18 +494,18 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...LMA fiber
 !  ...LP11 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       ampl =  1.0d0
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+      if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.   &
+          (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
          k    = 85.6630d0
          gamm =  2.41319d0
          beta =  2.51336d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.1520d0) .and. dnear(CLAD_NX,1.1500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.1520d0) .and. dnear(CLAD_NY,1.1500d0))) then
          k    = 67.9830d0
          gamm = 2.48683d0
          beta = 3.14177d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.6510d0) .and. dnear(CLAD_NX,1.6500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0))) then
          k    = 97.4662d0
          gamm =  2.39795d0
          beta =  2.40022d0
@@ -532,18 +534,18 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...LMA fiber
 !  ...LP21 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       ampl =  1.0d0
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+      if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.   &
+          (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
          k    = 85.6380d0
          gamm =  3.17859d0
          beta =  1.42726d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.1520d0) .and. dnear(CLAD_NX,1.1500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.1520d0) .and. dnear(CLAD_NY,1.1500d0))) then
          k    = 67.9484d0
          gamm = 3.29870d0
          beta = 2.27456d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.6510d0) .and. dnear(CLAD_NX,1.6500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0))) then
          k    = 97.4447d0
          gamm =  3.15230d0
          beta =  1.25468d0
@@ -572,18 +574,18 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...LMA fiber
 !  ...LP02 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       ampl =  1.0d0
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+      if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.   &
+          (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
          k    = 85.6322d0
          gamm =  3.33123d0
          beta =  1.02145d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.1520d0) .and. dnear(CLAD_NX,1.1500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.1520d0) .and. dnear(CLAD_NY,1.1500d0))) then
          k    = 67.9384d0
          gamm = 3.50008d0
          beta = 1.95051d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.6510d0) .and. dnear(CLAD_NX,1.6500d0)) .or.  &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0))) then
          k    = 97.4401d0
          gamm =  3.28999d0
          beta =  0.82896d0
@@ -613,8 +615,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       E21b = 0.d0; dE21b = 0.d0
       E02  = 0.d0; dE02  = 0.d0
 !
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+      if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) .or.   &
+          (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0))) then
 !
 !     ...LMA fiber, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
 !     ...LP01 (signal)
@@ -693,8 +695,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          if (ENVELOPE) k = k - WAVENUM_FLD
          !call get_LP02(Xp,ampl,k,gamm,beta, E02,dE02)
 !
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.   &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+      else if ((ICOMP_EXACT.eq.1 .and. dnear(CORE_NX,1.1520d0) .and. dnear(CLAD_NX,1.1500d0)) .or.   &
+               (ICOMP_EXACT.eq.2 .and. dnear(CORE_NY,1.1520d0) .and. dnear(CLAD_NY,1.1500d0))) then
 !
 !     ...LMA fiber, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
 !     ...LP01 (signal)
@@ -756,7 +758,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    elseif (ISOL .eq. 19) then
 !
       r = sqrt(x1*x1+x2*x2)
-      if (r .eq. 0.d0) then
+      if (dnear(r,0.d0)) then
          r_x = 1.d0
          r_y = 1.d0
       else
@@ -793,7 +795,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
                ampl =  0.9d0
-               if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
+               if (dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) then
                   k    = 85.6833d0
                   gamm =  1.53131d0
                   beta =  3.12978d0
@@ -805,11 +807,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !              with CORE_NY = 1.6510
 !              with CLAD_NY = 1.6500
                ampl =  0.3d0
-               if (CORE_NY .eq. 1.4512d0 .and. CLAD_NY .eq. 1.4500d0) then
+               if (dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0)) then
                   k    = 85.6833d0
                   gamm =  1.53131d0
                   beta =  3.12978d0
-               elseif (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
+               elseif (dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0)) then
                   k    = 97.4838d0
                   gamm =  1.52302d0
                   beta =  3.03177d0
@@ -833,11 +835,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !              with CORE_NY = 1.6510
 !              with CLAD_NY = 1.6500
                ampl =  0.3d0
-               if (CORE_NY .eq. 1.4512d0 .and. CLAD_NY .eq. 1.4500d0) then
+               if (dnear(CORE_NY,1.4512d0) .and. dnear(CLAD_NY,1.4500d0)) then
                   k    = 93.4108d0
                   gamm =  1.55709d0
                   beta =  3.46466d0
-               elseif (CLAD_NY .eq. 1.6500d0) then
+               elseif (dnear(CLAD_NY,1.6500d0)) then
                   k    = 106.275d0
                   gamm =  1.54933d0
                   beta =  3.35860d0
@@ -862,8 +864,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...omega_s=2*pi/0.1064=59.0525
 !  ...omega_p=2*pi/0.0976
 !
-      if (R_CORE .ne. 0.9d0*sqrt(2.0d0)      .or.  &
-          LAMBDA_SIGNAL .ne. 1064.0d-9/L_0   .or.  &
+      if (.not. dnear(R_CORE,0.9d0*sqrt(2.0d0)) .or.  &
+          LAMBDA_SIGNAL .ne. 1064.0d-9/L_0      .or.  &
           LAMBDA_PUMP   .ne.  976.0d-9/L_0 ) then
          write(*,*) 'mfd_solutions: unexpected parameters. stop.'
          stop
@@ -895,7 +897,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
             ! ampl 0.9/0.6 -> ~90% power in LP01, ~10% power in LP11
             if (ICOMP_TS .eq. 1) then
-               if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
+               if (dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) then
                   ampl =  0.9d0 * cc ! oscillating signal power
                   k    = 85.6833d0
                   gamm =  1.53131d0
@@ -906,7 +908,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                endif
                call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
             else if (ICOMP_TS .eq. 2) then
-               if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
+               if (dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0)) then
                   ampl =  0.6d0 * cc ! oscillating signal power
                   k    = 97.4662d0
                   gamm =  2.39795d0
@@ -939,7 +941,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
             ! ampl 2.0/3.0 -> ~66% power in LP01, ~33% in LP11
             if (ICOMP_TS .eq. 1) then
-               if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
+               if (dnear(CORE_NX,1.4512d0) .and. dnear(CLAD_NX,1.4500d0)) then
                   ampl =  2.5d0 * cc ! increasing pump power
                   k    = 93.4108d0
                   gamm =  1.55709d0
@@ -950,7 +952,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                endif
                call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
             else if (ICOMP_TS .eq. 2) then
-               if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
+               if (dnear(CORE_NY,1.6510d0) .and. dnear(CLAD_NY,1.6500d0)) then
                   ampl =   3.0d0 * cc ! increasing pump power
                   k    = 106.258d0
                   gamm =   2.44593d0
@@ -1081,6 +1083,8 @@ subroutine get_LP01(Xp,ampl,k,gamm,beta, E,dE)
    real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
    real(8) :: BESSEL_K0, BESSEL_K1
 !
+   logical, external :: dnear
+!
 !------------------------------------------------------
 !
 !..Cartesian coordinates
@@ -1089,7 +1093,7 @@ subroutine get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !..radial coordinate
    r = sqrt(x1*x1+x2*x2)
 !
-   if (r .eq. 0.d0) then
+   if (dnear(r,0.d0)) then
       r_x = 1.d0
       r_y = 1.d0
    else
@@ -1182,12 +1186,12 @@ subroutine get_LP11b(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
    VTYPE , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, ca, cb, cc
-   real*8 :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
 !
 !------------------------------------------------------
 !
@@ -1247,6 +1251,8 @@ subroutine get_LP02(Xp,ampl,k,gamm,beta, E,dE)
    real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
    real(8) :: BESSEL_K0, BESSEL_K1
 !
+   logical, external :: dnear
+!
 !------------------------------------------------------
 !
 !..Cartesian coordinates
@@ -1255,7 +1261,7 @@ subroutine get_LP02(Xp,ampl,k,gamm,beta, E,dE)
 !..radial coordinate
    r = sqrt(x1*x1+x2*x2)
 !
-   if (r .eq. 0.d0) then
+   if (dnear(r,0.d0)) then
       r_x = 1.d0
       r_y = 1.d0
    else
@@ -1363,15 +1369,15 @@ subroutine get_LP21b(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
    VTYPE , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, ca, cb, cc
-   real*8 :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
 !
-   real*8 :: cos_t,cos_2t
-   real*8 :: sin_t,sin_2t
+   real(8) :: cos_t,cos_2t
+   real(8) :: sin_t,sin_2t
 !
 !------------------------------------------------------
 !

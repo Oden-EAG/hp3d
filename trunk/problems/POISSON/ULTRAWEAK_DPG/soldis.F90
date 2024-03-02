@@ -1,19 +1,19 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
+!> @brief display user-defined quantity
 !
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] RsolH  - H1    sol
-!! @param[in] RgradH - H1    grad
-!! @param[in] RsolE  - Hcurl sol
-!! @param[in] RcurlE - Hcurl curl
-!! @param[in] RsolV  - Hdiv  sol
-!! @param[in] RdivV  - Hdiv  div
-!! @param[in] RsolQ  - L2    sol
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] RsolH  - H1    sol
+!> @param[in] RgradH - H1    grad
+!> @param[in] RsolE  - Hcurl sol
+!> @param[in] RcurlE - Hcurl curl
+!> @param[in] RsolV  - Hdiv  sol
+!> @param[in] RdivV  - Hdiv  div
+!> @param[in] RsolQ  - L2    sol
 !
-!! @param[out] Val   - quantity to display
+!> @param[out] Val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -36,7 +36,7 @@ subroutine soldis(Mdle,Xi,X,Rn,RsolH,RgradH,RsolE,RcurlE,RsolV,RdivV,RsolQ, Val)
    VTYPE  ,dimension(  MAXEQNQ  ),intent(in)  :: RsolQ
    real(8),                       intent(out) :: Val
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
@@ -57,7 +57,7 @@ subroutine soldis(Mdle,Xi,X,Rn,RsolH,RgradH,RsolE,RcurlE,RsolV,RdivV,RsolQ, Val)
          end select
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7003) IEXACT_DISP, ICHOOSE_COMP, Val
  7003 format('IEXACT_DISP, ICHOOSE_COMP, Val = ',2i2,e12.5)

@@ -7,7 +7,7 @@
 !
 !     latest revision:  - June 2021
 !
-!     purpose:          - routine returns unconstrained (ordinary)
+!> @brief         - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
 !                         UW DPG formulation for Maxwell equations
 !                       - uses sum factorization for fast integration
@@ -255,8 +255,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(3,6) :: nfce
 !
    integer, external :: ij_upper_to_packed
+   logical, external :: dnear
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: icomp,iphys
    integer :: iprint
    iprint = 0
@@ -270,7 +271,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !---------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'elem_maxwell_fi_hexa: Mdle = ', Mdle
    endif
@@ -319,7 +320,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..get the element boundary conditions flags
    call find_bc(Mdle, ibc)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7001) Mdle
  7001 format('elem_maxwell_fi_hexa: BCFLAGS FOR Mdle = ',i5)
@@ -487,7 +488,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !............consistency check
 !-----------------------------------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !
 !..total number of test functions (per field)
    nrdof=nord1*nrdofH2*nrdofH3+nrdofH1*nord2*nrdofH3+nrdofH1*nrdofH2*nord3
@@ -615,7 +616,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !        ...Compute shape functions needed for geometry - 3D H1 shape functions
             call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (nrdof .ne. NrdofH) then
                write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
                stop
@@ -623,7 +624,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 #endif
 !        ...Geometry map
             call geom3D(Mdle,xip,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag.ne.0) then
                write(*,5999) Mdle,rjac
  5999          format('elem_maxwell_fi_hexa: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
@@ -660,7 +661,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                endif
 !
 !           ...update background polarization with thermal perturbation
-               if(delta_n .ne. 0.d0) then
+               if(.not. dnear(delta_n,0.d0)) then
                   call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
                endif
 !
@@ -1840,7 +1841,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
          call face_param(etype,ifc,t, xi,dxidt)
 !
          call shape3EE(etype,xi,nordP, nrdof,shapEE,curlEE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofEE) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEE. stop.'
             stop
@@ -1850,7 +1851,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
             stop
@@ -1861,7 +1862,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !     ...for interfaces only (no bubbles)
          call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
                        nrdof,shapE,curlE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEi. stop.'
             stop

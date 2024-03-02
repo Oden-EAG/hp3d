@@ -2,20 +2,20 @@
 !> @brief    update H(curl) edge dof interpolating H1 Dirichlet data
 !            using PB interpolation
 !!
-!! @param[in]  Mdle         - element (middle node) number
-!! @param[in]  Iflag        - a flag specifying which of the objects the
+!> @param[in]  Mdle         - element (middle node) number
+!> @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Icase        - the edge node case
-!! @param[in]  Bcond        - the edge node BC flag
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation (not used)
-!! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Icase        - the edge node case
+!> @param[in]  Bcond        - the edge node BC flag
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation (not used)
+!> @param[in]  Norder       - element order
+!> @param[in]  Iedge        - edge number
 !!
-!! @param[in,out] ZnodE     - H(curl) dof for the edge
+!> @param[in,out] ZnodE     - H(curl) dof for the edge
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------
@@ -91,7 +91,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
 ! load vector and solution
   VTYPE,   dimension(MAXP,MAXEQNE)      :: zbE,zuE
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXP,MAXEQNE)      :: uE_real,uE_imag
 #endif
 !
@@ -101,7 +101,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -110,7 +110,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -134,7 +134,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
   call homogenD(TANGEN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
-    go to 100
+    goto 100
   endif
 !
 ! # of dof cannot be zero
@@ -255,7 +255,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeE: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofE_edge = ',ndofE_edge
@@ -263,13 +263,13 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
       write(*,7015) j, zbE(j,1:MAXEQNE)
       write(*,7016) aaE(j,1:ndofE_edge)
     enddo
-# if C_MODE
-7015    format(i5, 6(2e10.3,2x))
-# else
-7015    format(i5, 10e12.5)
-# endif
-7016    format(10e12.5)
   endif
+#if HP3D_COMPLEX
+  7015 format(i5,2x,6(2e10.3,2x))
+#else
+  7015 format(i5,2x,10e12.5)
+#endif
+  7016 format(10e12.5)
 #endif
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
@@ -289,7 +289,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 ! copy load vector
   zuE(1:ndofE_edge,:) = zbE(1:ndofE_edge,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 ! apply pivots to load vector
   call zlaswp(MAXEQNE,zuE,naE,1,ndofE_edge,ipivE,1)
@@ -323,7 +323,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeE: k,zuE(k) = '
    do k=1,ndofE_edge
@@ -384,7 +384,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !  ...loop through multiple loads
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call result
 #endif
 !

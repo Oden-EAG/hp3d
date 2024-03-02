@@ -1,13 +1,13 @@
 #include "typedefs.h"
 !-----------------------------------------------------------------------
 !
-!    routine name:      - coo2csc
+!> @name                - coo2csc
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sparse coo format to csc
+!> @brief               - sparse coo format to csc
 !
 !    arguments:
 !           in/out
@@ -46,9 +46,9 @@ end subroutine coo2csc
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sparse coo format to csr
+!> @brief               - sparse coo format to csr
 !
 !    arguments:
 !           in/out
@@ -86,9 +86,9 @@ end subroutine coo2csr
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Aug 2018
+!> @date                - Aug 2018
 !
-!    purpose:           - convert row vector indices to pointers
+!> @brief               - convert row vector indices to pointers
 !                         (compatible to CSR format)
 !
 !    arguments:
@@ -124,13 +124,13 @@ end subroutine get_pointers
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - assemble_triplet
+!> @name                - assemble_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (row,col,val) and
+!> @brief               - sorts an array of triplets (row,col,val) and
 !                         subsequently removes (row,col) duplicates by
 !                         reduction (sum) over val
 !
@@ -152,7 +152,7 @@ subroutine assemble_triplet(row,col,val,nz,nnz)
    integer    , intent(in)    :: nz
    integer    , intent(out)   :: nnz
    integer    , intent(inout) :: row(nz),col(nz)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: val(nz)
 #else
    real(8)    , intent(inout) :: val(nz)
@@ -195,13 +195,13 @@ end subroutine assemble_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet_old
+!> @name                - qsort_triplet_old
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,XA) with
+!> @brief               - sorts an array of triplets (IA,JA,XA) with
 !                         sort key IA, in ascending order
 !
 !    arguments:
@@ -222,7 +222,7 @@ recursive subroutine qsort_triplet_old(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  , intent(inout) :: xa(n)
    complex(8)                  :: x
 #else
@@ -257,13 +257,13 @@ end subroutine qsort_triplet_old
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet
+!> @name                - qsort_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,Val) with
+!> @brief               - sorts an array of triplets (IA,JA,Val) with
 !                         IA (major), JA (minor), in ascending order
 !
 !    arguments:
@@ -284,7 +284,7 @@ recursive subroutine qsort_triplet(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  , intent(inout) :: xa(n)
    complex(8)                  :: x
 #else
@@ -319,13 +319,13 @@ end subroutine qsort_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - partition_triplet_omp
+!> @name                - partition_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - partitions an array of triples around a pivot
+!> @brief               - partitions an array of triples around a pivot
 !
 !    arguments:
 !           in/out
@@ -349,7 +349,7 @@ recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
    integer    , intent(in)     :: ip,jp,n
    integer    , intent(out)    :: k
    integer    , intent(inout)  :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout)  :: xa(n)
    complex(8)                  :: xaux
 #else
@@ -405,13 +405,13 @@ end subroutine partition_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet_omp
+!> @name                - qsort_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,Val) with
+!> @brief               - sorts an array of triplets (IA,JA,Val) with
 !                         IA (major), JA (minor), in ascending order
 !
 !    arguments:
@@ -430,7 +430,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !..declare variables
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: xa(n)
 #else
    real(8)    , intent(inout) :: xa(n)
@@ -475,13 +475,13 @@ end subroutine qsort_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - assemble_double
+!> @name                - assemble_double
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Nov 2016
+!> @date                - Nov 2016
 !
-!    purpose:           -
+!> @brief               -
 !
 !    arguments:         -
 !
@@ -492,7 +492,7 @@ subroutine assemble_double(row,val,nz,nnz)
 !
    integer       :: nz, nnz
    integer       :: row(nz)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)    :: Val(nz)
 #else
    real(8)       :: Val(nz)
@@ -548,7 +548,7 @@ recursive subroutine qsort_double(ia,val,n,first, last)
    implicit none
    integer     :: i, j, n, k, l
    integer     :: ia(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  :: val(n), x
 #else
    real(8)     :: val(n), x

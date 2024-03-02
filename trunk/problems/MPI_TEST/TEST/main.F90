@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - main driver for MPI Poisson Test Program
+!> @brief         - main driver for MPI Poisson Test Program
 !
 !----------------------------------------------------------------------
 !
@@ -66,13 +66,13 @@ program main
       if (RANK == i .and. RANK == ROOT) then
          write(6,*)
          write(6,1020) "Master proc [", RANK, "], initialize.."
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
          call initialize
       else if (RANK == i) then
          write(6,1020) "Worker proc [", RANK, "], initialize.."
-         QUIET_MODE = .TRUE.
+         QUIET_MODE = .true.
          call initialize
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
       else
       endif
       flush(6)
@@ -145,10 +145,10 @@ subroutine master_main()
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-#if DEBUG_MODE
-   write(*,*) '========================='
-   write(*,*) '  RUNNING in DEBUG_MODE  '
-   write(*,*) '========================='
+#if HP3D_DEBUG
+   write(*,*) '    ===================================    '
+   write(*,*) '      RUNNING with HP3D_DEBUG enabled      '
+   write(*,*) '    ===================================    '
 #endif
 !
 !..display menu in infinite loop
@@ -282,11 +282,11 @@ subroutine worker_main()
    idec = 1
    do while(idec /= 0)
 !
-      write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+      !write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-      write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
-      flush(6)
+      !write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+      !flush(6)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       select case(idec)

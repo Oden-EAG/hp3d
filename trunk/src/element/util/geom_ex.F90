@@ -12,15 +12,15 @@ end subroutine geom_ex
 !
 !
 !------------------------------------------------------------------------
-!> Purpose : routine computes physical coordinates for a point in the
+!> @brief routine computes physical coordinates for a point in the
 !!           master element using the exact geometry maps
 !!
-!! @param[in]  Mdle  - middle node
-!! @param[in]  Xi    - a point within the corresponding master element
-!! @param[out] X     - coordinates of the corresponding physical point
-!! @param[out] Dxdxi - derivatives wrt master element coordinates
+!> @param[in]  Mdle  - middle node
+!> @param[in]  Xi    - a point within the corresponding master element
+!> @param[out] X     - coordinates of the corresponding physical point
+!> @param[out] Dxdxi - derivatives wrt master element coordinates
 !!
-!! @revision Feb 2023
+!> @date Feb 2023
 !------------------------------------------------------------------------
 subroutine exact_geom(Mdle,Xi, X,Dxdxi)
 !
@@ -39,7 +39,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       integer :: iflag, i, j, k, no
       integer :: ntype
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -63,7 +63,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Mdle,iflag,no
 7001    format('exact_geom: Mdle = ',i5,' iflag,no  = ',2i4,' etav = ')

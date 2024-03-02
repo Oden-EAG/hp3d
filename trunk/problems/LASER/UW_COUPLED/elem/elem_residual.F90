@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Apr 2019
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the Primal Poisson and UW Time Harmonic
 !                         Maxwell equation
 !

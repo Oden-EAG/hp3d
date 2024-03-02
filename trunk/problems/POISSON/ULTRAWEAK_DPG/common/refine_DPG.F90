@@ -1,12 +1,12 @@
 !--------------------------------------------------------------------
 !
-!     routine name      - refine_DPG
+!@ name           - refine_DPG
 !
 !--------------------------------------------------------------------
 !
-!     last revision:    - May 2023
+!> @date          - May 2023
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief         - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to
@@ -186,11 +186,11 @@ subroutine refine_DPG
    case default
       rate_mesh(istep) =  &
       log(residual_mesh(istep-1)/residual_mesh(istep))/  &
-      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(error_mesh(istep-1)/error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
    end select
 !
@@ -349,13 +349,13 @@ end subroutine refine_DPG
 
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_duplet
+!> @name                - qsort_duplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Oct 2019
+!> @date                - Oct 2019
 !
-!    purpose:           - sorts an array of duplets (iel,residual) with
+!> @brief               - sorts an array of duplets (iel,residual) with
 !                         residual (sort key) in descending order
 !                         (initial call needs: First = 1, Last = N)
 !
@@ -408,7 +408,7 @@ recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
 end subroutine qsort_duplet
 
 !-----------------------------------------------------------------------
-! subroutine: adap_solve (adaptive refinements and solve)
+!> @name adap_solve (adaptive refinements and solve)
 !-----------------------------------------------------------------------
 subroutine adap_solve
 !
@@ -428,8 +428,8 @@ subroutine adap_solve
          read(*,*) nsteps
       enddo
    else
-      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
-   405  format(A,I4,A,A)
+!      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
+!   405  format(A,I4,A,A)
    endif
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
@@ -463,4 +463,4 @@ subroutine adap_solve
       endif
    enddo
 !
-   end subroutine adap_solve
+end subroutine adap_solve

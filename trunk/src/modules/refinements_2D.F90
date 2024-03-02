@@ -224,18 +224,18 @@ module refinements_2D
       case(MEDG)
         select case(Kref)
         case(1); Nrsons=3
-        case default; go to 10
+        case default; goto 10
         end select
       case(MDLT)
         select case(Kref)
         case(1); Nrsons=7
-        case default; go to 10
+        case default; goto 10
         end select
       case(MDLQ)
         select case(Kref)
         case(11)   ; Nrsons=9
         case(10,01); Nrsons=3
-        case default; go to 10
+        case default; goto 10
         end select
       end select
 !
@@ -256,14 +256,12 @@ module refinements_2D
 !
       integer, intent(in)    :: Norient
       integer, intent(inout) :: Is,Nort
-      integer :: imod,j,m
 !
-      imod(j,m) = j-(j-1)/m*m
       select case(Norient)
       case(1)
         select case(Is)
         case(1,2)
-          Is = imod(Is+1,2)
+          Is = ref2_imod(Is+1,2)
           Nort = mod(Nort+1,2)
         case(3)
         end select
@@ -272,5 +270,14 @@ module refinements_2D
 !
    end subroutine rotate_edge
 !
+!-----------------------------------------------------------------------
+!
+   integer function ref2_imod(j,m)
+!
+      integer, intent(in) :: j,m
+!
+      ref2_imod = j-(j-1)/m*m
+!
+   end function ref2_imod
 !
 end module refinements_2D

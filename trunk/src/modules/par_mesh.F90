@@ -3,11 +3,11 @@
 !
 !----------------------------------------------------------------------
 !
-!     module:              par_mesh
+!> @name       par_mesh
 !
-!     last modified:       Sep 2023
+!> @date       Sep 2023
 !
-!     purpose:             provides functionality for distributing
+!> @brief            provides functionality for distributing
 !                          degrees of freedom in the FE mesh
 !
 !----------------------------------------------------------------------
@@ -33,8 +33,8 @@ module par_mesh
    contains
 !
 !----------------------------------------------------------------------
-!     routine:    distr_mesh
-!     purpose:    (re-)distribute the current mesh to MPI processes
+!> @name    distr_mesh
+!> @brief   (re-)distribute the current mesh to MPI processes
 !----------------------------------------------------------------------
 subroutine distr_mesh()
 !
@@ -49,7 +49,7 @@ subroutine distr_mesh()
    integer :: nrnodm, nrdof_nod
    real(8) :: start_time,end_time
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 !
@@ -126,7 +126,7 @@ subroutine distr_mesh()
 !        ...3e. pack buffer with DOF data
             call pack_dof_buf(nod,nrdof_nod, buf)
 !        ...3f. send buffer to new subdomain
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ', &
                   'Sending data to [',subd_next(iel),'], nod = ',nod
@@ -141,7 +141,7 @@ subroutine distr_mesh()
 !     ...3d. if new subdomain is my subdomain, receive data
          else if (subd_next(iel) .eq. RANK) then
 !        ...3e. receive buffer from old subdomain
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
@@ -216,7 +216,7 @@ subroutine distr_mesh()
       call update_Ddof
    endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif
@@ -225,8 +225,8 @@ subroutine distr_mesh()
 end subroutine distr_mesh
 !
 !----------------------------------------------------------------------
-!     routine:    get_elem_nodes
-!     purpose:    get (unconstrained) nodes associated with an element
+!> @name    get_elem_nodes
+!> @brief   get (unconstrained) nodes associated with an element
 !----------------------------------------------------------------------
 subroutine get_elem_nodes(Mdle, Nodesl,Nodm,Nrnodm)
    integer, intent(in)  :: Mdle
@@ -241,8 +241,8 @@ subroutine get_elem_nodes(Mdle, Nodesl,Nodm,Nrnodm)
 end subroutine get_elem_nodes
 !
 !----------------------------------------------------------------------
-!     routine:    set_subd_elem
-!     purpose:    set subd values for (unconstrained) nodes associated
+!> @name    set_subd_elem
+!> @brief   set subd values for (unconstrained) nodes associated
 !                 with an element
 !----------------------------------------------------------------------
 subroutine set_subd_elem(Mdle)
@@ -263,8 +263,8 @@ subroutine set_subd_elem(Mdle)
 end subroutine set_subd_elem
 !
 !----------------------------------------------------------------------
-!     routine:    alloc_nod_dof
-!     purpose:    allocate all dofs associated with a node
+!> @name    alloc_nod_dof
+!> @brief   allocate all dofs associated with a node
 !----------------------------------------------------------------------
 subroutine alloc_nod_dof(Nod)
    integer, intent(in) :: Nod
@@ -315,8 +315,8 @@ subroutine alloc_nod_dof(Nod)
 end subroutine alloc_nod_dof
 !
 !----------------------------------------------------------------------
-!     routine:    dealloc_nod_dof
-!     purpose:    deallocate all dofs associated with a node
+!> @name    dealloc_nod_dof
+!> @brief   deallocate all dofs associated with a node
 !----------------------------------------------------------------------
 subroutine dealloc_nod_dof(Nod)
    integer, intent(in) :: Nod
@@ -331,8 +331,8 @@ subroutine dealloc_nod_dof(Nod)
 end subroutine dealloc_nod_dof
 !
 !----------------------------------------------------------------------
-!     routine:    get_dof_buf_size
-!     purpose:    calculate buffer size for message passing of nodal dofs
+!> @name    get_dof_buf_size
+!> @brief   calculate buffer size for message passing of nodal dofs
 !----------------------------------------------------------------------
 subroutine get_dof_buf_size(Nod, Nrdof_nod)
    integer, intent(in)  :: Nod
@@ -350,8 +350,8 @@ subroutine get_dof_buf_size(Nod, Nrdof_nod)
 end subroutine get_dof_buf_size
 !
 !----------------------------------------------------------------------
-!     routine:    pack_dof_buf
-!     purpose:    pack nodal dofs into contiguous buffer for message passing
+!> @name    pack_dof_buf
+!> @brief   pack nodal dofs into contiguous buffer for message passing
 !----------------------------------------------------------------------
 subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
    integer, intent(in)  :: Nod
@@ -416,8 +416,8 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
 end subroutine pack_dof_buf
 !
 !----------------------------------------------------------------------
-!     routine:    unpack_dof_buf
-!     purpose:    unpack nodal dofs from contiguous buffer
+!> @name    unpack_dof_buf
+!> @brief   unpack nodal dofs from contiguous buffer
 !----------------------------------------------------------------------
 subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
    integer, intent(in) :: Nod

@@ -15,7 +15,7 @@
 !
 !----------------------------------------------------------------------
 !
-      module pardiso_data
+   module pardiso_data
 !
       implicit none
 !
@@ -37,11 +37,11 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine start_pardiso
+   subroutine start_pardiso
 !
       implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
       select case(PRDS_TYPE)
       case('S')
          PRDS_MTYPE   = 6  ! complex symmetric
@@ -70,11 +70,11 @@
       PRDS_MAXFCT  = 1
       PRDS_MSGLVL  = 0       ! with statistical no information
 !
-      end subroutine start_pardiso
+   end subroutine start_pardiso
 !
 !----------------------------------------------------------------------
 !
-      subroutine finalize_pardiso
+   subroutine finalize_pardiso
 !
       implicit none
 !
@@ -90,11 +90,11 @@
 !
       deallocate(PRDS_A, PRDS_IA,PRDS_JA,PRDS_RHS,PRDS_XSOL,PRDS_PERM)
 !
-      end subroutine finalize_pardiso
+   end subroutine finalize_pardiso
 !
 !----------------------------------------------------------------------
 !
-      end module pardiso_data
+   end module pardiso_data
 !
 
 #endif

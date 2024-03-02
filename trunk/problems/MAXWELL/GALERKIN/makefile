@@ -2,13 +2,13 @@
 
 -include ../../../m_options
 
-COMPLEX   ?= 1
-DEBUG     ?= 0
+HP3D_COMPLEX   ?= 1
+HP3D_DEBUG     ?= 0
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
 
-ifeq ($(COMPLEX),0)
-$(error COMPLEX FLAG MUST BE 1 FOR MAXWELL APPLICATION)
+ifeq ($(HP3D_COMPLEX),0)
+$(error HP3D_COMPLEX FLAG MUST BE 1 FOR MAXWELL APPLICATION)
 endif
 
 SRC_PATH        = .
@@ -47,8 +47,8 @@ FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
 	@echo "- Linking - " $(EXEC)
-	@echo "- COMPLEX = " $(COMPLEX)
-	@echo "- DEBUG   = " $(DEBUG)
+	@echo "- HP3D_COMPLEX = " $(HP3D_COMPLEX)
+	@echo "- HP3D_DEBUG   = " $(HP3D_DEBUG)
 	@echo "------------------------------ "
 	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 

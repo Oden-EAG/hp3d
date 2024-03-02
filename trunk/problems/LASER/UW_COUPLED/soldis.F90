@@ -1,18 +1,18 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] ZsolH  - H1    sol
-!! @param[in] ZgradH - H1    grad
-!! @param[in] ZsolE  - Hcurl sol
-!! @param[in] ZcurlE - Hcurl curl
-!! @param[in] ZsolV  - Hdiv  sol
-!! @param[in] ZdivV  - Hdiv  div
-!! @param[in] ZsolQ  - L2    sol
+!> @brief display user-defined quantity
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] ZsolH  - H1    sol
+!> @param[in] ZgradH - H1    grad
+!> @param[in] ZsolE  - Hcurl sol
+!> @param[in] ZcurlE - Hcurl curl
+!> @param[in] ZsolV  - Hdiv  sol
+!> @param[in] ZdivV  - Hdiv  div
+!> @param[in] ZsolQ  - L2    sol
 !!
-!! @param[out] val   - quantity to display
+!> @param[out] val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -311,7 +311,7 @@ end subroutine soldis
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : select quantities to display
+!> @brief select quantities to display
 !---------------------------------------------------------------------------------------
 subroutine soldis_select
 !
@@ -342,21 +342,21 @@ subroutine soldis_select
       if ((NEXACT.eq.1).or.(NEXACT.eq.2)) then
    10   write(*,*) 'DISPLAY APPROXIMATE OR EXACT SOLUTION (0/1) ?'
         read(*,*) IEXACT_DISP
-        if ((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)) go to 10
+        if ((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)) goto 10
       endif
 !
    20 write(*,*) 'SET VARIABLE: tempr(1), EEhat(2-4), HHhat(5-7), hflux(8), EHfld(9-14)'
       read(*,*) ICHOOSE_COMP
       write(*,*) 'SET SIGNAL OR PUMP: SIGNAL - 1, PUMP - 0'
       read(*,*) ICHOOSE_SIGPUMP
-      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.14)) go to 20
+      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.14)) goto 20
 !
       call disp_soldis(NSTD_OUT)
 !
 end subroutine soldis_select
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities selected to display
+!> @brief show the quantities selected to display
 !---------------------------------------------------------------------------------------
 
 subroutine disp_soldis(Nstream)

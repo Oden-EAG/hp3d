@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Sep 15
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief         - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to
@@ -31,7 +31,7 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
+   subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !
       use control
       use data_structure3D
@@ -41,22 +41,22 @@
       implicit none
       integer, intent(in)  :: Irefine
       integer, intent(in)  :: Nreflag
-      real*8,  intent(in)  :: Factor
+      real(8),  intent(in)  :: Factor
       integer, intent(out) :: Nstop
 !
       integer, parameter :: max_step = 20
       integer, dimension(max_step), save :: nrdofDPG_mesh
       integer, dimension(max_step), save :: nrdofField_mesh
-      real*8 , dimension(max_step), save :: residual_mesh
-      real*8 , dimension(max_step), save :: rate_mesh
-      real*8 , dimension(max_step), save :: error_mesh
-      real*8 , dimension(max_step), save :: rel_error_mesh
-      real*8 , dimension(max_step), save :: rate_error_mesh
+      real(8) , dimension(max_step), save :: residual_mesh
+      real(8) , dimension(max_step), save :: rate_mesh
+      real(8) , dimension(max_step), save :: error_mesh
+      real(8) , dimension(max_step), save :: rel_error_mesh
+      real(8) , dimension(max_step), save :: rate_error_mesh
 
 !
-      real*8 , allocatable, dimension(:) :: elem_resid
-      real*8 , allocatable, dimension(:) :: elem_error
-      real*8 , allocatable, dimension(:) :: elem_rnorm
+      real(8) , allocatable, dimension(:) :: elem_resid
+      real(8) , allocatable, dimension(:) :: elem_error
+      real(8) , allocatable, dimension(:) :: elem_rnorm
       integer, allocatable, dimension(:) :: elem_ref_flag
       integer, allocatable, dimension(:) :: list_elem
       integer, allocatable, dimension(:) :: list_ref_flags
@@ -67,8 +67,8 @@
       integer :: nrdofField, nrdofDPG, ndom
       integer :: nr_elem_to_refine
       integer, dimension(NR_PHYSA) :: nflag
-      real*8 :: residual, elem_resid_max, err, rnorm
-      real*8 :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
+      real(8) :: residual, elem_resid_max, err, rnorm
+      real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
       integer :: i,iprint,ic,mdle,iel,kref,idec_href
 
 !
@@ -191,11 +191,11 @@
 !       case default
 !         rate_mesh(istep) =  &
 !          log(residual_mesh(istep-1)/residual_mesh(istep))/  &
-!          log(float(nrdofDPG_mesh(istep-1))/float(nrdofDPG_mesh(istep)))
+!          log(real(nrdofDPG_mesh(istep-1))/real(nrdofDPG_mesh(istep)))
 !         if (NEXACT.ge.1) then
 !           rate_error_mesh(istep) = &
 !           log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
-!           log(float(nrdofDPG_mesh(istep-1))/float(nrdofDPG_mesh(istep)))
+!           log(real(nrdofDPG_mesh(istep-1))/real(nrdofDPG_mesh(istep)))
 !         endif
 !       end select
 ! !
@@ -252,7 +252,7 @@
         call global_href
         call update_gdof
         call update_ddof
-#if DEBUG_MODE
+#if HP3D_DEBUG
         call verify_orient
         call verify_neig
 #endif
@@ -354,7 +354,7 @@
 !      ...update geometry and Dirichlet flux dof after the refinements
           call update_gdof
           call update_Ddof
-#if DEBUG_MODE
+#if HP3D_DEBUG
           call verify_orient
           call verify_neig
 #endif
@@ -452,10 +452,10 @@
 !
         integer, parameter :: n_dispvar = 3
         integer, dimension(NR_PHYSA) :: nerrflag
-        real*8, dimension(max_step,n_dispvar), save :: other_err
-        real*8, dimension(max_step,n_dispvar), save :: other_rel_err
-        real*8, dimension(n_dispvar) :: err_more,rnorm_more
-        real*8 :: error_stress,rnorm_stress
+        real(8), dimension(max_step,n_dispvar), save :: other_err
+        real(8), dimension(max_step,n_dispvar), save :: other_rel_err
+        real(8), dimension(n_dispvar) :: err_more,rnorm_more
+        real(8) :: error_stress,rnorm_stress
 !    ...compute other related errors which the user might want to know
         if (NEXACT.ge.1) then
           mdle=0
@@ -522,4 +522,4 @@
 !
         end subroutine custom_display
 !
-      end subroutine refine_DPG
+   end subroutine refine_DPG

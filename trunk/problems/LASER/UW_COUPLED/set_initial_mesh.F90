@@ -6,7 +6,7 @@
 !
 !     latest revision   - June 2021
 !
-!     purpose:          - define problem dependent data
+!> @brief         - define problem dependent data
 !                         (multiphysics, BC, approximation)
 !
 !     arguments:
@@ -146,7 +146,7 @@ subroutine set_initial_mesh(Nelem_order)
 !                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
 !                 ...BCs on EH-traces signal and pump
-                     if((IBCFLAG.eq.2..or.IBCFLAG.eq.3).and.(ifc.eq.2)) then
+                     if((IBCFLAG.eq.2 .or. IBCFLAG.eq.3) .and. (ifc.eq.2)) then
 !                    ...Impedance on z=L face
 !                       REMARK: if IBCFLAG.eq.3 (i.e., using elimination), then
 !                               the routine propagate_flag must be called after

@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : driver for writing scalar attribute to .h5 file
+!> @brief driver for writing scalar attribute to .h5 file
 !!
 !> @param[in] Id   - integer to be converted to file postfix
 !> @param[in Scomp - component of solution
@@ -20,7 +20,7 @@ subroutine paraview_attr_custom(Id,Scomp)
       integer, intent(in) :: Id
       integer, intent(in) :: Scomp
 !
-      character*8, parameter, dimension(3) :: sAttr = (/'sigma_rr','sigma_rt','sigma_tt'/)
+      character(len=8), parameter, dimension(3) :: sAttr = (/'sigma_rr','sigma_rt','sigma_tt'/)
       character(len=60) :: fname,nick
       integer :: ic
       character(len=5) :: postfix

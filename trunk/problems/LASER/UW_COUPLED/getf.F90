@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------
 !                       subroutine getf
 !------------------------------------------------------------------------------
-!> Purpose : source term
+!> @brief source term
 !!
-!! @param[in]  Mdle  - element (middle node) number
-!! @param[in]  X     - physical coordinates
-!! @param[out] Zfval - rhs f
-!! @param[out] ZJval - rhs J
+!> @param[in]  Mdle  - element (middle node) number
+!> @param[in]  X     - physical coordinates
+!> @param[out] Zfval - rhs f
+!> @param[out] ZJval - rhs J
 !------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -42,14 +42,14 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
    VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
 !
 !------------------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7001) Mdle,X
  7001 format(' getf: Mdle,X = ',i8,2x,3(f8.3,2x))
@@ -146,7 +146,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !     ...do nothing
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7010) Zfval
  7010 format(' getf: Zfval = ',2e12.5)
@@ -195,14 +195,14 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
    VTYPE,dimension(3) :: rntimesE,rn2timesE,rntimesH
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
 !
 !------------------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7001) Mdle,X
  7001    format(' get_bdSource: Mdle,X = ',i8,2x,3(f8.3,2x))
@@ -256,7 +256,7 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
          stop
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7002) Imp_val
  7002 format('get_bsource: Imp_val = ',2e12.5)

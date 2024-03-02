@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------------------
-!> Purpose : write scalar attribute to .h5 file
+!> @brief write scalar attribute to .h5 file
 !!
 !> @param[in ] Sname   - "Scalar"
 !> @param[in ] Sfile   - attribute file name (e.g., ../output/paraview/scalar_00000.h5)
@@ -35,33 +35,33 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
    type(vis) :: vis_obj
    integer   :: etype
    integer                              :: mdle, nflag, iel, iv, ndom, nV
-   real*8,  dimension(3)                :: xi,x
+   real(8),  dimension(3)                :: xi,x
    integer, dimension(12)               :: nedge_orient
    integer, dimension(6)                :: nface_orient
    integer, dimension(19)               :: norder
-   real*8,  dimension(3,MAXbrickH)      :: xnod
-   real*8, dimension(MAXEQNH,MAXbrickH) :: zdofH
-   real*8, dimension(MAXEQNE,MAXbrickE) :: zdofE
-   real*8, dimension(MAXEQNV,MAXbrickV) :: zdofV
-   real*8, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
-   real*8, dimension(3,3)               :: dxdxi
-   real*8, dimension(  MAXEQNH  )       :: zsolH
-   real*8, dimension(  MAXEQNH,3)       :: zgradH
-   real*8, dimension(3,MAXEQNE  )       :: zsolE
-   real*8, dimension(3,MAXEQNE  )       :: zcurlE
-   real*8, dimension(3,MAXEQNV  )       :: zsolV
-   real*8, dimension(  MAXEQNV  )       :: zdivV
-   real*8, dimension(  MAXEQNQ  )       :: zsolQ
+   real(8),  dimension(3,MAXbrickH)      :: xnod
+   real(8), dimension(MAXEQNH,MAXbrickH) :: zdofH
+   real(8), dimension(MAXEQNE,MAXbrickE) :: zdofE
+   real(8), dimension(MAXEQNV,MAXbrickV) :: zdofV
+   real(8), dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+   real(8), dimension(3,3)               :: dxdxi
+   real(8), dimension(  MAXEQNH  )       :: zsolH
+   real(8), dimension(  MAXEQNH,3)       :: zgradH
+   real(8), dimension(3,MAXEQNE  )       :: zsolE
+   real(8), dimension(3,MAXEQNE  )       :: zcurlE
+   real(8), dimension(3,MAXEQNV  )       :: zsolV
+   real(8), dimension(  MAXEQNV  )       :: zdivV
+   real(8), dimension(  MAXEQNQ  )       :: zsolQ
 !
 !  ...stiffness tensor
-   real*8, dimension(3,3,3,3) :: C
+   real(8), dimension(3,3,3,3) :: C
 !
 !  ...stress and displacement
-   real*8, dimension(3,3) :: sigma
+   real(8), dimension(3,3) :: sigma
 !
 !  ...miscellaneous
-   real*8  :: val
-   real*8  :: r2
+   real(8)  :: val
+   real(8)  :: r2
    integer :: i,j,m,n
 !
 !..OpenMP parallelization: auxiliary variables

@@ -1,8 +1,8 @@
 !> @brief      dump the initial element's nodal connectivity
 !!
-!! @param[in]  Mdle     - middle node
-!! @param[out] Nodesl   - nodes
-!! @param[out] Norientl - orients
+!> @param[in]  Mdle     - middle node
+!> @param[out] Nodesl   - nodes
+!> @param[out] Norientl - orients
 !!
 !> @date       Feb 2023
 subroutine elem_dump(Mdle, Nodesl,Norientl)

@@ -373,7 +373,7 @@
 !  STEP 3 : CALL MUMPS TO SOLVE
 ! ----------------------------------------------------------------------
 !
-#if C_MODE
+#if HP3D_COMPLEX
   mumps_par%JOB = 1
  call zmumps(mumps_par)
   mumps_par%JOB = 2

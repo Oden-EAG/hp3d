@@ -2,7 +2,7 @@
 #include "typedefs.h"
 !
 !---------------------------------------------------------------------------------------
-!> Purpose     Display user-defined quantity
+!> @brief     Display user-defined quantity
 !!
 !> @param[in]  Mdle   - element (middle node) number
 !> @param[in]  Xi     - master element coordinates
@@ -164,7 +164,7 @@
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : select quantities to display
+!> @brief select quantities to display
 !---------------------------------------------------------------------------------------
    subroutine soldis_select
 !
@@ -195,12 +195,12 @@
       if ((NEXACT.eq.1).or.(NEXACT.eq.2)) then
    10   write(*,*) 'DISPLAY APPROXIMATE OR EXACT SOLUTION (0/1) ?'
         read(*,*) IEXACT_DISP
-        if ((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)) go to 10
+        if ((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)) goto 10
       endif
 !
    20 write(*,*) 'SET VARIABLE: EEhat(1-3), HHhat(4-6), EHfld(7-12)'
       read(*,*) ICHOOSE_COMP
-      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.14)) go to 20
+      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.14)) goto 20
 !
       call disp_soldis(NSTD_OUT)
 !
@@ -208,7 +208,7 @@
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities selected to display
+!> @brief show the quantities selected to display
 !---------------------------------------------------------------------------------------
    subroutine disp_soldis(Nstream)
 !

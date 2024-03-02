@@ -1,14 +1,14 @@
 !------------------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and its derivatives
+!> @brief routine evaluates physical coordinates and its derivatives
 !!           wrt to reference coordinates for a point in reference
 !!           pyramid
 !!
-!! @param[in]  No     - a GMP pyramid number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in]  No     - a GMP pyramid number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 11
 !------------------------------------------------------------------------------
 !
 subroutine pyram(No,Eta, X,Dxdeta)
@@ -72,14 +72,14 @@ end subroutine pyram
 !
 !
 !-----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for pyramid
+!> @brief parametric transfinite interpolation for pyramid
 !!
-!! @param[in]  No     - a GMP pyramid number
-!! @param[in]  Eta    - reference coordinates
-!! @param[out] X      - physical coordinates
-!! @param[out] Dxdeta - derivatives
+!> @param[in]  No     - a GMP pyramid number
+!> @param[in]  Eta    - reference coordinates
+!> @param[out] X      - physical coordinates
+!> @param[out] Dxdeta - derivatives
 !!
-!! @revision Mar 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine pyram_TI(No,Eta, Xp,Dxdeta)
@@ -234,8 +234,9 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
         end select
 ! ......this is needed for face contributions...
         if (ie.le.4) then
-          blend_edge(ie) = blend
-          dblend_edge(1:3,ie) = dblend(1:3)
+          i = ie ! suppresses gfortran W-do-subscript warning
+          blend_edge(i) = blend
+          dblend_edge(1:3,i) = dblend(1:3)
         endif
 !
 !  .....add edge contribution

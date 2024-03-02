@@ -1,18 +1,18 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] ZsolH  - H1    sol
-!! @param[in] ZgradH - H1    grad
-!! @param[in] ZsolE  - Hcurl sol
-!! @param[in] ZcurlE - Hcurl curl
-!! @param[in] ZsolV  - Hdiv  sol
-!! @param[in] ZdivV  - Hdiv  div
-!! @param[in] ZsolQ  - L2    sol
+!> @brief display user-defined quantity
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] ZsolH  - H1    sol
+!> @param[in] ZgradH - H1    grad
+!> @param[in] ZsolE  - Hcurl sol
+!> @param[in] ZcurlE - Hcurl curl
+!> @param[in] ZsolV  - Hdiv  sol
+!> @param[in] ZdivV  - Hdiv  div
+!> @param[in] ZsolQ  - L2    sol
 !!
-!! @param[out] val   - quantity to display
+!> @param[out] val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
@@ -21,32 +21,32 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
 !---------------------------------------------------------------------------------------
   implicit none
   integer,                      intent(in)  :: Mdle
-  real*8,dimension(3),          intent(in)  :: Xi,X,Rn
-  real*8,dimension(  MAXEQNH  ),intent(in)  :: ZsolH
-  real*8,dimension(  MAXEQNH,3),intent(in)  :: ZgradH
-  real*8,dimension(3,MAXEQNE  ),intent(in)  :: ZsolE
-  real*8,dimension(3,MAXEQNE  ),intent(in)  :: ZcurlE
-  real*8,dimension(3,MAXEQNV  ),intent(in)  :: ZsolV
-  real*8,dimension(  MAXEQNV  ),intent(in)  :: ZdivV
-  real*8,dimension(  MAXEQNQ  ),intent(in)  :: ZsolQ
-  real*8,                       intent(out) :: Val
+  real(8),dimension(3),          intent(in)  :: Xi,X,Rn
+  real(8),dimension(  MAXEQNH  ),intent(in)  :: ZsolH
+  real(8),dimension(  MAXEQNH,3),intent(in)  :: ZgradH
+  real(8),dimension(3,MAXEQNE  ),intent(in)  :: ZsolE
+  real(8),dimension(3,MAXEQNE  ),intent(in)  :: ZcurlE
+  real(8),dimension(3,MAXEQNV  ),intent(in)  :: ZsolV
+  real(8),dimension(  MAXEQNV  ),intent(in)  :: ZdivV
+  real(8),dimension(  MAXEQNQ  ),intent(in)  :: ZsolQ
+  real(8),                       intent(out) :: Val
 !---------------------------------------------------------------------------------------
 ! exact solution workspace
   integer                         :: icase
-  real*8,dimension(  MAXEQNH    ) ::   zvalH
-  real*8,dimension(  MAXEQNH,3  ) ::  zdvalH
-  real*8,dimension(  MAXEQNH,3,3) :: zd2valH
-  real*8,dimension(3,MAXEQNE    ) ::   zvalE
-  real*8,dimension(3,MAXEQNE,3  ) ::  zdvalE
-  real*8,dimension(3,MAXEQNE,3,3) :: zd2valE
-  real*8,dimension(3,MAXEQNV    ) ::   zvalV
-  real*8,dimension(3,MAXEQNV,3  ) ::  zdvalV
-  real*8,dimension(3,MAXEQNV,3,3) :: zd2valV
-  real*8,dimension(  MAXEQNQ    ) ::   zvalQ
-  real*8,dimension(  MAXEQNQ,3  ) ::  zdvalQ
-  real*8,dimension(  MAXEQNQ,3,3) :: zd2valQ
+  real(8),dimension(  MAXEQNH    ) ::   zvalH
+  real(8),dimension(  MAXEQNH,3  ) ::  zdvalH
+  real(8),dimension(  MAXEQNH,3,3) :: zd2valH
+  real(8),dimension(3,MAXEQNE    ) ::   zvalE
+  real(8),dimension(3,MAXEQNE,3  ) ::  zdvalE
+  real(8),dimension(3,MAXEQNE,3,3) :: zd2valE
+  real(8),dimension(3,MAXEQNV    ) ::   zvalV
+  real(8),dimension(3,MAXEQNV,3  ) ::  zdvalV
+  real(8),dimension(3,MAXEQNV,3,3) :: zd2valV
+  real(8),dimension(  MAXEQNQ    ) ::   zvalQ
+  real(8),dimension(  MAXEQNQ,3  ) ::  zdvalQ
+  real(8),dimension(  MAXEQNQ,3,3) :: zd2valQ
 !---------------------------------------------------------------------------------------
-  real*8 :: tmpVal(3)
+  real(8) :: tmpVal(3)
 !---------------------------------------------------------------------------------------
 !
   select case (IEXACT_DISP)
@@ -85,7 +85,7 @@ end subroutine soldis
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities to display
+!> @brief show the quantities to display
 !---------------------------------------------------------------------------------------
 subroutine soldis_select
   use parameters, only : NSTD_OUT
@@ -116,7 +116,7 @@ subroutine soldis_select
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : Soldis display interface
+!> @brief Soldis display interface
 !---------------------------------------------------------------------------------------
 end subroutine soldis_select
 

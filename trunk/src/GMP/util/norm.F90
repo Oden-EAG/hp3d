@@ -4,7 +4,7 @@
 !> @param[in]  Vec   - 3D vector
 !> @param[out] Rnorm - norm of the vector
 !
-!> @revision Feb 13
+!> @date Feb 13
 !-------------------------------------------------------------------------
 subroutine norm(Vec, Rnorm)
 !

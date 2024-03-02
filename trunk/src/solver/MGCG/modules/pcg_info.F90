@@ -81,7 +81,7 @@
       enddo
 !
 !  ...compute the local residual vectors
-#if C_MODE
+#if HP3D_COMPLEX
       call ZHPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,p_loc,1,ZERO,Ap_loc,1)
 #else
       call DSPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,p_loc,1,ZERO,Ap_loc,1)
@@ -152,7 +152,7 @@
       enddo
 !
 !  ...compute the local residual vectors
-#if C_MODE
+#if HP3D_COMPLEX
       call ZHPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,r_loc,1)
 #else
       call DSPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,r_loc,1)
@@ -224,7 +224,7 @@
       enddo
 !
 !  ...compute the local residual vectors
-#if C_MODE
+#if HP3D_COMPLEX
       call ZHPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,GRID(Igrid)%loc(iel)%z,1,ZERO,r_loc,1)
 #else
       call DSPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,GRID(Igrid)%loc(iel)%z,1,ZERO,r_loc,1)
@@ -295,7 +295,7 @@
       enddo
 !
 !  ...compute the local residual vectors
-#if C_MODE
+#if HP3D_COMPLEX
       call ZHPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,GRID(Igrid)%loc(iel)%r,1)
 #else
       call DSPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,GRID(Igrid)%loc(iel)%r,1)
@@ -358,7 +358,7 @@
       enddo
 !
 !  ...compute the local residual vectors
-#if C_MODE
+#if HP3D_COMPLEX
       call ZHPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,r_loc,1)
 #else
       call DSPMV('U',ndof,ZONE,GRID(Igrid)%dloc(iel)%zstiff,z_loc,1,ZERO,r_loc,1)

@@ -6,7 +6,7 @@
 !
 !     latest revision: - May 2021
 !
-!     purpose:         - return dirichlet data at a point
+!> @brief        - return dirichlet data at a point
 !
 !     arguments:
 !
@@ -48,7 +48,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    real(8),dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -78,7 +78,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
          stop 1
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7010) X(1:3), ValH(1:MAXEQNH)
  7010 format('dirichlet: X = ',3f8.3,' ValH = ',10e12.5)

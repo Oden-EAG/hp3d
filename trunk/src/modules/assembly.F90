@@ -82,7 +82,7 @@ contains
 
    end subroutine assembly_begin_par
 
-!> Purpose : free workspace
+!> @brief free workspace
    subroutine assembly_end
       integer :: istat
       deallocate( &

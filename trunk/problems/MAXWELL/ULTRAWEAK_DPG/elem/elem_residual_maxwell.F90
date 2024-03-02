@@ -124,7 +124,7 @@
 !
       integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -177,7 +177,7 @@
 !     ...determine element H1 shape functions
          call shape3DH(ntype,xi,norder,norient_edge,norient_face,  &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
             stop
@@ -186,7 +186,7 @@
 !   ...determine element H(curl) shape functions
          call shape3DE(ntype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapE,curlE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofE) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofE. stop.'
             stop
@@ -194,7 +194,7 @@
 #endif
 !     ...determine element L2 shape functions
          call shape3DQ(ntype,xi,norder, nrdof,shapQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofQ) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofQ. stop.'
             stop
@@ -202,7 +202,7 @@
 #endif
 !     ...determine discontinuous H(curl) shape functions
          call shape3EE(ntype,xi,nordP, nrdof,shapEE,curlEE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofEE) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofEE. stop.'
             stop
@@ -387,7 +387,7 @@
 !        ...determine element H1 shape functions (for geometry)
             call shape3DH(ntype,xi,norder,norient_edge,norient_face, &
                           nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (nrdof .ne. NrdofH) then
                write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
                stop
@@ -397,7 +397,7 @@
 !        ...determine element H(curl) shape functions (for fluxes)
             call shape3DE(ntype,xi,norder,norient_edge,norient_face, &
                           nrdof,shapE,curlE)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (nrdof .ne. NrdofE) then
                write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofE. stop.'
                stop
@@ -509,7 +509,7 @@
          enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.gt.0) then
          write(*,7015) bload_E(1:2*NrdofEE)
  7015    format('elem_residual_maxwell: FINAL bload_E = ',10(/,6(2e12.5,2x)))
@@ -564,7 +564,7 @@
          case(MDLN,MDLD); Nref_flag = 1
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) Mdle, Resid
  7010    format('elem_residual_maxwell: Mdle, Resid = ',i5,3x,e12.5)

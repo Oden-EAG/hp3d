@@ -4,7 +4,7 @@
 !> @param[in]  X       - Cartesian coordinates of a point
 !> @param[out] R,Theta - polar coordinates of the point
 !
-!> rev@Feb 13
+!> @date Feb 2013
 !
 !  REMARK : -pi <= Theta <= pi
 !----------------------------------------------------------------------

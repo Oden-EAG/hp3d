@@ -20,7 +20,7 @@ module frsolmod
 !
 !..work space for the frontal solver
    integer                       :: MFRSOL
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8), allocatable       :: ZWORKFRS(:)
 #else
    real(8)   , allocatable       :: ZWORKFRS(:)

@@ -36,7 +36,7 @@ subroutine find_case(Number,Phys, Icase)
       integer :: narray(10)
       integer :: ii, j
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -45,7 +45,7 @@ subroutine find_case(Number,Phys, Icase)
 !
       narray(1:10)=0
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Number, Phys(1:Number)
  7001   format(' find_case: Phys(1:',i1,') = ',5(a5,' ; '))
@@ -61,7 +61,7 @@ subroutine find_case(Number,Phys, Icase)
 !  ...encode the case number
       call encod(narray,2,NR_PHYSA, Icase)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) Icase
  7002   format(' find_case: Icase = ',i2)

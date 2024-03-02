@@ -16,9 +16,9 @@ end module surfsc2
 ! DESCRIPTION OF VARIABLES
 !
 !      COMMON /SURFC2/ IB, IU, IL, IFB, IFU, IFL, MBUF, MW, MKF,
-!     .                MELEM, MFWR, MB, MDOF, MLDEST, NRHSF, NFN,
-!     .                NFW, KFW, LFW, NDOFM, MFW, IDUMP, LENU,
-!     .                MBUFSV(2,2)
+!                      MELEM, MFWR, MB, MDOF, MLDEST, NRHSF, NFN,
+!                      NFW, KFW, LFW, NDOFM, MFW, IDUMP, LENU,
+!                      MBUFSV(2,2)
 !
 ! Frontal Solver Common Block
 ! ---------------------------

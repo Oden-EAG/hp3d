@@ -7,7 +7,7 @@
 !
 !     latest revision:  - May 2020
 !
-!     purpose:          - define options for main file specific to the problem.
+!> @brief         - define options for main file specific to the problem.
 !                         These can be consulted with the -help option when running
 !                         the executable. It is especially important to define
 !                         the global environment variables in module/environment.
@@ -20,7 +20,6 @@ subroutine set_environment
    use environment
    use common_prob_data
    use paraview
-   use parametersDPG, only: MAXNORD_ADD
 !
    implicit none
 !

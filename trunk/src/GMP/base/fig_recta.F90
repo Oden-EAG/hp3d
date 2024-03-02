@@ -1,16 +1,16 @@
 !-----------------------------------------------------------------------
-!> Purpose : physical coordinates for a rectangle parametrization, and
+!> @brief physical coordinates for a rectangle parametrization, and
 !!           their derivatives wrt to a GIVEN system of coordinates
 !!
-!! @param[in ] No      - rectangle number
-!! @param[in ] Norient - orientation of GLOBAL REFERENCE coordinates
+!> @param[in ] No      - rectangle number
+!> @param[in ] Norient - orientation of GLOBAL REFERENCE coordinates
 !!                       wrt a GIVEN system of coordinates
-!! @param[in ] T       - coordinates of a point in the rectangle
+!> @param[in ] T       - coordinates of a point in the rectangle
 !!                       according to the GIVEN system
-!! @param[out] X       - physical coordinates
-!! @param[out] Dxdt    - derivatives of physical coordinates
+!> @param[out] X       - physical coordinates
+!> @param[out] Dxdt    - derivatives of physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !-----------------------------------------------------------------------
 subroutine recta_local(No,Norient,T, X,Dxdt)
 !
@@ -57,15 +57,15 @@ end subroutine recta_local
 !
 !
 !--------------------------------------------------------------------------
-!> Purpose : physical coordinates and derivatives wrt to reference
+!> @brief physical coordinates and derivatives wrt to reference
 !!           coordinates for a point in a GMP rectangle
 !!
-!! @param[in ]  No     - the rectangle number
-!! @param[in ]  Eta    - reference coordinates of a point
-!! @param[out]  X      - physical coordinates of the point
-!! @param[out]  Dxdeta - derivatives of the physical coordinates
+!> @param[in ]  No     - the rectangle number
+!> @param[in ]  Eta    - reference coordinates of a point
+!> @param[out]  X      - physical coordinates of the point
+!> @param[out]  Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !--------------------------------------------------------------------------
 !
 subroutine recta(No,Eta, X,Dxdeta)

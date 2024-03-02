@@ -1,3 +1,0 @@
-      common /rastcom/ IFILE,IDUMP,LASTCOL,LASTX,LASTY
-c
-      integer IFILE,IDUMP,LASTCOL,LASTX,LASTY

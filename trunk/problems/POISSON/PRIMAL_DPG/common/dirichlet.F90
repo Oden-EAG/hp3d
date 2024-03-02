@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - return dirichlet data at a point
+!> @brief         - return dirichlet data at a point
 !
 !     arguments:
 !

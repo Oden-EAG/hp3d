@@ -21,7 +21,7 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    integer :: icase,nvar,ndofH,ndofE,ndofV,ndofQ
    integer :: act_dof,subd
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -34,7 +34,7 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !..determine number of dofs, update geometry dofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,', ndofH,ndofE,ndofV,ndofQ= ',4i4)
@@ -100,7 +100,7 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !..raise activation flag
    NODES(Nod)%act=.true.
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,*) 'activate : ACTIVATED Nod = ', Nod
    endif
@@ -110,7 +110,7 @@ end subroutine activate
 !
 !
 !-------------------------------------------------------------------------
-!> Purpose : deactivate a node.
+!> @brief deactivate a node.
 !            note: dofs are only deallocated if node was in subdomain,
 !                  i.e., if dof pointers were associated with data.
 !
@@ -129,7 +129,7 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !
    integer :: icase,ndofH,ndofE,ndofV,ndofQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -142,7 +142,7 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !..find number of dofs associated to node, update number of gdofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('deactivate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
@@ -198,7 +198,7 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !..lower activation flag
    NODES(Nod)%act=.false.
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,*) 'deactivate : DEACTIVATED Nod = ', Nod
    endif

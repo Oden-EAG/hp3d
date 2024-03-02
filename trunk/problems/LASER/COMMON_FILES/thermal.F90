@@ -9,7 +9,7 @@
 !
 !     latest revision:  - Jan 2024
 !
-!     purpose:          - routine sets up computation of average and peak
+!> @brief         - routine sets up computation of average and peak
 !                         temperature in the fiber at certain z-locations
 !                         (peak temperature assumed at R=0 fiber axis)
 !
@@ -122,7 +122,7 @@ end subroutine get_avgTemp
 !
 !     latest revision:    - Jan 2024
 !
-!     purpose:            - routine computes average and peak temperature in the
+!> @brief           - routine computes average and peak temperature in the
 !                           fiber at certain z-locations (sample points)
 !
 !     arguments:
@@ -289,7 +289,7 @@ end subroutine comp_avgTemp
 !
 !     latest revision:    - Mar 2019
 !
-!     purpose:            - routine computes average temperature in
+!> @brief           - routine computes average temperature in
 !                           an element
 !
 !     arguments:
@@ -375,7 +375,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !  ...Jacobian
       call geom(dxdxi, dxidx,rjac,iflag)
       weight = wa*rjac
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iflag .ne. 0) then
         write(*,*) 'comp_elem_avgTemp: geom iflag != 0. Mdle,rjac = ',Mdle,rjac
       endif
@@ -398,11 +398,11 @@ end subroutine comp_elem_avgTemp
 !
 !-------------------------------------------------------------------------------
 !
-!  routine: get_thermLoad
+!> @name get_thermLoad
 !
-!  last modified: Mar 2019
+!> @date Mar 2019
 !
-!  purpose: returns the thermal load (heat deposition)
+!> @brief returns the thermal load (heat deposition)
 !
 !  input:   - ZsolQ  : EH fields (6 EH - for signal, 6 EH - for pump)
 !           - Coord_z: Element z-coordinate in physical coordinates

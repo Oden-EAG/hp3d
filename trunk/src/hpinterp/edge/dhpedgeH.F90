@@ -2,21 +2,21 @@
 !> @brief    update H1 edge dof interpolating H1 Dirichlet data using
 !            PB interpolation
 !!
-!! @param[in]  Mdle         - element (middle node) number
-!! @param[in]  Iflag        - a flag specifying which of the objects the
+!> @param[in]  Mdle         - element (middle node) number
+!> @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Icase        - the edge node case
-!! @param[in]  Bcond        - the edge node BC flag
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation (not used)
-!! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number
-!! @param[in]  ZdofH        - H1 dof for the element (vertex values)
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Icase        - the edge node case
+!> @param[in]  Bcond        - the edge node BC flag
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation (not used)
+!> @param[in]  Norder       - element order
+!> @param[in]  Iedge        - edge number
+!> @param[in]  ZdofH        - H1 dof for the element (vertex values)
 !!
-!! @param[in,out] ZnodH     - H1 dof for the edge
+!> @param[in,out] ZnodH     - H1 dof for the edge
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------
@@ -88,7 +88,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! load vector and solution
   VTYPE,   dimension(MAXP-1,MAXEQNH)    :: zbH,zuH
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXP-1,MAXEQNH)    :: duH_real,duH_imag
 #endif
 !
@@ -98,7 +98,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -107,7 +107,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeH: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -131,7 +131,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call homogenD(CONTIN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuH = ZERO
-    go to 100
+    goto 100
   endif
 !
 ! if # of dof is zero, return, nothing to do
@@ -263,7 +263,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_edge = ',ndofH_edge
@@ -271,13 +271,13 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       write(*,7015) j, zbH(j,1:MAXEQNH)
       write(*,7016) aaH(j,1:ndofH_edge)
     enddo
-# if C_MODE
-7015    format(i5, 6(2e10.3,2x))
-# else
-7015    format(i5, 10e12.5)
-# endif
-7016    format(10e12.5)
   endif
+#if HP3D_COMPLEX
+  7015 format(i5,2x,6(2e10.3,2x))
+#else
+  7015 format(i5,2x,10e12.5)
+#endif
+  7016 format(10e12.5)
 #endif
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
@@ -297,7 +297,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! copy load vector
   zuH(1:ndofH_edge,:) = zbH(1:ndofH_edge,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 ! apply pivots to load vector
   call zlaswp(MAXEQNH,zuH,naH,1,ndofH_edge,ipivH,1)
@@ -336,7 +336,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeH: k,zu(k) = '
    do k=1,ndofH_edge

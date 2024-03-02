@@ -49,7 +49,7 @@
    if (ISTORE .eq. ISTORE_YES) then
       if (jb .ne. 0) then
 !
-#if C_MODE
+#if HP3D_COMPLEX
          call ZGEMV('N',jb,ji,ZONE,A_MACRO(ielc)%array,jb,Zsol_globi,1,ZERO,Zsol_globb,1)
 #else
          call DGEMV('N',jb,ji,ZONE,A_MACRO(ielc)%array,jb,Zsol_globi,1,ZERO,Zsol_globb,1)
@@ -70,7 +70,7 @@
       stop
       if (jb .ne. 0) then
 
-#if C_MODE
+#if HP3D_COMPLEX
          call ZGEMV('N',jb,ji,ZONE,macro_array,jb,Zsol_globi,1,ZERO,Zsol_globb,1)
 #else
          call DGEMV('N',jb,ji,ZONE,macro_array,jb,Zsol_globi,1,ZERO,Zsol_globb,1)

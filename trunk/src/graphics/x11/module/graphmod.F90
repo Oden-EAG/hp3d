@@ -1,6 +1,6 @@
 #if HP3D_USE_X11
 
-!> Purpose : define the workspace for graphics
+!> @brief define the workspace for graphics
 module graphmod
   !
   implicit none

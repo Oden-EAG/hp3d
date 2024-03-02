@@ -1,7 +1,7 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !-----------------------------------------------------------------------
-!> Purpose : routine employs the greedy strategy to perform adaptive
+!> @brief routine employs the greedy strategy to perform adaptive
 !!           h-refinements
 !!
 !> @param[in] Iphy  -
@@ -9,7 +9,7 @@
 !> @param[in] Eps   -
 !> @param[in] Ath   -
 !!
-!> rev@Dec 12
+!> @date Dec 2012
 !-----------------------------------------------------------------------
 subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
       use data_structure3D

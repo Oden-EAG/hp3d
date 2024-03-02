@@ -29,7 +29,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !
       integer :: mdle,nfath,nrbros,noson
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -39,7 +39,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !  ...first element in the mesh
       if (mdle.eq.0) then
         mdle = 1
-        go to 20
+        goto 20
       endif
 !
 !  ...Step 1: move horizontally, if you can, otherwise move vertically up
@@ -51,7 +51,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !
 !  .....move to the next initial mesh element
         mdle = mdle + 1
-        go to 20
+        goto 20
       else
 !
 !  .....find the son number in the family
@@ -60,23 +60,23 @@ subroutine nelcon(Mdle0, Mdle1)
         noson = mdle - NODES(nfath)%first_son + 1
 !        if (noson<0 .or. noson>nrbros) call pause
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) mdle,nfath,nrbros,noson
  7002     format('nelcon: mdle,nfath,nrbros,noson = ',2i7,2i3)
         endif
 #endif
 !
-!  .....if mdle is not the last son in the family, go to the next brother
+!  .....if mdle is not the last son in the family, goto the next brother
         if (noson.lt.nrbros) then
 !          mdle = NODES(nfath)%sons(noson+1)
           mdle = Son(nfath,noson+1)
-          go to 20
+          goto 20
         else
 !
 !  .......move up on the tree
           mdle = nfath
-          go to 10
+          goto 10
         endif
       endif
 !
@@ -89,7 +89,7 @@ subroutine nelcon(Mdle0, Mdle1)
       Mdle1 = mdle
 !
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010) Mdle0,Mdle1
  7010   format('nelcon: Mdle0,Mdle1 = ',2i7)
@@ -100,7 +100,7 @@ end subroutine nelcon
 
 
 !! Alternate routine
-!      subroutine nelcon(Mdle, Mdle_next)
+!   subroutine nelcon(Mdle, Mdle_next)
 !      integer, intent(in)  :: Mdle
 !      integer, intent(out) :: Mdle_next
 !
@@ -136,4 +136,4 @@ end subroutine nelcon
 !! Assign next middle node
 !      Mdle_next = Mdle
 !
-!      end subroutine nelcon
+!   end subroutine nelcon
