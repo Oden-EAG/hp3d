@@ -60,6 +60,8 @@ Some examples of 3D applications that have been implemented in $hp\mathrm{3D}$ i
 
 Instructions on installing and using the code are available in the $hp\mathrm{3D}$ user manual [@hpUserManual]. $hp\mathrm{3D}$'s underlying algorithms are described in various published articles and books. Many parts of the current version of the $hp\mathrm{3D}$ software are based on the algorithms described in the two-volume $hp$ book series [@hpbook; @hpbook2] on the former 2D and 3D versions of the code (which were not published as open-source libraries). A third $hp$ book volume detailing the additions and modifications of the newest version, including its MPI/OpenMP parallel algorithms, will be published soon [@hpbook3]. The orientation-embedded shape functions package is described in @fuentes2015shape. Details on the FE methodology and conforming discretization of exact-sequence elements are given in @demkowicz2023fem.
 
+The source code for $hp\mathrm{3D}$ has been archived to Zenodo [@hp3D-v1.0].
+
 # Acknowledgements
 
 We acknowledge contributions from Ankit Chakraborty, Paolo Gatto, Brendan Keith, Kyungjoo Kim, Jaime D. Mora, and Sriram Nagaraj for this project. The development and open-sourcing of the $hp\mathrm{3D}$ FE code are supported by NSF award 2103524. This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344, LLNL-JRNL-855288.
