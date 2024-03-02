@@ -10,10 +10,6 @@ authors:
     corresponding: true
     equal-contrib: true
     affiliation: 1
-  - name: Jacob Badger
-    orcid: 0000-0001-6482-105X
-    equal-contrib: true
-    affiliation: 1
   - name: Socratis Petrides
     orcid: 0000-0002-1284-5495
     equal-contrib: true
@@ -22,6 +18,10 @@ authors:
     orcid: 0000-0002-4039-082X
     equal-contrib: true
     affiliation: 3
+  - name: Jacob Badger
+    orcid: 0000-0001-6482-105X
+    equal-contrib: true
+    affiliation: 1
   - name: Leszek Demkowicz
     orcid: 0000-0001-7839-8037
     equal-contrib: true
@@ -58,7 +58,7 @@ Some examples of 3D applications that have been implemented in $hp\mathrm{3D}$ i
 
 # Further reading
 
-Instructions on installing and using the code are available in the $hp\mathrm{3D}$ user manual [@hpUserManual]. $hp\mathrm{3D}$'s underlying algorithms are described in various published articles and books. Many parts of the current version of the $hp\mathrm{3D}$ software are based on the algorithms described in the two-volume $hp$ book series [@hpbook; @hpbook2] on the former 2D and 3D versions of the code (which were not published as open-source libraries). A third $hp$ book volume detailing the additions and modifications of the newest version, including its MPI/OpenMP parallel algorithms, will be published soon [@hpbook3]. The orientation-embedded shape functions package is described in [@fuentes2015shape]. Details on the FE methodology and conforming discretization of exact-sequence elements are given in [@demkowicz2023fem].
+Instructions on installing and using the code are available in the $hp\mathrm{3D}$ user manual [@hpUserManual]. $hp\mathrm{3D}$'s underlying algorithms are described in various published articles and books. Many parts of the current version of the $hp\mathrm{3D}$ software are based on the algorithms described in the two-volume $hp$ book series [@hpbook; @hpbook2] on the former 2D and 3D versions of the code (which were not published as open-source libraries). A third $hp$ book volume detailing the additions and modifications of the newest version, including its MPI/OpenMP parallel algorithms, will be published soon [@hpbook3]. The orientation-embedded shape functions package is described in @fuentes2015shape. Details on the FE methodology and conforming discretization of exact-sequence elements are given in @demkowicz2023fem.
 
 # Acknowledgements
 
