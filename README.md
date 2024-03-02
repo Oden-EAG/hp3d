@@ -21,7 +21,7 @@ Set the `HP3D_BASE_PATH` to the path of the `hp3d/trunk/`
 ## Linking to external libraries
 The `m_options` file must link to the correct paths for external libraries. The following external libraries are used:
 - Intel MKL [optional]
-- X11
+- X11 [optional]
 - PETSc (all following packages can be installed with PETSc)
 - HDF5/pHDF5
 - MUMPS
