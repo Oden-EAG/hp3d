@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use hp3D, please cite it as follows."
 url: "https://github.com/Oden-EAG/hp3d"
 version: 1.0
+doi: 10.5281/zenodo.10763374
 date-released: 2024-03-02
 title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library for Complex Multiphysics Applications"
 authors:
