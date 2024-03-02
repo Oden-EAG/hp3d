@@ -195,7 +195,7 @@
             igv(icount) = nel
           else
             write(*,*)'OBJECT3: END OF SELECTION'
-            go to 410
+            goto 410
           endif
         enddo
  410    continue
@@ -248,7 +248,7 @@
             icount = icount +1
             igv(icount) = nel
           else
-            go to 420
+            goto 420
           endif
         enddo
  420    continue

@@ -104,7 +104,7 @@
 ! ------------------------------------------------------
 ! into u() we place:  [k(1,m)/k(m,m), k(2,m)/k(m,m),...k(m-1,m)/k(m,m),
 !
-      do 20 i = 1,idm
+      do i = 1,idm
 !     ---------------
 ! pick up k(i,m)
 !
@@ -119,7 +119,7 @@
          if (dabs(s) .le. sml2) then
             m = m + 1
             k = k + i
-            go to 20
+            goto 20
           endif
 !wb <
 !
@@ -132,13 +132,13 @@
 ! ----------
 !   k(i,j)' = k(i,j) - [k(i,m)/k(m,m)]*k(m,j)      note: k(i,m) = k(m,i)
 !
-         do 10 j=1,i
+         do j=1,i
             Flhs(k) = Flhs(k) - s*Ubuf(j)
             k = k + 1
-   10    continue
+         enddo
 !
          m = m + 1
-   20 continue
+   20 enddo
 !
 !-----------------------------------------------------------------------
 !
@@ -148,7 +148,7 @@
 !
       m = mp
       k = 0
-      do 80 i = idp,NFW
+      do i = idp,NFW
 !     -----------------
          nn = m - id
          m = m + id + k
@@ -171,9 +171,9 @@
 ! ARDENT directives
 !$doit VBEST
 !
-            do 30 j = 1,idm
+            do j = 1,idm
                Flhs(nn+j) = Flhs(n+j)
-   30       continue
+            enddo
             nn = nn - 1
 !
 ! ALLIANT directives
@@ -181,12 +181,12 @@
 ! ARDENT directives
 !$doit VBEST
 !
-            do 35 j = idp,i
+            do j = idp,i
                Flhs(nn+j) = Flhs(n+j)
-   35       continue
+            enddo
 !
             k = k + 1
-            go to 80
+            goto 80
           endif
 !wb <
 !
@@ -212,9 +212,9 @@
 ! ARDENT directives
 !$doit VBEST
 !
-         do 40 j = 1,idm
+         do j = 1,idm
             Flhs(nn+j) = Flhs(n+j) - s*Ubuf(j)
-   40    continue
+         enddo
 !
          nn = nn - 1
 !
@@ -223,13 +223,13 @@
 ! ARDENT directives
 !$doit VBEST
 !
-         do 60 j = idp,i
+         do j = idp,i
             Flhs(nn+j) = Flhs(n+j) - s*Ubuf(j)
-   60    continue
+         enddo
 !
          k = k + 1
 !
-   80 continue
+   80 enddo
 !  ------------
 !
    end subroutine symelm

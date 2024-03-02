@@ -39,7 +39,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !  ...first element in the mesh
       if (mdle.eq.0) then
         mdle = 1
-        go to 20
+        goto 20
       endif
 !
 !  ...Step 1: move horizontally, if you can, otherwise move vertically up
@@ -51,7 +51,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !
 !  .....move to the next initial mesh element
         mdle = mdle + 1
-        go to 20
+        goto 20
       else
 !
 !  .....find the son number in the family
@@ -67,16 +67,16 @@ subroutine nelcon(Mdle0, Mdle1)
         endif
 #endif
 !
-!  .....if mdle is not the last son in the family, go to the next brother
+!  .....if mdle is not the last son in the family, goto the next brother
         if (noson.lt.nrbros) then
 !          mdle = NODES(nfath)%sons(noson+1)
           mdle = Son(nfath,noson+1)
-          go to 20
+          goto 20
         else
 !
 !  .......move up on the tree
           mdle = nfath
-          go to 10
+          goto 10
         endif
       endif
 !

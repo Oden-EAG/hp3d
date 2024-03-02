@@ -309,7 +309,7 @@ subroutine connect
             do i2=1,CURVES(nc2)%NrFig
               nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
-                go to 40
+                goto 40
               endif
             enddo
           enddo
@@ -451,7 +451,7 @@ subroutine connect
             do i2=1,CURVES(nc2)%NrFig
               nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
-                go to 70
+                goto 70
               endif
             enddo
           enddo
@@ -625,7 +625,7 @@ subroutine connect
             do i2=1,CURVES(nc2)%NrFig
               nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
-                go to 90
+                goto 90
               endif
             enddo
           enddo
@@ -760,7 +760,7 @@ subroutine connect
             do i2=1,CURVES(nc2)%NrFig
               nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
-                go to 170
+                goto 170
               endif
             enddo
           enddo

@@ -33,9 +33,9 @@
       if (NRVISTR.eq.0) return
 !
 !  ...initialize index array
-      do 10 i=1,NRVISTR
+      do i=1,NRVISTR
         IGTR(i) = i
- 10   continue
+      enddo
 !
 !  ...start sorting (heapsort algorithm)
       l=NRVISTR/2+1
@@ -65,7 +65,7 @@
       i=l
       j=l*2
    30 continue
-      if (j.gt.ir) go to 40
+      if (j.gt.ir) goto 40
       if (j.lt.ir) then
         if (RGTRZ(IGTR(j)).lt.RGTRZ(IGTR(j+1))) j=j+1
       endif
@@ -76,10 +76,10 @@
       else
         j=ir+1
       endif
-      go to 30
+      goto 30
    40 continue
       IGTR(i) = index
-      go to 20
+      goto 20
 !
    end subroutine sortz
 

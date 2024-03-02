@@ -146,7 +146,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call homogenD(TANGEN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
-    go to 100
+    goto 100
   endif
 !
 ! if # of dof is zero, return, nothing to do

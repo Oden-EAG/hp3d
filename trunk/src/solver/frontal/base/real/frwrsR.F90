@@ -78,7 +78,7 @@
 !
 ! loop over the Elements
 ! **********************
-      do 200 iel  = 1,NUMELM
+      do iel  = 1,NUMELM
 !     ***********************
 !
          negiel = -iel
@@ -87,7 +87,7 @@
 !
          call solin1 (iel, numdes, Aldest)
 !        ---------------------------------
-         if (numdes.eq.0) go to 200
+         if (numdes.eq.0) goto 200
 !
 ! convert the nodal destination vectors to dof destination vectors (Amde
 !  also determine the number of dof to eliminate from the front (ne)
@@ -140,9 +140,9 @@
 ! ARDENT directives
 !$doit VBEST
 !
-            do 133 id = 1,NDOFM
+            do id = 1,NDOFM
                Amdest(id) = dabs(Amdest(id))
-  133       continue
+  133       enddo
 !wb <
 !
             call semrhs (Amdest, Elem, Frnt)
@@ -159,7 +159,7 @@
 ! eliminate those equations possible from the current front
 ! **********************************************************
 !
-         do 150 ie = 1,ne
+         do ie = 1,ne
 !        ****************
 !
 ! check for rhs Buffer being full and dump if necessary
@@ -269,14 +269,14 @@
 !
             NFW  =  NFW - 1
 !
-  150    continue
+         enddo
 ! ***************
 ! store the final length of the current front (LFW) into Alelm
 !
          LFW  =  NFW
          Alelm(iel)  =  LFW
 !
-  200 continue
+  200 enddo
 ! *************
 !
 ! dump the final rhs Buffers to diskfiles

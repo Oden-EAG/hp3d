@@ -49,9 +49,9 @@
 ! ARDENT directives
 !$doit VBEST
 !
-      do 10 i = mi,mj
+      do i = mi,mj
          Flhs(i) = dzero
-   10 continue
+      enddo
 !
 !
    end subroutine zeros

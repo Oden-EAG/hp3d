@@ -33,7 +33,7 @@
 !
 ! loop over the number of rhs's
 !
-      do 70 in=1,NRHS
+      do in=1,NRHS
 !     ---------------
 !
 ! ALLIANT directives
@@ -43,7 +43,7 @@
 !
 ! loop thru the dof in the element
 !
-         do 50 i=1,NDOFM
+         do i=1,NDOFM
 !        ---------------
 ! pull the dof destination vector
 !
@@ -59,9 +59,9 @@
 !
             Frhs(j) = Frhs(j) + Elrhs(n)
             n = n + 1
-   50    continue
+         enddo
 !
-   70 continue
+      enddo
 !
 !
    end subroutine semrhs

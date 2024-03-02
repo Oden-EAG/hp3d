@@ -84,7 +84,7 @@ subroutine update_gdof
       nod_flg = .false.
 !
 !  ...loop through active elements
-      do 100 iel=1,NRELES_SUBD
+      do iel=1,NRELES_SUBD
 !
          mdle = ELEM_SUBD(iel)
          call find_elem_type(mdle, mdltype)
@@ -114,7 +114,7 @@ subroutine update_gdof
 !           ...check if the node has been updated
                if (NODES(nod)%visit.eq.0) then
                   nod_flg = .true.
-                  goto 100
+                  cycle
                endif
             endif
          enddo
@@ -198,7 +198,7 @@ subroutine update_gdof
          NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
- 100  continue
+      enddo
 !
       if (nr_up_elem.eq.0) exit
 !
@@ -595,7 +595,7 @@ subroutine update_gdof_omp
 !        ...check if the node has been updated
             if (NODES(nod)%visit.eq.0) then
                nod_flg = .true.
-               goto 100
+               cycle
             endif
          enddo
 !
@@ -709,7 +709,6 @@ subroutine update_gdof_omp
          NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
- 100  continue
       enddo
 !$OMP END DO
 !$OMP END PARALLEL

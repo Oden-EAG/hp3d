@@ -64,7 +64,7 @@
 ! =======================================================
 ! loop over the number of nodal destination vectors
 !
-      do 50 i = 1,Nd
+      do i = 1,Nd
 !     --------------
 ! set the nodal dest vec to an integer
 ! note: destination vecs are packed as:
@@ -102,7 +102,7 @@
 !wb <
 ! loop over dof
 !
-         do 10 j = 1,n
+         do j = 1,n
 !
 ! set the front location (ie: the dof destination vector array)
 !
@@ -124,7 +124,7 @@
 !
             km = km+1
 !
-   10    continue
+         enddo
 !
 ! set the current frontwidth number
 !wb >
@@ -143,7 +143,7 @@
 !wb <
          if (l .gt. NFW) NFW = l
 !
-   50 continue
+      enddo
 !  -----------
 !
 ! create the elimination destination vector array (Andest)
@@ -157,7 +157,7 @@
 !========================================================
 ! loop over the number of dof to eliminate
 !
-      do 70 i = 1,ne
+      do i = 1,ne
 !     --------------
          j = i + 1
 !
@@ -168,7 +168,7 @@
 !
 ! loop over the remaining number of dof to eliminate
 !
-         do 60 l = j,ne
+         do l = j,ne
 !
             ndi = int(Andest(i))
             ndl = int(Andest(l))
@@ -176,9 +176,9 @@
             if (ndi .lt. ndl) ndl = ndl - 1
             Andest(l) = ndl
 !
-60       continue
+         enddo
 !
-   70 continue
+      enddo
 !  -----------
       Nee = ne
 !

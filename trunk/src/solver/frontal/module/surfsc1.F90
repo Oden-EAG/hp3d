@@ -14,7 +14,7 @@ module surfsc1
               IPFSBF, IPFSBK, IPFSXX
 !
 #if HP3D_COMPLEX
-   integer :: IDUMPWR
+   integer    :: IDUMPWR
 #endif
 !
    contains

@@ -113,7 +113,7 @@
 !
       write(*,*) 'test_trian_aniso_h1: CONTINUE ?(1/0)'
       read(*,*) ians
-      if (ians.eq.1) go to 777
+      if (ians.eq.1) goto 777
 !
       return
 !

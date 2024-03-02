@@ -74,7 +74,7 @@
         write(nfsout,*) 'FRWCP: NUMELM = ',NUMELM
       endif
 #endif
-      do 200 iel=1,NUMELM
+      do iel=1,NUMELM
 !     ********************
 
 
@@ -111,7 +111,7 @@
 !  ...test......test......test......test......test......test......test...
 
 
-         if(numdes .eq. 0) go to 200
+         if(numdes .eq. 0) goto 200
 !
 ! convert the nodal destination vectors to dof destination vectors (Amde
 !  also determine the number of dof to eliminate from the front (ne)
@@ -192,11 +192,11 @@
 !
 
 
-            do 133 id = 1,NDOFM
+            do id = 1,NDOFM
 !wr10.07.99
 !!!!!          Amdest(id) = Cdabs(Amdest(id))
                Amdest(id) =   abs(Amdest(id))
-  133       continue
+            enddo
 
 !wb <
 !
@@ -248,7 +248,7 @@
             endif
 
 !
-         do 150 ie = 1,ne
+         do ie = 1,ne
 !        ****************
 !
 ! check if the equation Buffers are going to get full
@@ -415,11 +415,11 @@
 !$doit VBEST
 !
 !
-               do 110 j = 1,n
+               do j = 1,n
                   Buf(IL) = Frnt(m)
                   IL = IL - 1
                   m = m + KFW
-  110          continue
+               enddo
 !
             endif
 !
@@ -427,7 +427,7 @@
 !
             NFW = NFW - 1
 !           -------------
-  150    continue
+         enddo
 ! ***************
 ! store the final length of the current front (LFW) into Alelm
 !
@@ -452,7 +452,7 @@
             n = KFW
             m = NFW + 1
 !
-            do 170 i = 2,NFW
+            do i = 2,NFW
 !
 ! ALLIANT directives
 !vd$ select (vector)
@@ -460,13 +460,13 @@
 !$doit VBEST
 !
 !
-               do 160 j = 1,NFW
+               do j = 1,NFW
                   Frnt(m) = Frnt(n+j)
                   m = m + 1
-  160          continue
+               enddo
 !
                n = n + KFW
-  170       continue
+            enddo
 !
          endif
 #if HP3D_DEBUG
@@ -475,7 +475,7 @@
          endif
 #endif
 !
-  200 continue
+  200 enddo
 ! ************
 !
 ! dump the final Buffers to diskfiles

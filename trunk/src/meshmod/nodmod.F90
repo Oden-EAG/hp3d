@@ -1,6 +1,16 @@
 !
 #include "typedefs.h"
 !
+#if HP3D_DEBUG
+!> @brief This module replaces obsolete common blocks
+!> @date Mar 2024
+   module meshmod_common
+      integer :: iprint_copy_dofG,                    &
+                 iprint_copy_dofH,iprint_copy_dofE,   &
+                 iprint_copy_dofV,iprint_copy_dofQ
+   end module meshmod_common
+#endif
+!
 !---------------------------------------------------------------------
 !
 !   routine name       - nodmod
@@ -25,18 +35,11 @@
       use data_structure3D
       use mpi_param, only: RANK
       use par_mesh , only: DISTRIBUTED
+#if HP3D_DEBUG
+      use meshmod_common
+#endif
 !
       implicit none
-!
-#if HP3D_DEBUG
-      common /ccopy_dofG/ iprint_copy_dofG
-      common /ccopy_dofH/ iprint_copy_dofH
-      common /ccopy_dofE/ iprint_copy_dofE
-      common /ccopy_dofV/ iprint_copy_dofV
-      common /ccopy_dofQ/ iprint_copy_dofQ
-      integer :: iprint_copy_dofG,iprint_copy_dofH,iprint_copy_dofE, &
-                 iprint_copy_dofV,iprint_copy_dofQ
-#endif
 !
       integer, intent(in)   :: Nod,Nordn
 !
@@ -302,11 +305,6 @@
       use parameters, only: NDIMEN
       implicit none
 !
-#if HP3D_DEBUG
-      common /ccopy_dofG/ iprint
-      integer :: iprint
-#endif
-!
       integer :: Ntype,Nordo,Nordn,NdofGo,NdofGn
       real(8) :: Xnodo(NDIMEN,NdofGo)
       real(8) :: Xnodn(NDIMEN,NdofGn)
@@ -315,6 +313,8 @@
                  nord1n,nord2n,nord3n
 !
 #if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofGo,NdofGn
  7010    format(' copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ', &
@@ -386,11 +386,6 @@
       use node_types
       implicit none
 !
-#if HP3D_DEBUG
-      common /ccopy_dofH/ iprint
-      integer :: iprint
-#endif
-!
       integer :: Ntype,Nordo,Nordn,NdofHo,NdofHn,NvarH
       VTYPE   :: ZdofHo(NvarH,NdofHo)
       VTYPE   :: ZdofHn(NvarH,NdofHn)
@@ -399,6 +394,8 @@
                  nord1n,nord2n,nord3n
 !
 #if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofHo,NdofHn
  7010    format(' copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ', &
@@ -471,11 +468,6 @@
       use node_types
       implicit none
 !
-#if HP3D_DEBUG
-      common /ccopy_dofE/ iprint
-      integer :: iprint
-#endif
-!
       integer :: Ntype
       integer :: Nordo,Nordn,NdofEo,NdofEn,NvarE
       VTYPE   :: ZdofEo(NvarE,NdofEo)
@@ -486,6 +478,8 @@
                  ibego,ibegn
 !
 #if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofEo,NdofEn
  7010    format(' copy_dofE: Ntype,Nordo,Nordn,NdofEo,NdofEn = ', &
@@ -666,11 +660,6 @@
       use node_types
       implicit none
 !
-#if HP3D_DEBUG
-      common /ccopy_dofV/ iprint
-      integer :: iprint
-#endif
-!
       integer :: Ntype,Nordo,Nordn,NdofVo,NdofVn,NvarV
       VTYPE   :: ZdofVo(NvarV,NdofVo)
       VTYPE   :: ZdofVn(NvarV,NdofVn)
@@ -680,6 +669,8 @@
                  ibego,ibegn
 !
 #if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofVo,NdofVn
  7010    format(' copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ', &
@@ -854,11 +845,6 @@
       use node_types
       implicit none
 !
-#if HP3D_DEBUG
-      common /ccopy_dofQ/ iprint
-      integer :: iprint
-#endif
-!
       integer :: Ntype,Nordo,Nordn,NdofQo,NdofQn,NvarQ
       VTYPE   :: ZdofQo(NvarQ,NdofQo)
       VTYPE   :: ZdofQn(NvarQ,NdofQn)
@@ -867,6 +853,8 @@
                  nord1n,nord2n,nord3n
 !
 #if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofQo,NdofQn
  7010    format(' copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ', &

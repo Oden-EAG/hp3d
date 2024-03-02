@@ -398,45 +398,45 @@ module refinements
     case(MEDG)
        select case(Kref)
          case(1)     ; Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLT)
        select case(Kref)
          case(1)    ; Nrsons=7
          case(2,3,4); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLQ)
        select case(Kref)
          case(11)   ; Nrsons=9
          case(10,01); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLB)
        select case(Kref)
          case(111)        ; Nrsons=27
          case(110,101,011); Nrsons=9
          case(100,010,001); Nrsons=9
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLP)
        select case(Kref)
          case(11); Nrsons=21
          case(10); Nrsons=7
          case(01); Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLN)
        select case(Kref)
          case(11,12,13)         ; Nrsons=17
          case(21,22,23,24,25,26); Nrsons=7
          case(31,32,33,34)      ; Nrsons=3
-         case default; go to 10
+         case default; goto 10
        end select
     case(MDLD)
        select case(Kref)
          case(10,01) ; Nrsons=7
-         case default; go to 10
+         case default; goto 10
        end select
     end select
     !

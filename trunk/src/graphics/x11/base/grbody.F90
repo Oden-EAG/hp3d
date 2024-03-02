@@ -249,12 +249,12 @@
         write(*,*) 'GIVE THE NUMBER OF ELEMENTS TO MAKE INVISIBLE'
         read(*,*) inickbl
         write(*,*) 'GIVE THE ELEMENT NUMBERS TO MAKE INVISIBLE'
-        do 15 ibl=1,inickbl
+        do ibl=1,inickbl
           read(*,*) nrelem
           NRINVBL = NRINVBL + 1
           IGINV(NRINVBL) = nrelem
-   15   continue
-        go to 16
+        enddo
+        goto 16
         write(*,*) 'CLICK ON ELEMENTS TO BE INVISIBLE'
         write(*,*) 'CLICK OUTSIDE THE MESH TO TERMINATE INPUT'
         mdlep=-1

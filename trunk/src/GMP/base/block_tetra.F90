@@ -359,7 +359,7 @@
 !!!        read(*,*) ians
 !!!        if (ians.eq.1) then
 !!!          iprint=1
-!!!          go to 10
+!!!          goto 10
 !!!        endif
 !!!      endif
 !

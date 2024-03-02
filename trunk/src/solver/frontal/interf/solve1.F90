@@ -366,7 +366,7 @@
           kk=kk+1
           write(*,*) 'i,nick(i) = ',i,IAWORK(kk)
         enddo
-        go to 10
+        goto 10
       endif
 #endif
 !

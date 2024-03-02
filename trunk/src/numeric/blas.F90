@@ -45,7 +45,7 @@
           call pause
         endif
         pivmin = dmin1(pivmin,abs(a(ip(k),k)) )
-        if (dabs(a(ip(k),k)) > eps) go to 20
+        if (dabs(a(ip(k),k)) > eps) goto 20
         Iflag=1
         return
 !

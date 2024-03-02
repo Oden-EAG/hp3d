@@ -361,7 +361,7 @@
         read(*,*) rnsc
         rnsc = abs(rnsc)
         DIMIM=DIMIM/rnsc
-        go to 20
+        goto 20
       end select
 !
       goto 10

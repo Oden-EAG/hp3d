@@ -92,9 +92,9 @@
 !     (for the symmetric case u is divided by the pivot)
 !    *note: these are of course the k(i,j)' from previous eliminations
 !
-      do 5 i = 1,NFW
+      do i = 1,NFW
          Ubuf(i) = Flhs(k+i)
-    5 continue
+      enddo
 !
 !-----------------------------------------------------------------------
 ! perform the lhs elimination:
@@ -121,7 +121,7 @@
       k = 0
       kk = 0
 !
-      do 30 i = 1,idm
+      do i = 1,idm
 !     ----------------
 ! *note: (id+k) is an appropriate offset to pick up the column entries (
 !        (j+k)  is an appropriate offset to pick up the row entries (a11
@@ -139,10 +139,10 @@
 ! ------------------------
 !vd$ select (vector)
 !
-            do 10 j = 1,idm
+            do j = 1,idm
                m = j + k
                Flhs(m) = Flhs(m) - s*Ubuf(j)
-   10       continue
+            enddo
          endif
 !
          m = k - 1
@@ -154,18 +154,18 @@
 !
 !vd$ select (vector)
 !
-            do 15 j = idp,NFW
+            do j = idp,NFW
                Flhs(j+m) = Flhs(j+k)
-   15       continue
+            enddo
          else
 !wb <
 ! elimination for block b2 (as shown in the figure above)
 ! ------------------------
 !vd$ select (vector)
 !
-            do 20 j = idp,NFW
+            do j = idp,NFW
                Flhs(j+m) = Flhs(j+k) - s*Ubuf(j)
-   20       continue
+            enddo
          endif
 !
 ! store also the k(i,m)/k(m,m) terms, for possible dumping to diskfile
@@ -175,13 +175,13 @@
          k = k + KFW
          Flhs(k-KFW+NFW) = s
 !
-   30 continue
+      enddo
 !
 !-----------------------------------------------------------------------
 ! loop thru the dof below the elimination dof in the front
 !
       k= k + KFW
-      do 70 i = idp,NFW
+      do i = idp,NFW
 !    -------------------
          s = Flhs(id+k)/pivot
          m = k - KFW
@@ -192,9 +192,9 @@
 !
 !vd$ select (vector)
 !
-            do 40 j = 1,idm
+            do j = 1,idm
               Flhs(j+m) = Flhs(k+j)
-   40       continue
+            enddo
          else
 !wb <
 !
@@ -202,9 +202,9 @@
 ! ------------------------
 !vd$ select (vector)
 !
-            do 50 j = 1,idm
+            do j = 1,idm
               Flhs(j+m) = Flhs(k+j) - s*Ubuf(j)
-   50       continue
+            enddo
          endif
 !
          m = m - 1
@@ -216,9 +216,9 @@
 !
 !vd$ select (vector)
 !
-            do 55 j = idp,NFW
+            do j = idp,NFW
                Flhs(m+j) = Flhs(k+j)
-   55       continue
+            enddo
          else
 !wb <
 !
@@ -226,9 +226,9 @@
 ! ------------------------
 !vd$ select (vector)
 !
-            do 60 j = idp,NFW
+            do j = idp,NFW
                Flhs(m+j) = Flhs(k+j) - s*Ubuf(j)
-   60       continue
+            enddo
          endif
 !
 ! store also the k(i,m)/k(m,m) terms, for possible dumping to diskfile
@@ -238,7 +238,7 @@
          Flhs(k-KFW+NFW) = s
          k = k + KFW
 !
-   70 continue
+      enddo
 !
 !
    end subroutine unselm

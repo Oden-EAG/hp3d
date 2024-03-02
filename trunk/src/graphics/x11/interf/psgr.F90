@@ -209,11 +209,11 @@
         call wvpsout(Xc(1,1),Xc(2,1),1)
 !
 !  .....loop through the consequtive vertices of the polygon
-        do 10 i=2,N-1
+        do i=2,N-1
 !
 !  .......line to the vertex point
           call wvpsout(Xc(1,i),Xc(2,i),2)
-   10   continue
+        enddo
 !
 !  .....line to the last vertex point and close the path
         call wvpsout(Xc(1,n),Xc(2,n),4)
@@ -225,9 +225,9 @@
 !  ...draw the boundary line if a different color
       if (Icl.ne.Icf) then
         call wvpsout(Xc(1,1),Xc(2,1),1)
-        do 20 i=2,n-1
+        do i=2,n-1
           call wvpsout(Xc(1,i),Xc(2,i),2)
-   20   continue
+        enddo
         call wvpsout(Xc(1,n),Xc(2,n),4)
         call wvpsout(dum1,dum2,6)
       endif
@@ -358,9 +358,9 @@
           BUFOR(1,ILBUF)=X*scale
           BUFOR(2,ILBUF)=Y*scale
 !      make sure they are in correct limits
-          do 20 i=1,2
+          do i=1,2
               BUFOR(i,ILBUF)=max(-999.d0,min(9990.d0,BUFOR(i,ILBUF)))
-   20     continue
+          enddo
       endif
 !
       if (iprint.eq.1) then
@@ -423,7 +423,7 @@
       if (ILBUF.ne.0) then
         line=' '
         linelen=0
-        do 100 i=1, ILBUF
+        do i=1, ILBUF
 
           if (IBUFC(i).ne.0) then
 
@@ -496,7 +496,7 @@
               linelen=linelen+lentext
             endif
            endif
-  100     continue
+        enddo
 !
 !.......here one may reduce size of output by:
 !.......skipping repeated blanks

@@ -134,7 +134,7 @@
       call saruss(aij,aux, Dxdeta,ifl)
       if (ifl.ne.0) then
         iprint=1
-        go to 5
+        goto 5
       endif
       if (iprint.eq.1) then
         write(*,7006) X(1:3)

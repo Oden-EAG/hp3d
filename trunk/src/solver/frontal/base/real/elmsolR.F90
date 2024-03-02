@@ -96,7 +96,7 @@
 !
 ! loop thru and back-substitute for each rhs
 ! --------------------------------------------
-      do 40 in = 1,NRHS
+      do in = 1,NRHS
 !     -----------------
          iuu = NFW
 !
@@ -134,7 +134,7 @@
 !
 ! loop thru the dof beyond this one in the solution front
 ! --------------------------------------------------------
-         do 10 i = idp,NFW
+         do i = idp,NFW
 !
 ! suffle the solution forward 1 slot to make room for this solution
 !  if necessary, cuz its possible the new solution just gets stuck at th
@@ -156,7 +156,7 @@
             ia = ia - 1
             iuu = iuu - 1
 !
-   10    continue
+         enddo
 !
          iuu = iuu - 1
 !
@@ -166,11 +166,11 @@
 !$doit VBEST
 !
 
-         do 30 i = 1,idm
+         do i = 1,idm
             s = s - Ubuf(iuu)*Xfrnt(ia)
             ia = ia - 1
             iuu = iuu - 1
-   30    continue
+         enddo
 !
 ! store the solution
 ! -------------------
@@ -178,7 +178,7 @@
 !
          Xfrnt(ja+id) = s/f2
 !
-   40 continue
+      enddo
 !
 !
    end subroutine elmsol

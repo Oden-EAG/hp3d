@@ -143,7 +143,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call homogenD(NORMAL,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuV = ZERO
-    go to 100
+    goto 100
   endif
 !
 ! # of dof has to be positive...

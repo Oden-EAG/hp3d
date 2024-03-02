@@ -115,7 +115,7 @@
 ! error out
 !
       IERR = 10*IERR
-      if (IERR .ne. 0) go to 9100
+      if (IERR .ne. 0) goto 9100
 !
 ! debug print
 !
@@ -145,7 +145,7 @@
          write (NFSOUT,7120) minn
  7120    format(2(/),5x,'ERROR: TOO MANY RHS', &
                    /,12x,'MAXIMUM NUMBER OF RHS =',i2)
-         go to 9100
+         goto 9100
       endif
 !
 !
@@ -204,7 +204,7 @@
  7160     format(10x,'RHS BUFFER DUMPS:',i4)
       endif
 !
-      if (IERR .ne. 0) go to 9100
+      if (IERR .ne. 0) goto 9100
 !
 ! backward substitution of all elements
 ! ====================================

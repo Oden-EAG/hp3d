@@ -50,25 +50,25 @@
 ! ARDENT directives
 !$doit VBEST
 !
-      do 10 i = mi,mj
+      do i = mi,mj
         Flhs(i) = dzero
-   10 continue
+      enddo
 !
       if (LFW .eq. 0) return
 !
       mj = NFW - LFW
 !
-      do 50 i = 1,LFW
+      do i = 1,LFW
 !
 ! ALLIANT directives
 !vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
-         do 20 j = 1,mj
+         do j = 1,mj
             mi = mi - 1
             Flhs(mi) = dzero
-   20    continue
+         enddo
 !
 ! ALLIANT directives
 !vd$ select (vector)
@@ -77,13 +77,13 @@
 !
 ! also shove to the end the RHS elimination terms
 !
-         do 30 j = 1,LFW
+         do j = 1,LFW
             mi = mi - 1
             mk = mk - 1
             Flhs(mi) = Flhs(mk)
-   30    continue
+         enddo
 !
-   50 continue
+      enddo
 !
 !
    end subroutine zerou

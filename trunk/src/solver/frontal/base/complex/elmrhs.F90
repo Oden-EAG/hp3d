@@ -58,7 +58,7 @@
 !
 ! loop over the number of rhs in the model
 !
-      do 60 in = 1,NRHS
+      do in = 1,NRHS
 !     -----------------
 !
          iuu = 1
@@ -79,7 +79,7 @@
 !!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
             iuu = iuu + idm*Inc
-            go to 25
+            goto 25
          endif
 !wb <
 !
@@ -97,10 +97,10 @@
 !
 !
 
-         do 20 ii = ii1,ii2
+         do  ii = ii1,ii2
             Frhs(ii) = Frhs(ii) - s*Ubuf(iuu)
             iuu = iuu + Inc
-   20    continue
+         enddo
 
 !
    25    if (ISYM.eq.1 .or. ISYM.eq.4) iuu = iuu + 1
@@ -130,9 +130,9 @@
 
 !
 !
-               do 27 ii = ii1,ii2
+               do ii = ii1,ii2
                   Frhs(ii-1) = Frhs(ii)
-   27          continue
+               enddo
 !
                iuu = iuu + (NFW - idp + 1)*Inc
             else
@@ -144,17 +144,17 @@
 
 !
 !
-               do 30 ii = ii1,ii2
+               do ii = ii1,ii2
                   Frhs(ii-1) = Frhs(ii) - s*Ubuf(iuu)
                   iuu = iuu + Inc
-   30          continue
+               enddo
 
 
             endif
          endif
 !
          im = im + MFW
-   60 continue
+      enddo
 !
 !
    end subroutine elmrhs

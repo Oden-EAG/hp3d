@@ -42,29 +42,29 @@
       DX=1.d0/NRSUB
 !
 !  ...determine bounds for the picture
-      do 10 ivar=1,2
+      do ivar=1,2
         xmin(ivar) = bigp
         xmax(ivar) = bign
-   10 continue
+      enddo
 !
 !  ...loop through curves
-      do 40 nc = 1,NRCURVE
+      do nc = 1,NRCURVE
 !
 !  .....loop through the points on the curve
         xi = -DX
-        do 30 i=1,NRSUB+1
+        do i=1,NRSUB+1
           xi = xi + DX
           call curve(nc,xi, x,dxdx)
-          do 20 j=1,2
+          do j=1,2
             xmin(j) = min(xmin(j),x(j))
             xmax(j) = max(xmax(j),x(j))
-   20     continue
-   30   continue
-   40 continue
-      do 50 j=1,2
+          enddo
+        enddo
+      enddo
+      do j=1,2
         DIMOB(j) = (xmax(j) - xmin(j))/2.d0
         XCENTR(j) = (xmax(j) + xmin(j))/2.d0
-   50 continue
+      enddo
         XCIM(1) = XCENTR(1)
         XCIM(2) = XCENTR(2)
         xc1 = XCENTR(1)
@@ -92,29 +92,29 @@
       call selwin(Iwind)
 !
 !  ...loop through curves
-      do 90 nc = 1,NRCURVE
+      do nc = 1,NRCURVE
 !
 !  .....loop through the points on the curve
         xi = 0.d0
         call curve(nc,xi, x2,dxdx)
-        do 80 i=1,NRSUB
-          do 60 j=1,2
+        do i=1,NRSUB
+          do j=1,2
             x1(j) = x2(j)
-   60     continue
+          enddo
           xi = xi + DX
           call curve(nc,xi, x2,dxdx)
 !
 !  .......scale the points
-          do 70 j=1,2
+          do  j=1,2
             XY(j,1) = (x1(j)-XCIM(j))/DIMIM*SIZE + XCWIN(j)
             XY(j,2) = (x2(j)-XCIM(j))/DIMIM*SIZE + XCWIN(j)
-   70     continue
+          enddo
 !          write(*,*)"XY(1,1),XY(2,1)",XY(1,1),XY(2,1),XY(1,2),XY(2,2)
           call drawline(XY(1,1),XY(2,1),XY(1,2),XY(2,2),ncol)
-   80   continue
+        enddo
 !
 !  ...end of the loop through curves
-   90 continue
+      enddo
 !
 !  ...close window
       write(*,*) 'PLEASE CLICK THE MOUSE INSIDE THE GRAPHICS'
@@ -168,7 +168,7 @@
         XCIM(2) = xc2
       endif
 !
-      go to 100
+      goto 100
 !
    end subroutine object2
 
