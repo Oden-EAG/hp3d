@@ -1,6 +1,25 @@
 cff-version: 1.2.0
 message: "If you use hp3D, please cite it as follows."
 url: "https://github.com/Oden-EAG/hp3d"
+version: 1.0
+date-released: 2024-03-02
+title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library for Complex Multiphysics Applications"
+authors:
+- family-names: "Henneking"
+  given-names: "Stefan"
+  orcid: "https://orcid.org/0000-0003-2177-8519"
+- family-names: "Petrides"
+  given-names: "Socratis"
+  orcid: "https://orcid.org/0000-0002-1284-5495"
+- family-names: "Fuentes"
+  given-names: "Federico"
+  orcid: "https://orcid.org/0000-0002-4039-082X"
+- family-names: "Badger"
+  given-names: "Jacob"
+  orcid: "https://orcid.org/0000-0001-6482-105X"
+- family-names: "Demkowicz"
+  given-names: "Leszek"
+  orcid: "https://orcid.org/0000-0001-7839-8037"
 preferred-citation:
   type: article
   authors:
@@ -9,6 +28,7 @@ preferred-citation:
     orcid: "https://orcid.org/0000-0003-2177-8519"
   - family-names: "Demkowicz"
     given-names: "Leszek"
+    orcid: "https://orcid.org/0000-0001-7839-8037"
   doi: "10.48550/arXiv.2207.12211"
   journal: "arXiv preprint arXiv:2207.12211"
   title: "hp3D User Manual"
