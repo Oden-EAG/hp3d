@@ -1,8 +1,7 @@
 cff-version: 1.2.0
-message: "If you use hp3D, please cite it as follows."
 url: "https://github.com/Oden-EAG/hp3d"
-version: 1.0
 doi: 10.5281/zenodo.10763374
+version: 1.0
 date-released: 2024-03-02
 title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite
   Element Software Library for Complex Multiphysics Applications"
@@ -22,6 +21,7 @@ authors:
 - family-names: "Demkowicz"
   given-names: "Leszek"
   orcid: "https://orcid.org/0000-0001-7839-8037"
+message: "If you use hp3D, please cite it as follows."
 preferred-citation:
   type: article
   authors:
@@ -45,7 +45,7 @@ preferred-citation:
   journal: Journal of Open Source Software
   publisher:
     name: Open Journals
-  date-published: 2024-03-04
+  year: 2024
   volume: 9
   issue: 95
   start: 5946
