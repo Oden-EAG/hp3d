@@ -2,6 +2,9 @@
 A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
 for Complex Multiphysics Applications
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05946/status.svg)](https://doi.org/10.21105/joss.05946)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10763374.svg)](https://doi.org/10.5281/zenodo.10763374)
+
 ## Downloading the library
 1. Clone the repository
 - via HTTPS: `git clone https://github.com/Oden-EAG/hp3d.git`
@@ -75,44 +78,56 @@ Projects are implemented in `hp3d/trunk/problems/`. A few projects have been imp
 ## Citing hp3D
 Please add the following citation to any paper, technical report, or article that incorporated the `hp3D` library:
 ```bibtex
-@article{hpUserManual,
-         Author = {Henneking, Stefan and Demkowicz, Leszek},
-         Title = {{$hp$3D User Manual}},
-         Year = {2022},
-         Journal={arXiv preprint arXiv:2207.12211}}
+@article{hp2024joss,
+         Author = {Henneking, Stefan and Petrides, Socratis and Fuentes, Federico and Badger, Jacob and Demkowicz, Leszek},
+         Title = {{$hp$3D: A Scalable MPI/OpenMP $hp$-Adaptive Finite Element Software Library for Complex Multiphysics Applications}},
+         Publisher = {The Open Journal},
+         Journal = {Journal of Open Source Software},
+         Year = {2024},
+         Volume = {9}, 
+         Number = {95}, 
+         Pages = {5946},
+         doi = {10.21105/joss.05946}}
 ```
 And, optionally,
 ```bibtex
+@article{hpUserManual,
+         Author = {Henneking, Stefan and Demkowicz, Leszek},
+         Title = {{$hp$3D User Manual}},
+         Journal={arXiv preprint arXiv:2207.12211},
+         Year = {2022}}
+```
+```bibtex
 @book{hpBook3,
       Author = {Henneking, Stefan and Demkowicz, Leszek and Petrides, Socratis and Fuentes, Federico and Keith, Brendan and Gatto, Paolo},
-      Publisher = {In preparation},
       Title = {{Computing with $hp$ Finite Elements. III. Parallel $hp$3D Code}},
+      Publisher = {In preparation},
       Year = {2024}}
 ```
 ```bibtex
 @book{hpBook2,
       Author = {Demkowicz, Leszek and Kurtz, Jason and Pardo, David and Paszy\'{n}ski, Maciej and Rachowicz, Waldemar and Zdunek, Adam},
-      Publisher = {Chapman \& Hall/CRC},
       Title = {{Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications}},
+      Publisher = {Chapman \& Hall/CRC},
       Year = {2007}}
 ```
 ```bibtex
 @book{hpBook1,
       Author = {Demkowicz, Leszek},
-      Publisher = {Chapman \& Hall/CRC Press, Taylor and Francis},
       Title = {{Computing with $hp$ Finite Elements. I. One- and Two-Dimensional Elliptic and Maxwell Problems}},
+      Publisher = {Chapman \& Hall/CRC Press, Taylor and Francis},
       Year = {2006}}
 ```
 ```bibtex
 @article{shape2015,
          Author = {Fuentes, Federico and Keith, Brendan and Demkowicz, Leszek and Nagaraj, Sriram},
-         Journal = {Computers \& Mathematics with Applications},
-         Number = {4},
-         Pages = {353--458},
-         Publisher = {Elsevier},
          Title = {Orientation embedded high order shape functions for the exact sequence elements of all shapes},
+         Publisher = {Elsevier},
+         Journal = {Computers \& Mathematics with Applications},
+         Year = {2015},
          Volume = {70},
-         Year = {2015}}
+         Number = {4},
+         Pages = {353--458}}
 ```
 
 ## User Guide
