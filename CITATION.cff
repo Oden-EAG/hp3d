@@ -4,7 +4,8 @@ url: "https://github.com/Oden-EAG/hp3d"
 version: 1.0
 doi: 10.5281/zenodo.10763374
 date-released: 2024-03-02
-title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library for Complex Multiphysics Applications"
+title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite
+  Element Software Library for Complex Multiphysics Applications"
 authors:
 - family-names: "Henneking"
   given-names: "Stefan"
@@ -27,10 +28,26 @@ preferred-citation:
   - family-names: "Henneking"
     given-names: "Stefan"
     orcid: "https://orcid.org/0000-0003-2177-8519"
+  - family-names: "Petrides"
+    given-names: "Socratis"
+    orcid: "https://orcid.org/0000-0002-1284-5495"
+  - family-names: "Fuentes"
+    given-names: "Federico"
+    orcid: "https://orcid.org/0000-0002-4039-082X"
+  - family-names: "Badger"
+    given-names: "Jacob"
+    orcid: "https://orcid.org/0000-0001-6482-105X"
   - family-names: "Demkowicz"
     given-names: "Leszek"
     orcid: "https://orcid.org/0000-0001-7839-8037"
-  doi: "10.48550/arXiv.2207.12211"
-  journal: "arXiv preprint arXiv:2207.12211"
-  title: "hp3D User Manual"
-  year: 2022
+  title: "hp3D: A Scalable MPI/OpenMP hp-Adaptive Finite
+    Element Software Library for Complex Multiphysics Applications"
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  date-published: 2024-03-04
+  volume: 9
+  issue: 95
+  start: 5946
+  issn: 2475-9066
+  doi: 10.21105/joss.05946
