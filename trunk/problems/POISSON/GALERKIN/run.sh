@@ -25,15 +25,15 @@ imax=2
 # Initial mesh
 geom='./geometries/hexa_orient0'
 
-# - MAXNODS
+# MAXNODS
 maxnods=525000
 
-export KMP_STACKSIZE=64M # p=5
-
-
+# OMP stack size
+export KMP_STACKSIZE=64M
 
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
 args+=" -file-geometry ${geom}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./pois ${args}
+#ibrun -n ${nproc} ./pois ${args}
