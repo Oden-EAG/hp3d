@@ -237,7 +237,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                        +  zdvalHdeta(1:MAXEQNH,2)*dvHdeta(2) &
                        +  zdvalHdeta(1:MAXEQNH,3)*dvHdeta(3))*weight
 !
-!     loop through element face trial functions
+!     loop through element edge trial functions
       do i=1,ndofH_edge
         ki = nrdofH + i
 !
