@@ -20,6 +20,7 @@ subroutine set_environment
    use environment
    use common_prob_data
    use paraview
+   use parametersDPG
 !
    implicit none
 !
@@ -96,6 +97,9 @@ subroutine set_environment
 !
 !..Boundary condition flag
    IBC_PROB = BC_DIRICHLET
+!
+!..Set order increment for DPG method
+   NORD_ADD = 1
 !
 end subroutine set_environment
 
