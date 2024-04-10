@@ -15,7 +15,7 @@ subroutine exec_job
    integer :: flag(7)
    logical :: iPvAttr(7)
    integer :: physNick,nstop
-   logical :: ires
+   logical :: ires,balanced
 !
    integer :: i,ierr,numPts,fld
    real(8) :: start_time,end_time
@@ -38,6 +38,7 @@ subroutine exec_job
    call distr_mesh
 !..set Zoltan partitioner
    call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
+   balanced = .false.
 !
    do i=1,IMAX+JMAX
 !
@@ -69,7 +70,12 @@ subroutine exec_job
       if (NUM_PROCS .eq. 1) goto 30
 !
 !  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
-      if (i .eq. IMAX-2) then
+      if (2**i .eq. NUM_PROCS) then
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
+         balanced = .true.
+      elseif ((i.eq.9) .and. (.not.balanced)) then
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
+      elseif ((i .eq. IMAX) .and. (.not. balanced)) then
          call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
       elseif (i .gt. IMAX) then
          !call zoltan_w_set_lb(ZOLTAN_LB_GRAPH) ! graph partitioner
