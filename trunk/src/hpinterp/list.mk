@@ -7,4 +7,6 @@ hpvert.F90
 initiate_order.F90
 update_Ddof.F90
 update_gdof.F90
+update_deg.F90
+update_geom.F90
 0

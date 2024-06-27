@@ -46,6 +46,7 @@ subroutine update_gdof
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag,i,k,loc
    integer :: mdle,no,nod,nr_elem_nodes,nrnodm,nr_up_elem
+   integer :: nr_skipped
 !
 !..additional variables for distributed case
    integer :: src,rcv,tag,count,ierr,j_loc,j_glb,j_off,loc_max
@@ -54,6 +55,7 @@ subroutine update_gdof
    integer :: nod_cnt(NUM_PROCS)
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    real(8), dimension(:,:), pointer :: buf
+   integer :: visit_flag_comm(MAXNODS)
 !
 !..use threaded routine; not recommended without proper verification first
    logical :: USE_THREADED = .false.
@@ -72,6 +74,13 @@ subroutine update_gdof
 !
 !-----------------------------------------------------------------------
 !
+!..fetch active elements
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
+!
+!-----------------------------------------------------------------------
  10 continue
 !
 !..multiple passes
@@ -79,9 +88,12 @@ subroutine update_gdof
 !
 !  ...initiate number of updated elements
       nr_up_elem=0
+!..initiate number of skipped elements in this pass
+      nr_skipped=0
 !
 !  ...set flag that indicates if an element was skipped
       nod_flg = .false.
+      visit_flag_comm = ZERO
 !
 !  ...loop through active elements
       do iel=1,NRELES_SUBD
@@ -104,21 +116,39 @@ subroutine update_gdof
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
          nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+         nod_flg = .false.
+!
          do i=1,nrnodm
             nod = nodm(i)
             call locate(nod,nodesl,nr_elem_nodes, loc)
 !
 !        ...if not a regular node of the element
             if (loc.eq.0) then
-!
-!           ...check if the node has been updated
-               if (NODES(nod)%visit.eq.0) then
-                  nod_flg = .true.
-                  cycle
-               endif
+               nod_flg = .true.
             endif
          enddo
 !
+         if (nod_flg) then
+            call update_geom(NODES(mdle)%father,visit_flag_comm)
+         endif
+!
+!..double check if all parent nodes have been updated
+         nod_flg = .false.
+         do i=1,nrnodm
+            nod = nodm(i)
+            call locate(nod,nodesl,nr_elem_nodes, loc)
+!
+!..if not a regular node check if it has been updated
+            if (loc.eq.0) then
+!..skip the element if the node has not been updated
+            if (NODES(nod)%visit.ne.1) nod_flg = .true.
+            endif
+         enddo
+!
+         if (nod_flg) then
+            nr_skipped = nr_skipped+1
+            go to 100
+         endif
 !     ...update the number of processed elements
          nr_up_elem = nr_up_elem+1
 !
@@ -133,6 +163,7 @@ subroutine update_gdof
             if (NODES(nod)%visit.eq.1) cycle
             call hpvert(iflag,no,xsub(1:3,iv), NODES(nod)%dof%coord)
             NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
 !
 !     ...end of loop through element vertices
          enddo
@@ -151,8 +182,10 @@ subroutine update_gdof
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%visit=1
+               visit_flag_comm(nod) = 1
             elseif (.not.associated(NODES(nod)%dof%coord)) then
                NODES(nod)%visit=1
+               visit_flag_comm(nod) = 1
             endif
             if (NODES(nod)%visit.eq.1) cycle
             if (Is_inactive(nod))            cycle
@@ -164,6 +197,7 @@ subroutine update_gdof
             endif
 !
             NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
 !
 !     ...end of loop through element edges
          enddo
@@ -179,8 +213,10 @@ subroutine update_gdof
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%visit=1
+               visit_flag_comm(nod) = 1
             elseif (.not.associated(NODES(nod)%dof%coord)) then
                NODES(nod)%visit=1
+               visit_flag_comm(nod) = 1
             endif
             if (NODES(nod)%visit.eq.1) cycle
             if (Is_inactive(nod))            cycle
@@ -191,14 +227,19 @@ subroutine update_gdof
                            xnod,NODES(nod)%dof%coord)
             endif
             NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
 !
 !     ...end of loop through element faces
          enddo
 !
          NODES(mdle)%visit=1
+         visit_flag_comm(mdle) = 1
 !
 !  ...end of loop through elements
-      enddo
+      100 enddo
+         ! 100  continue
+      ! NODES(mdle)%visit=1
+      ! visit_flag_comm(mdle) = 1
 !
       if (nr_up_elem.eq.0) exit
 !
