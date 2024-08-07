@@ -229,7 +229,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
                        +  zvalEeta(2,1:MAXEQNE)*vEeta(2) &
                        +  zvalEeta(3,1:MAXEQNE)*vEeta(3))*weight
 !
-!     loop through element face trial functions
+!     loop through element edge trial functions
       do i=1,ndofE_edge
         ki = Iedge-1 + i
 !

@@ -116,6 +116,7 @@ subroutine par_nested(mtype)
 !
 !..timer
    real(8) :: start_time,end_time,time_stamp
+   real(8) :: loc_time,min_time,max_time,avg_time
 !
 !..info (verbose output if true)
    logical :: info = .false.
@@ -726,11 +727,24 @@ subroutine par_nested(mtype)
    endif
 !
    if (IPRINT_TIME .eq. 1) then
+      loc_time = MPI_Wtime()-start_time
       !write(*,3104) RANK,MPI_Wtime()-start_time
  3104 format('[',I4,'] - Local Solve: ',f12.5,'  seconds')
+ 3105 format('   - Local Solve (min): ',f12.5,'  seconds')
+ 3106 format('   - Local Solve (max): ',f12.5,'  seconds')
+ 3107 format('   - Local Solve (avg): ',f12.5,'  seconds')
       call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(3) = end_time-start_time
+      call MPI_REDUCE(loc_time,min_time,1,MPI_REAL8,MPI_MIN,ROOT,mumps_comm,ierr)
+      call MPI_REDUCE(loc_time,max_time,1,MPI_REAL8,MPI_MAX,ROOT,mumps_comm,ierr)
+      loc_time = loc_time / NUM_PROCS
+      call MPI_REDUCE(loc_time,avg_time,1,MPI_REAL8,MPI_SUM,ROOT,mumps_comm,ierr)
+      if (RANK .eq. ROOT) then
+         write(*,3105) min_time
+         write(*,3106) max_time
+         write(*,3107) avg_time
+      endif
       if (RANK .eq. ROOT) write(*,1006) Mtime(3)
  1006 format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif

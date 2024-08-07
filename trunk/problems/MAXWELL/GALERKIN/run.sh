@@ -20,12 +20,14 @@ job=0
 # - number of refinements (if job=1)
 imax=3
 
-# - MAXNODS
+# MAXNODS
 maxnods=525000
 
+# OMP Stacksize
 export KMP_STACKSIZE=32M
 
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./maxw ${args}
+#ibrun -n ${nproc} ./maxw ${args}

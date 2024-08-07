@@ -136,7 +136,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
                                                       ', mSUB_PROCS = ', mSUB_PROCS
       !write(*,*) ' - solving distributed sparse problem: mPROCS     = ',mPROCS
       !write(*,*) ' - splitting into subproblems of size: mSUB_PROCS = ',mSUB_PROCS
- 5010 format(A,I4,A,I2,A,I4,A,I4)
+ 5010 format(A,I6,A,I2,A,I6,A,I4)
    endif
 !
 !..currently, we assume that we are doing nested dissection on 2^k processors
@@ -628,7 +628,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    if (mRANK.eq.ROOT) then
       time_stamp = MPI_Wtime()-start_time
       write(*,9090) '[',RANK,'] par_fiber (level ',level,'): ',time_stamp,' seconds'
- 9090 format(A,I4,A,I2,A,F12.5,A)
+ 9090 format(A,I6,A,I2,A,F12.5,A)
    endif
 !
 !..cleanup

@@ -50,8 +50,11 @@ subroutine elem_heat(Mdle,                   &
    use data_structure3D
    use laserParam
    use commonParam
+   use mpi_wrapper
+!
 !..no implicit statements
    implicit none
+!
 !..declare input/output variables
    integer,                     intent(in)  :: Mdle
    integer,                     intent(in)  :: NrTest
@@ -161,6 +164,9 @@ subroutine elem_heat(Mdle,                   &
    real(8)    :: rfval,therm_Load
    complex(8) :: zfval
 !
+!..timer
+!   real(8) :: start_time,end_time
+!
 !..for lapack eigensolve
    ! complex(8), allocatable :: Z(:,:), WORK(:)
    ! real(8), allocatable     :: W(:),   RWORK(:)
@@ -187,6 +193,9 @@ subroutine elem_heat(Mdle,                   &
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
 #endif
+!
+!..TIMER
+   !start_time = MPI_Wtime()
 !
 !..allocate auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
@@ -278,6 +287,14 @@ subroutine elem_heat(Mdle,                   &
    gramP     = rZERO
    stiff_HH  = rZERO
    stiff_HV  = rZERO
+!
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'Allocate: ', end_time-start_time
+!   !$OMP END CRITICAL
+!11 format(A,f12.5,' s')
+!   start_time = MPI_Wtime()
 !
 !---------------------------------------------------------------------
 !              E L E M E N T    I N T E G R A L S                    |
@@ -441,7 +458,14 @@ subroutine elem_heat(Mdle,                   &
 !..end loop through integration points
    enddo
 !
-#if HP3D_DEBUG
+!#if HP3D_DEBUG
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'Interior: ', end_time-start_time
+!   !$OMP END CRITICAL
+!   start_time = MPI_Wtime()
+!
 !..printing Gram matrix
 !   iprint = 0
 !   if (iprint.eq.1) then
@@ -457,7 +481,7 @@ subroutine elem_heat(Mdle,                   &
 !      enddo
 !      pause
 !   endif
-#endif
+!#endif
 !
 !---------------------------------------------------------------------
 !    B O U N D A R Y    I N T E G R A L S                            |
@@ -550,6 +574,13 @@ subroutine elem_heat(Mdle,                   &
 !..end loop through element faces
    enddo
 !
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'Boundary: ', end_time-start_time
+!   !$OMP END CRITICAL
+!   start_time = MPI_Wtime()
+!
 !..Compute condition number of Gram matrix
       !kk = NrTest*(NrTest+1)/2
       !allocate(gramEigen(kk))
@@ -629,6 +660,12 @@ subroutine elem_heat(Mdle,                   &
    ZalocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
 !
    deallocate(raloc)
+!
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'Lin Alg : ', end_time-start_time
+!   !$OMP END CRITICAL
 !
 end subroutine elem_heat
 

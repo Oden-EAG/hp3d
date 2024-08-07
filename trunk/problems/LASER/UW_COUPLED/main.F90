@@ -104,7 +104,7 @@ program main
          QUIET_MODE = .true.
       endif
    enddo
- 1020 format (A,I4,A,A,A)
+ 1020 format (A,I6,A,A,A)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
