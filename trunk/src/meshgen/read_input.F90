@@ -144,12 +144,12 @@ subroutine read_input(Fp)
             end select
          endif
       enddo
-      #if HP3D_DEBUG
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,9998)i,NREQNH(i),NREQNE(i),NREQNV(i),NREQNQ(i)
        9998 format(' Icase,NREQNH,NREQNE,NREQNV,NREQNQ = ',5(i2,2x))
          endif
-      #endif
+#endif
    enddo
 !
 end subroutine read_input
