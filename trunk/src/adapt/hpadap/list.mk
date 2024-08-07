@@ -1,0 +1,16 @@
+dof_investment.F90
+elem_proj_h_linear.F90
+extraction_vector.F90
+fine_to_coarse_gp_map.F90
+Finegrid_padap.F90
+Hpadapt.F90
+Nodes_copy.F90
+opt_polynomial_search_coarse_linear.F90
+opt_polynomial_search_subson_linear.F90
+project_h.F90
+project_p_linear.F90
+projection_error.F90
+solelm_L2.F90
+upgrade_kref.F90
+refine_opt.F90
+0
