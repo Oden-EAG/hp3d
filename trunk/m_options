@@ -10,23 +10,25 @@ HP3D_BASE_PATH  = /Users/jaimedavid/hp3D/LIBS/par_hp3d/trunk
 COMPLEX ?= 0
 DEBUG   ?= 1
 
+# Dependencies
+HP3D_USE_INTEL_MKL ?= 1
+
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP  ?= 1
-
-# Use parallel threads to compile libraries and problems
-J ?= 4
+HP3D_USE_OPENMP ?= 1
 
 FF = mpifort
 CC = mpicc
 FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
+# gcc 10 issue mpi: add flag
+FFLAGS += -fallow-argument-mismatch
 
 # OpenMP
-ifeq ($(OPENMP),1)
+ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
 endif
 
@@ -46,7 +48,7 @@ endif
 
 # Debug flags
 ifeq ($(DEBUG),1)
-  FFLAGS += -O0 -g -fbacktrace -fcheck=all
+  FFLAGS += -Og -g -fbacktrace -fcheck=all
 endif
 
 CFLAGS  =
@@ -65,7 +67,6 @@ MKL_LIBS = /opt/intel/mkl/lib/libmkl_intel_lp64.a \
            /opt/intel/mkl/lib/libmkl_intel_thread.a \
            /opt/intel/mkl/lib/libmkl_core.a \
            /opt/intel/compilers_and_libraries_2020.1.216/mac/compiler/lib/libiomp5.a \
-           -lpthread -lm -ldl
 MKL_INCS = -I/opt/intel/mkl/include
 # -i8 (default 64-bit integer)
 
@@ -87,7 +88,7 @@ endif
 
 SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
                              -lmumps_common -lpord -lscalapack \
-                             -lflapack -lfblas -lzoltan \
+                             -lflapack -lfblas -lzoltan -lptesmumps \
                              -lptscotchparmetis -lptscotch \
                              -lptscotcherr -lesmumps -lscotch \
                              -lscotcherr -lparmetis -lmetis
@@ -113,26 +114,28 @@ EXTRA_LINK_INCS    = -I/opt/X11/include
 #
 # Mainly for library makefile
 
-ifeq ($(COMPLEX),1)
-  HP3D_PATH     = $(HP3D_BASE_PATH)/complex
-else
-  HP3D_PATH     = $(HP3D_BASE_PATH)/real
-endif
+HP3D_PATH_COMPLEX = $(HP3D_BASE_PATH)/complex
+HP3D_PATH_REAL    = $(HP3D_BASE_PATH)/real
 
-SRC_PATH        = src
-MODULE_PATH     = module
-LIB_PATH        = lib
+OBJ_PATH_COMPLEX  =  _obj_complex_
+OBJ_PATH_REAL     =  _obj_real_
 
-OBJ_PATH_COMPLEX =  _obj_complex_
-OBJ_PATH_REAL    =  _obj_real_
+SRC_PATH          = src
+MODULE_PATH       = module
+LIB_PATH          = lib
 
 ifeq ($(COMPLEX),1)
-  OBJ_PATH      = $(OBJ_PATH_COMPLEX)
+  HP3D_PATH       = $(HP3D_PATH_COMPLEX)
+  OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
-  OBJ_PATH      = $(OBJ_PATH_REAL)
+  HP3D_PATH       = $(HP3D_PATH_REAL)
+  OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+  HP3D_LIB_EXTRA_INCS = $(MKL_INCS)
+endif
+HP3D_LIB_EXTRA_INCS += $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
 
 HP3D_MOD_OPTION_INC = -J./$(MODULE_PATH)
 
@@ -162,8 +165,15 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOLVER & MKL LINKING
 
-SOLVER_LINK_LIBS    = $(SOLVER_LIBS) $(MKL_LIBS)
-SOLVER_LINK_INCS    = $(SOLVER_INCS) $(MKL_INCS)
+SOLVER_LINK_LIBS = $(SOLVER_LIBS)
+SOLVER_LINK_INCS = $(SOLVER_INCS)
+
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+   SOLVER_LINK_LIBS += $(MKL_LIBS)
+   SOLVER_LINK_INCS += $(MKL_INCS)
+endif
+
+SOLVER_LINK_LIBS += -lpthread -lm -lc++ -ldl
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PROBLEM LINKING
@@ -184,5 +194,6 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # are preprocessed according to certain directives
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)"
-
+                -D"DEBUG_MODE=$(DEBUG)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

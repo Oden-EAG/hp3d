@@ -6,7 +6,6 @@ SRC_MODULE  = \
 
 SRC_COMMON = \
             ../common/routines/uniform_href.F90 \
-            ../common/routines/customize_geometry.F90 \
             ../common/routines/dirichlet.F90 \
             ../common/routines/set_environment_galerkin.F90 \
             ../common/routines/initialize.F90 \
@@ -29,5 +28,3 @@ SRC_HYPER  = \
             exec_job.F90 \
             soldis.F90 \
             main.F90
-
-SRC_FILE   = $(SRC_MODULE) $(SRC_COMMON) $(SRC_HYPER)

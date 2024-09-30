@@ -11,7 +11,7 @@ subroutine set_environment
   use common_prob_data
   use paraview
   use parametersDPG, only: NORD_ADD
-  use testvars
+  ! use testvars
   use hyperelasticity
   implicit none
 

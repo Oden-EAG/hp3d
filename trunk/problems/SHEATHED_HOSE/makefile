@@ -3,8 +3,8 @@
 -include ../../m_options
 
 COMPLEX   ?= 0
-DEBUG     ?= 0
-HP3D_USE_OPENMP    ?= 0
+DEBUG     ?= 1
+HP3D_USE_OPENMP    ?= 1
 HP3D_USE_INTEL_MKL ?= 0
 
 ifeq ($(COMPLEX),1)

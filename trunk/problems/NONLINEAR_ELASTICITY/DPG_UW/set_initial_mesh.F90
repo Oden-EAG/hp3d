@@ -51,11 +51,11 @@ subroutine set_initial_mesh(Nelem_order)
 !   set order of approximation
     if (IP.gt.0) then
 !     uniform order of approximation
-      select case(ELEMS(iel)%Type)
-      case('tetr'); Nelem_order(iel) = 1*IP
-      case('pyra'); Nelem_order(iel) = 1*IP
-      case('pris'); Nelem_order(iel) = 11*IP
-      case('bric'); Nelem_order(iel) = 111*IP
+      select case(ELEMS(iel)%etype)
+      case(TETR); Nelem_order(iel) = 1*IP
+      case(PYRA); Nelem_order(iel) = 1*IP
+      case(PRIS); Nelem_order(iel) = 11*IP
+      case(BRIC); Nelem_order(iel) = 111*IP
       end select
     else
 !     custom order of approximation (NOT IMPLEMENTED)
@@ -73,7 +73,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
     case(1)
       ! if exterior face, set boundary condition to IBC_PROB
-      do ifc=1,nface(ELEMS(iel)%Type)
+      do ifc=1,nface(ELEMS(iel)%etype)
         neig = ELEMS(iel)%neig(ifc)
         select case(neig)
         case(0)
@@ -83,7 +83,7 @@ subroutine set_initial_mesh(Nelem_order)
       enddo
     case(2)
       ! if exterior face, set boundary condition (traction on top + bottom, displacement on sides)
-      do ifc=1,nface(ELEMS(iel)%Type)
+      do ifc=1,nface(ELEMS(iel)%etype)
         neig = ELEMS(iel)%neig(ifc)
         select case(neig)
         case(0)
@@ -101,7 +101,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
     case(8)
       iDisplacement = 0
-      if (iDisplacement.eq.1 .or. ELEMS(iel)%Type.ne.'bric' .or. NRELIS.ne.3) then
+      if (iDisplacement.eq.1 .or. ELEMS(iel)%etype.ne.BRIC .or. NRELIS.ne.3) then
         ! If exterior face, set boundary condition (Mixed on top + bottom, Dirichlet all 6 sides)
         !
         !   ___D___
@@ -112,7 +112,7 @@ subroutine set_initial_mesh(Nelem_order)
         !        D
         !
         ! OR just set Displacement boundary conditions if the wrong geometry file is loaded
-        do ifc=1, nface(ELEMS(iel)%Type)
+        do ifc=1, nface(ELEMS(iel)%etype)
           neig = ELEMS(iel)%neig(ifc)
           select case(neig)
           case(0)
@@ -292,11 +292,11 @@ subroutine set_initial_mesh(Nelem_order)
       ! uniform order of approximation
       write(*,*) '-- uniform order of approximation --'
       write(*,999) NRELIS
-      select case(ELEMS(iel)%Type)
-      case('tetr'); write(*,1000) IP
-      case('pyra'); write(*,1000) IP
-      case('pris'); write(*,1001) IP,IP
-      case('bric'); write(*,1002) IP,IP,IP
+      select case(ELEMS(iel)%etype)
+      case(TETR); write(*,1000) IP
+      case(PYRA); write(*,1000) IP
+      case(PRIS); write(*,1001) IP,IP
+      case(BRIC); write(*,1002) IP,IP,IP
       end select
       write(*,*)
 !

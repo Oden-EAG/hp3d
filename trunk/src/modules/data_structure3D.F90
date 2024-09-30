@@ -1,15 +1,15 @@
 !----------------------------------------------------------------------
-!   latest revision    - Aug 2019
-!
-!   purpose            - module defines date structure arrays
+!> @brief   Defines data structure arrays
+!> @date    Mar 2023
 !----------------------------------------------------------------------
-!
 module data_structure3D
 !
       use physics
       use parameters
       use element_data
       use mpi_param, only: RANK
+!
+      implicit none
 !
 !  ...parameters
       integer, parameter :: NHIST = 20
@@ -23,6 +23,7 @@ module data_structure3D
 !
 !  ...number of initial mesh elements, active elements (global,local), nodes
       integer, save :: NRELIS,NRELES,NRELES_SUBD,NRNODS
+      integer, save :: NRELES_GHOST,NRELES_INTERF
 !
 !  ...total number of active H1,H(curl),H(div),L2 dofs
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
@@ -35,49 +36,32 @@ module data_structure3D
 !----------------------------------------------------------------------
       type element
 !
-!  .....type - 'bric','tetr','pris','pyra'
-        character(len=4) :: type
+!  .....etype - BRIC, TETR, PRIS, PYRA
+        integer :: etype
 !
 !  .....number of physics attributes supported BY the element
-        integer          :: nrphysics
+        integer :: nrphysics
 !
 !  .....list   of physics attributes supported BY the element
         character(len=5), dimension(:), pointer :: physics
 !
-!  .....boundary conditions nickname (1 BC flag per face) for each
-!       attribute supported BY the element.
-!       Reserved values (see subroutine meshgen/set_index):
-!         H1 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 2nd and 3rd component
-!           4 - Dirichlet BC on 1st and 3rd component
-!           5 - Dirichlet BC on 1st and 2nd component
-!           6 - Dirichlet BC on 1st component
-!           7 - Dirichlet BC on 2nd component
-!           8 - Dirichlet BC on 3rd component
-!         H(div) :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 1st component
-!           4 - Dirichlet BC on 2nd component
-!           5 - Dirichlet BC on 3rd component
-!           6 - Dirichlet BC on 2nd and 3rd component
-!           7 - Dirichlet BC on 1st and 3rd component
-!           8 - Dirichlet BC on 1st and 2nd component
-!         H(curl), L2 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
+!  .....array of boundary condition nicknames
+!       each entry specifies boundary conditions for one particular component;
+!       each entry is decimal-encoded per element face (1 BC flag per face)
+!       Values (per component and face):
+!         0   - No BC
+!         1   - Dirichlet BC
+!         2-9 - User-customizable BCs
         integer, dimension(:), pointer :: bcond
 !
 !  .....element nodal connectivities: vertices,edges,faces, middle node
         integer, dimension(:), pointer :: nodes
 !
 !  .....corresponding orientations for edges
-        integer          :: edge_orient
+        integer :: edge_orient
 !
 !  .....corresponding orientations for faces
-        integer          :: face_orient
+        integer :: face_orient
 !
 !  .....neighbors across faces
         integer, dimension(:), pointer :: neig
@@ -92,28 +76,19 @@ module data_structure3D
 !----------------------------------------------------------------------
       type node
 !
-!  .....type - 'vert','medg','mdlt','mdlq','mdlb','mdln','mdlp','mdld'
-        character(4)     :: type
+!  .....ntype - VERT, MEDG, MDLT, MDLQ, MDLB, MDLN, MDLP, MDLD
+        integer          :: ntype
 !
 !  .....case number indicating what physical attributes are supported
+!       (binary-encoded per physics variable)
         integer          :: case
 !
-!  .....nickname storing info about supported variables:
-!         0 - component does not exist
-!         1 - H1 component with Dirichlet BC flag
-!         2 - free H1 component
-!         3 - H(curl) component with Dirichlet BC flag
-!         4 - free H(curl) component
-!         5 - H(div) component with Dirichlet BC flag
-!         6 - free H(div) component
-!         7 - L2 component with Dirichlet BC flag
-!         8 - free L2 component
-        integer(1),dimension(:),pointer :: index
-!
-!  .....order of approximation
+!  .....order of approximation (decimal-encoded per direction (x,y,z))
         integer          :: order
 !
-!  .....boundary condition flag
+!  .....boundary condition flag (binary-encoded per component)
+!       0: component DOFs treated as unknowns
+!       1: component DOFs treated as Dirichlet DOFs
         integer          :: bcond
 !
 !  .....father node
@@ -123,11 +98,8 @@ module data_structure3D
         integer          :: first_son
         integer          :: nr_sons
 !
-!  .....refinement flag
+!  .....refinement flag (decimal-encoded per direction (x,y,z))
         integer          :: ref_kind
-!
-!  .....interface flag with GMP
-        integer          :: geom_interf
 !
 !  .....visitation flag
         integer          :: visit
@@ -142,11 +114,6 @@ module data_structure3D
         type(dof_data), pointer :: dof
 !
 #if DEBUG_MODE
-!
-        integer          :: iback
-!
-!  .....locker number
-        integer          :: lock
 !
 !  .....error
 !       0   - scalar error
@@ -205,28 +172,16 @@ module data_structure3D
       integer      , allocatable, save  :: ELEM_ORDER(:)
       integer      , allocatable, save  :: ELEM_SUBD(:)
 !
+!  ...all elements sharing nodes with subdomain (including ELEM_SUBD)
+      integer      , allocatable, save  :: ELEM_GHOST(:)
+!
+!  ...all elements touching the interface of subdomain
+!     (includes one layer of ELEM_SUBD but not all)
+      integer      , allocatable, save  :: ELEM_INTERF(:)
+!
 !-----------------------------------------------------------------------
 !
       contains
-!
-!-----------------------------------------------------------------------
-!
-      subroutine update_ELEM_ORDER()
-         integer :: iel,mdle
-         if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
-         if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
-         allocate(ELEM_ORDER(NRELES))
-         allocate(ELEM_SUBD(NRELES))
-         mdle = 0; NRELES_SUBD = 0
-         do iel=1,NRELES
-            call nelcon(mdle, mdle)
-            ELEM_ORDER(iel) = mdle
-            if (NODES(mdle)%subd .eq. RANK) then
-               NRELES_SUBD = NRELES_SUBD + 1
-               ELEM_SUBD(NRELES_SUBD) = mdle
-            endif
-         enddo
-      end subroutine
 !
 !-----------------------------------------------------------------------
 !
@@ -234,23 +189,24 @@ module data_structure3D
       character(len=*) :: fp
       open(unit=NHIST,file=fp,   &
            form='formatted',access='sequential',status='unknown')
-      end subroutine
+      end subroutine open_history_file
 !
 !-----------------------------------------------------------------------
 !
       subroutine close_history_file
       write(NHIST,*) '0 0'
       close(NHIST)
-      end subroutine
+      end subroutine close_history_file
 !
 !-----------------------------------------------------------------------
 !
 !  ...determine number of dof for a higher order node
       subroutine find_ndof(Nod, NdofH,NdofE,NdofV,NdofQ)
 !
-      integer Nod,NdofH,NdofE,NdofV,NdofQ
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
 !
-      call ndof_nod(NODES(Nod)%type,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
+      call ndof_nod(NODES(Nod)%ntype,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
 !
       end subroutine find_ndof
 !
@@ -259,8 +215,9 @@ module data_structure3D
 !  ...find number of H1,H(curl),H(div),L2 variables supported by a node
       subroutine find_nvar(Nod, NvarH,NvarE,NvarV,NvarQ)
 !
-      integer :: Nod,NvarH,NvarE,NvarV,NvarQ
-      integer, dimension(NRINDEX) :: idx
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: NvarH,NvarE,NvarV,NvarQ
+      integer :: idx(NRINDEX)
       integer :: k
 !
       NvarH=0 ; NvarE=0 ; NvarV=0 ; NvarQ=0
@@ -282,7 +239,8 @@ module data_structure3D
 !  ...determine number of sons for a higher order node
       subroutine find_nsons(Nod, Nrsons)
 !
-      integer Nod,Nrsons
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: Nrsons
 !
       Nrsons = NODES(Nod)%nr_sons
 !
@@ -298,21 +256,7 @@ module data_structure3D
 !
       Son = NODES(Nod)%first_son+I-1
 !
-      end function
-!
-!-----------------------------------------------------------------------
-!
-!  ...get index for a node
-      subroutine get_index(Nod, Indexd)
-!
-      integer Indexd(NRINDEX),i
-!
-      do i=1,NRINDEX
-        Indexd(i) = INT(NODES(Nod)%index(i),4)
-      enddo
-      ! call decodLonger(NODES(Nod)%index,10,NRINDEX, Indexd)
-!
-      end subroutine get_index
+      end function Son
 !
 !-----------------------------------------------------------------------
 !
@@ -329,7 +273,7 @@ module data_structure3D
 !
       allocate(ELEMS(NRELIS))
       do nel=1,NRELIS
-        ELEMS(nel)%type = 'none'
+        ELEMS(nel)%etype = 0
         ELEMS(nel)%nrphysics = 0
         nullify (ELEMS(nel)%physics)
         nullify (ELEMS(nel)%bcond)
@@ -343,9 +287,8 @@ module data_structure3D
       allocate(NODES(MAXNODS))
 !$OMP PARALLEL DO
       do nod=1,MAXNODS
-        NODES(nod)%type = 'none'
+        NODES(nod)%ntype = 0
         NODES(nod)%case = 0
-        nullify (NODES(nod)%index)
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
         NODES(nod)%subd = -1
@@ -354,7 +297,6 @@ module data_structure3D
         NODES(nod)%father = 0
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
-        NODES(nod)%geom_interf = 0
         nullify (NODES(nod)%dof)
 #if DEBUG_MODE
         NODES(nod)%error = 0.d0
@@ -363,7 +305,6 @@ module data_structure3D
 !$OMP END PARALLEL DO
       NODES(MAXNODS)%bcond = 0
       NPNODS=1
-!
 !
       end subroutine allocds
 !
@@ -383,7 +324,6 @@ module data_structure3D
       deallocate(ELEMS)
 !
       do nod=1,MAXNODS
-        if (associated(NODES(nod)%index)) deallocate(NODES(nod)%index)
         if (associated(NODES(nod)%dof)) then
           if (associated(NODES(nod)%dof%coord)) deallocate(NODES(nod)%dof%coord)
           if (associated(NODES(nod)%dof%zdofH)) deallocate(NODES(nod)%dof%zdofH)
@@ -402,7 +342,7 @@ module data_structure3D
 !-----------------------------------------------------------------------
 !
 !  ...increase MAXNODS
-      subroutine increase_MAXNODS()
+      subroutine increase_MAXNODS
 !
       type(node), allocatable :: NODES_NEW(:)
       integer :: MAXNODS_NEW,nod
@@ -428,9 +368,8 @@ module data_structure3D
 !
       !$OMP PARALLEL DO
       do nod=MAXNODS+1,MAXNODS_NEW
-        NODES_NEW(nod)%type = 'none'
+        NODES_NEW(nod)%ntype = 0
         NODES_NEW(nod)%case = 0
-        NODES_NEW(nod)%index = 0
         NODES_NEW(nod)%order = 0
         NODES_NEW(nod)%act = .false.
         NODES_NEW(nod)%subd = -1
@@ -439,7 +378,6 @@ module data_structure3D
         NODES_NEW(nod)%father = 0
         NODES_NEW(nod)%first_son = 0
         NODES_NEW(nod)%nr_sons = 0
-        NODES_NEW(nod)%geom_interf = 0
         nullify (NODES_NEW(nod)%dof)
 #if DEBUG_MODE
         NODES_NEW(nod)%error = 0.d0
@@ -462,21 +400,19 @@ module data_structure3D
       subroutine dumpout_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
+      integer :: nel,nod,nn,nn1,nn2
+      integer :: ndump
       ndump=31
-!!    kyungjoo
-!!      open(unit=ndump,file=Dump_file,
-!!     .     buffered='yes',blocksize = 65536,
-!!     .     form='formatted',access='sequential',status='unknown')
+!
       open(unit=ndump,file=Dump_file,  &
            form='formatted',access='sequential',status='unknown')
-
 !
       write(ndump,*) NRELIS,NRELES,NRNODS
       write(ndump,*) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
       write(ndump,*) MAXNODS,NPNODS
 !
       do nel=1,NRELIS
-        write(ndump,*) ELEMS(nel)%type
+        write(ndump,*) ELEMS(nel)%etype
         write(ndump,*) ELEMS(nel)%nrphysics
         if (associated(ELEMS(nel)%physics)) then
           nn = ubound(ELEMS(nel)%physics,1)
@@ -513,16 +449,14 @@ module data_structure3D
       enddo
 !
       do nod=1,NRNODS
-        write(ndump,*) NODES(nod)%type
+        write(ndump,*) NODES(nod)%ntype
         write(ndump,*) NODES(nod)%case
-        write(ndump,*) NODES(nod)%index
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
         write(ndump,*) NODES(nod)%father
         write(ndump,*) NODES(nod)%first_son
         write(ndump,*) NODES(nod)%nr_sons
-        write(ndump,*) NODES(nod)%geom_interf
         write(ndump,*) NODES(nod)%visit
         write(ndump,*) NODES(nod)%act
         if (associated(NODES(nod)%dof)) then
@@ -604,7 +538,8 @@ module data_structure3D
       subroutine dumpin_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
-      integer           :: npnods_loc
+      integer :: npnods_loc,nel,nod,nn,nn1,nn2,i
+      integer :: ndump
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds
 !
@@ -620,7 +555,7 @@ module data_structure3D
       NPNODS = npnods_loc
 !
       do nel=1,NRELIS
-        read(ndump,*) ELEMS(nel)%type
+        read(ndump,*) ELEMS(nel)%etype
         read(ndump,*) ELEMS(nel)%nrphysics
         read(ndump,*) nn
         if (nn.gt.0) then
@@ -656,16 +591,14 @@ module data_structure3D
       enddo
 !
       do nod=1,NRNODS
-        read(ndump,*) NODES(nod)%type
+        read(ndump,*) NODES(nod)%ntype
         read(ndump,*) NODES(nod)%case
-        read(ndump,*) NODES(nod)%index
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons
-        read(ndump,*) NODES(nod)%geom_interf
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
         read(ndump,*) nn1
@@ -720,19 +653,23 @@ module data_structure3D
       end subroutine dumpin_hp3d
 !
 !-----------------------------------------------------------------------
+!
       subroutine add_dirichlet_to_list(Iboundary)
-      integer loc
+      integer, intent(in) :: Iboundary
+      integer :: loc
       loc = 0
       call locate(Iboundary, DIRICHLET_LIST, NR_DIRICHLET_LIST, loc)
       if (loc.eq.0) then
         NR_DIRICHLET_LIST = NR_DIRICHLET_LIST + 1
         DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
       end if
-      end subroutine
-
+      end subroutine add_dirichlet_to_list
+!
 !-----------------------------------------------------------------------
+!
       subroutine add_dirichlet_homogeneous_to_list(Iboundary)
-      integer loc1,loc2
+      integer, intent(in) :: Iboundary
+      integer :: loc1,loc2
       loc1 = 0
       loc2 = 0
       call locate(Iboundary,DIRICHLET_LIST,NR_DIRICHLET_LIST, loc1)
@@ -747,12 +684,13 @@ module data_structure3D
           DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
         end if ! loc1
       end if !loc2
-      end subroutine
+      end subroutine add_dirichlet_homogeneous_to_list
 !
-
 !-----------------------------------------------------------------------
+!
 !  ...reset visitation flags for all nodes
       subroutine reset_visit
+      integer :: i
 !
 !$OMP PARALLEL DO
       do i=1,NRNODS
@@ -771,7 +709,7 @@ module data_structure3D
 !
       Vis = NODES(Nod)%visit
 !
-      end subroutine
+      end subroutine get_visit
 
 !  ...set visitation flag of a node
       subroutine set_visit(Nod)
@@ -780,7 +718,7 @@ module data_structure3D
 !
       NODES(Nod)%visit = 1
 !
-      end subroutine
+      end subroutine set_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -792,7 +730,7 @@ module data_structure3D
 !
       Subd = NODES(Nod)%subd
 !
-      end subroutine
+      end subroutine get_subd
 !
 !  ...set new subdomain of a node
       subroutine set_subd(Nod,Subd)
@@ -801,134 +739,151 @@ module data_structure3D
 !
       NODES(Nod)%subd = Subd
 !
-      end subroutine
+      end subroutine set_subd
 !
 !-----------------------------------------------------------------------
-      function Is_dirichlet(Nod)
+!
+      function Is_Dirichlet(Nod)
+      logical Is_Dirichlet
       integer Nod
-      integer ibc(NR_PHYSA), loc
-      logical Is_dirichlet
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
-      Is_dirichlet = .false.
+      integer ibc(NRINDEX), ic, iphys, ivar
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      Is_Dirichlet = .false.
+!
+      ic = 0
+!
+!  ...check Dirichlet flags for all variable types
       do iphys=1,NR_PHYSA
-        if (ibc(iphys).eq.1) then
-          Is_dirichlet = .true.
+         select case(D_TYPE(iphys))
+!     ...H1 checks all
+         case(CONTIN)
+            continue
+!     ...skip checking vertices of H(curl) variables
+         case(TANGEN)
+            if (NODES(nod)%ntype .eq. VERT) then
+               ic = ic + NR_COMP(iphys)
+               cycle
+            endif
+!     ...skip checking vertices and edges of H(div) variables
+         case(NORMAL)
+            if (     NODES(nod)%ntype .eq. VERT   &
+                .or. NODES(nod)%ntype .eq. MEDG ) then
+               ic = ic + NR_COMP(iphys)
+               cycle
+            endif
+!     ...skip checking all on L2
+         case(DISCON)
+            ic = ic + NR_COMP(iphys)
+            cycle
+         end select
+!
+         do ivar=1,NR_COMP(iphys)
+            ic = ic + 1
+            if (ibc(ic).eq.1) Is_Dirichlet = .true.
+         enddo
+!
+      enddo
+!
+      end function Is_Dirichlet
+!
+!-----------------------------------------------------------------------
+!
+      function Is_Dirichlet_attr(Nod,Dtype)
+      logical Is_Dirichlet_attr
+      integer Nod,Dtype
+      integer ibc(NRINDEX), ic, iphys, ivar
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      Is_Dirichlet_attr = .false.
+      ic = 0
+      do iphys=1,NR_PHYSA
+        if (D_TYPE(iphys).eq.Dtype) then
+          do ivar=1,NR_COMP(iphys)
+            ic = ic + 1
+            if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.
+          enddo
         else
-          call locate(ibc(iphys),DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.ne.0) then
-            Is_dirichlet = .true.
-          endif
+          ic = ic + NR_COMP(iphys)
         endif
       enddo
 !
-      end function
-!----------------------------------------------------------------------
-      function Is_dirichlet_homogeneous(Nod)
-      integer Nod
-      integer ibc(NR_PHYSA), loc
-      logical Is_dirichlet_homogeneous
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
-      Is_dirichlet_homogeneous = .false.
-      do iphys=1,NR_PHYSA
-        call locate(ibc(iphys),DIRICHLET_HOMOGENEOUS_LIST,  &
-                    NR_DIRICHLET_HOMOGENEOUS_LIST, loc)
-        if (loc.ne.0) then
-          Is_dirichlet_homogeneous = .true.
-        endif
-      enddo
+      end function Is_Dirichlet_attr
 !
-      end function
 !----------------------------------------------------------------------
-      subroutine check_dirichlet_homogeneous(istat)
-      integer :: istat
-
-!     local variables
-      integer :: ibc_number,ii
-
-!     we check if any flag number in list of homogeneous Dirichlet b.c.
-!     is also in the list
-      istat=0
-      do ii=1,SIZE(DIRICHLET_HOMOGENEOUS_LIST)
-        ibc_number=DIRICHLET_HOMOGENEOUS_LIST(ii)
-          call locate(ibc_number,DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.eq.0) then
-            istat = 1
-            write(*,*) 'ERROR check_dirichlet_homogeneous: ',  &
-             'ibc=',ibc_number,'is not in DIRICHLET_LIST array'
-            return
-          endif
-      end do
-
-      end subroutine
-!----------------------------------------------------------------------
+!
       function Is_right_handed(Mdle)
-      integer :: Mdle
       logical :: Is_right_handed
+      integer :: Mdle
       integer :: i, nod
       real(8) :: v(3,4), a(3,3), val
-      select case(ELEMS(Mdle)%type)
-      case('bric','pris','pyra')
-        Is_right_handed = .true.
-      case('tetr')
 !
-        do i=1,4
-          nod = ELEMS(Mdle)%nodes(i)
-          v(1:3,i) = NODES(nod)%dof%coord(1:3,1)
-        enddo
-!
-        do i=1,3
-          a(1:3,i) = v(1:3,i+1) - v(1:3,1)
-        enddo
-!
-        call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
-        Is_right_handed = (val > 0.d0)
+      select case(ELEMS(Mdle)%etype)
+      case(BRIC,PRIS,PYRA)
+         Is_right_handed = .true.
+      case(TETR)
+         do i=1,4
+            nod = ELEMS(Mdle)%nodes(i)
+            v(1:3,i) = NODES(nod)%dof%coord(1:3,1)
+         enddo
+         do i=1,3
+            a(1:3,i) = v(1:3,i+1) - v(1:3,1)
+         enddo
+         call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
+         Is_right_handed = (val > 0.d0)
+      case default
+         write(*,*) 'Is_right_handed'; stop
       end select
-      end function
+      end function Is_right_handed
+!
 !-----------------------------------------------------------------------
+!
       function Is_active(Nod)
-      integer Nod
       logical Is_active
+      integer Nod
       Is_active = NODES(Nod)%act
-      end function
+      end function Is_active
+!
 !-----------------------------------------------------------------------
+!
       function Is_inactive(Nod)
-      integer Nod
       logical Is_inactive
+      integer Nod
       Is_inactive = .not. NODES(Nod)%act
-      end function
+      end function Is_inactive
+!
 !-----------------------------------------------------------------------
+!
       function Is_leaf(Nod)
-      integer Nod
       logical Is_leaf
-      select case (NODES(Nod)%ref_kind)
-      case (0)
-         Is_leaf = .TRUE.
-      case default
-         Is_leaf = .FALSE.
+      integer Nod
+      select case(NODES(Nod)%ref_kind)
+         case(0);       Is_leaf = .TRUE.
+         case default;  Is_leaf = .FALSE.
       end select
-      end function
+      end function Is_leaf
+!
 !-----------------------------------------------------------------------
+!
       function Is_root(Nod)
-      integer Nod
       logical Is_root
-      if (NODES(Nod)%father.lt.0) then
-        Is_root = .TRUE.
-      else
-        Is_root = .FALSE.
-      endif
-      end function
-!-----------------------------------------------------------------------
-      function Is_middle(Nod)
       integer Nod
+      if (NODES(Nod)%father.lt.0) then
+         Is_root = .TRUE.
+      else
+         Is_root = .FALSE.
+      endif
+      end function Is_root
+!
+!-----------------------------------------------------------------------
+!
+      function Is_middle(Nod)
       logical Is_middle
-      select case(NODES(Nod)%type)
-      case('mdlb','mdlp','mdln','mdld')
-        Is_middle = .TRUE.
-      case default
-        Is_middle = .FALSE.
+      integer Nod
+      select case(NODES(Nod)%ntype)
+         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .TRUE.
+         case default;              Is_middle = .FALSE.
       end select
-      end function
+      end function Is_middle
 !
 end module data_structure3D

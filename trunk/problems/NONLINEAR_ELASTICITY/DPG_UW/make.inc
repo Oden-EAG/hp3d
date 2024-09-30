@@ -5,7 +5,6 @@ SRC_MODULE  = \
             ../common/modules/nl_solver_module.F90
 
 SRC_COMMON = \
-            ../common/routines/customize_geometry.F90 \
             ../common/routines/dirichlet.F90 \
             ../common/routines/set_environment.F90 \
             ../common/routines/initialize.F90 \

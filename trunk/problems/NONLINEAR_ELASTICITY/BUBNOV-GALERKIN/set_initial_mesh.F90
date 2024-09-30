@@ -43,11 +43,11 @@ subroutine set_initial_mesh(Nelem_order)
   ! set order of approximation
     if (IP.gt.0) then
       ! uniform order of approximation
-      select case(ELEMS(iel)%Type)
-      case('tetr'); Nelem_order(iel) = 1*IP
-      case('pyra'); Nelem_order(iel) = 1*IP
-      case('pris'); Nelem_order(iel) = 11*IP
-      case('bric'); Nelem_order(iel) = 111*IP
+      select case(ELEMS(iel)%etype)
+      case(TETR); Nelem_order(iel) = 1*IP
+      case(PYRA); Nelem_order(iel) = 1*IP
+      case(PRIS); Nelem_order(iel) = 11*IP
+      case(BRIC); Nelem_order(iel) = 111*IP
       end select
     else
       ! custom order of approximation (NOT IMPLEMENTED)
@@ -65,7 +65,7 @@ subroutine set_initial_mesh(Nelem_order)
     !----------------
     case(1,2,3)
       ! if exterior face, set boundary condition to IBC_PROB
-      do i=1,nface(ELEMS(iel)%Type)
+      do i=1,nface(ELEMS(iel)%etype)
         neig = ELEMS(iel)%neig(i)
         select case(neig)
         case(0); ibc(i) = IBC_PROB
@@ -76,7 +76,7 @@ subroutine set_initial_mesh(Nelem_order)
     !----------------
     case(8)
       iDirichlet = 1
-      if (iDirichlet.eq.1 .or. ELEMS(iel)%Type.ne.'bric' .or. NRELIS.ne.3) then
+      if (iDirichlet.eq.1 .or. ELEMS(iel)%etype.ne.BRIC .or. NRELIS.ne.3) then
         ! If exterior face, set boundary condition (Mixed on top + bottom, Dirichlet all 6 sides)
         !
         !   ___D___
@@ -87,7 +87,7 @@ subroutine set_initial_mesh(Nelem_order)
         !        D
         !
         ! OR just set Dirichlet boundary conditions if the wrong geometry file is loaded
-        do i=1, nface(ELEMS(iel)%Type)
+        do i=1, nface(ELEMS(iel)%etype)
           neig = ELEMS(iel)%neig(i)
           select case(neig)
           case(0)
@@ -160,11 +160,11 @@ subroutine set_initial_mesh(Nelem_order)
       !  uniform order of approximation
       write(*,*) '-- uniform order of approximation --'
       write(*,999) NRELIS
-      select case(ELEMS(iel)%Type)
-        case('tetr'); write(*,1000) IP
-        case('pyra'); write(*,1000) IP
-        case('pris'); write(*,1001) IP,IP
-        case('bric'); write(*,1002) IP,IP,IP
+      select case(ELEMS(iel)%etype)
+        case(TETR); write(*,1000) IP
+        case(PYRA); write(*,1000) IP
+        case(PRIS); write(*,1001) IP,IP
+        case(BRIC); write(*,1002) IP,IP,IP
       end select
       write(*,*)
       !
