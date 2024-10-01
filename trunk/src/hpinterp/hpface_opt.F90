@@ -19,11 +19,11 @@
 !!
 !> @param[out] Xdof         - geometry dof for the face
 !!
-!> @date       Feb 2023
+!> @date       Apr 2024
 !-----------------------------------------------------------------------
-  subroutine hpface(Mdle,Iflag,No,Etav,Ntype, &
-                    Nedge_orient,Nface_orient,Norder,Iface, &
-                    Xnod, Xdof)
+  subroutine hpface_opt(Mdle,Iflag,No,Etav,Ntype, &
+                        Nedge_orient,Nface_orient,Norder,Iface, &
+                        Xnod, Xdof)
   use parameters
   use element_data
   use mpi_wrapper
@@ -56,12 +56,12 @@
 !
 ! work space for shape3H
   integer                               :: nrdofH
-  integer, dimension(19)                :: norder_1
-  real(8), dimension(MAXbrickH)         :: shapH
+  integer, dimension(19)                :: norder_ifc
+  real(8), dimension(  MAXbrickH)       :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real(8), dimension(3)                 :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: dvHdeta
 !
 ! dot product
   real(8)                               :: prod
@@ -74,16 +74,19 @@
   real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! work space for linear solvers
-  integer                               :: naH,info
-  real(8), dimension(MAXmdlqH,MAXmdlqH) :: aaH
-  integer, dimension(MAXmdlqH)          :: ipivH
+  integer                                     :: info
+  real(8), dimension(MAXmdlqH*(MAXmdlqH+1)/2) :: aaH_RFP
 !
-! load vector and solution
-  real(8), dimension(MAXmdlqH,3)        :: bb,uu
+! load vector
+  real(8), dimension(MAXmdlqH,3) :: bb
+!
+!..workspace for auxiliary matrix (storing info at integration points)
+   real(8) :: A_TEST(MAXmdlqH,3*MAX_NINT2)
+   integer :: lda,nda,noff,nRFP
 !
 ! misc work space
-  integer :: nrv,nre,nrf,i,j,k,ie,kj,ki,&
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
+  integer :: nrv,nre,nrf,i,j,k,ie,kj
+  integer :: ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
 !..TIMER
 !   real(8) :: start_time,end_time
@@ -123,16 +126,16 @@
   if (ndofH_face.eq.0) return
 !
 ! set order and orientation for all element edge nodes and the face node
-  call initiate_order(Ntype, norder_1)
+  call initiate_order(Ntype, norder_ifc)
   do ie=1,nre
-    norder_1(ie) = Norder(ie)
+    norder_ifc(ie) = Norder(ie)
   enddo
-  norder_1(nre+Iface) = Norder(nre+Iface)
+  norder_ifc(nre+Iface) = Norder(nre+Iface)
 !
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-     write(*,7060) norder_1; call pause
-7060 format('hpface: norder_1 = ',20i4)
+     write(*,7060) norder_ifc; call pause
+7060 format('hpface: norder_ifc = ',20i4)
   endif
 #endif
 !
@@ -141,8 +144,12 @@
   call set_2Dint(face_type(Ntype,Iface),norder_face, &
                  nint,xi_list,wa_list)
 !
-! initiate stiffness matrix and load vector
-  bb = 0.d0; aaH = 0.d0
+!..allocate auxiliary matrix
+!   allocate(A_TEST(ndofH_face,nda))
+!   allocate(A_MAT(ndofH_face,ndofH_face))
+!
+! initiate load vector
+  bb = 0.d0
 !
 ! loop through integration points
   do l=1,nint
@@ -155,13 +162,13 @@
     call face_param(Ntype,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,norder_ifc,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   evaluate reference coordinates of the point as needed by GMP
     nsign = nsign_param(Ntype,Iface)
-    call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
-                    eta,detadxi,dxideta,rjac,detadt,rn,bjac)
+    call brefgeom3D(Mdle,xi,Etav,shapH(1:8),gradH(1:3,1:8),nrv,dxidt, &
+                    nsign, eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
 !   call GMP routines to evaluate physical coordinates and their
@@ -183,18 +190,21 @@
     do k=1,nrdofH
 !
 !     compute derivatives of the shape function wrt reference coordinates
-      duHdeta(1:3) = gradH(1,k)*dxideta(1,1:3) &
+      dvHdeta(1:3) = gradH(1,k)*dxideta(1,1:3) &
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
 !     subtract...
       do i=1,3
         dxdeta(1:3,i) = dxdeta(1:3,i) &
-                      - Xnod(1:3,k)*duHdeta(i)
+                      - Xnod(1:3,k)*dvHdeta(i)
       enddo
     enddo
 !
-!   loop through element face test functions
+!   offset in auxiliary matrix
+    noff = 3*(l-1)
+!
+!   loop through face shape functions
     do j=1,ndofH_face
       kj = nrdofH + j
 !
@@ -213,31 +223,21 @@
                 +  dxdeta(1:3,2)*dvHdeta(2) &
                 +  dxdeta(1:3,3)*dvHdeta(3))*weight
 !
-!     loop through element face trial functions
-      do i=1,ndofH_face
-        ki = nrdofH + i
+!     fill auxiliary matrix for stiffness
+      A_TEST(j,noff+1:noff+3) = dvHdeta(1:3) * sqrt(weight)
 !
-!       compute gradient wrt reference coordinates
-        duHdeta(1:3) = gradH(1,ki)*dxideta(1,1:3) &
-                     + gradH(2,ki)*dxideta(2,1:3) &
-                     + gradH(3,ki)*dxideta(3,1:3)
-!
-!       no need to subtract normal component...
-!
-!       accumulate for the stiffness matrix
-        aaH(j,i) = aaH(j,i) &
-                 + (dvHdeta(1)*duHdeta(1) &
-                 +  dvHdeta(2)*duHdeta(2) &
-                 +  dvHdeta(3)*duHdeta(3))*weight
-!
-!     end of loop through trial functions
-      enddo
-!
-!   end of loop through test functions
+!   end of loop through face shape functions
     enddo
 !
 ! end of loop through integration points
   enddo
+!
+!  compute stiffness matrix in RFP format
+   nda = 3*nint; lda = MAXmdlqH
+   nRFP = ndofH_face*(ndofH_face+1)/2
+   call DSFRK('N','U','N',ndofH_face,nda,       &
+               1.0d0,A_TEST(1:lda,1:nda),lda,   &
+               0.0d0,aaH_RFP(1:nRFP))
 !
 #if HP3D_DEBUG
   if (iprint.eq.1) then
@@ -245,38 +245,34 @@
                'ndofH_face = ',ndofH_face
     do j=1,ndofH_face
       write(*,7015) j, bb(j,1:3)
-      write(*,7016) aaH(j,1:ndofH_face)
+!      write(*,7016) aaH(j,1:ndofH_face)
     enddo
 7015    format(i5, 10e12.5)
-7016    format(10e12.5)
+!7016    format(10e12.5)
   endif
 #endif
 !
 !-----------------------------------------------------------------------
 !
-! invert the stiffness matrix
-  naH = MAXmdlqH
-  call dgetrf(ndofH_face,ndofH_face,aaH,naH,ipivH,info)
+! compute Cholesky decomposition
+  call DPFTRF('N','U',ndofH_face,aaH_RFP(1:nRFP),info)
   if (info.ne.0) then
-    write(*,*)'hpface:  DGETRF RETURNED INFO = ',info
+    write(*,*)'hpface:  DPFTRF RETURNED INFO = ',info
+    call logic_error(FAILURE,__FILE__,__LINE__)
+  endif
+
+! solve linear system
+  call DPFTRS('N','U',ndofH_face,3,aaH_RFP(1:nRFP),bb(1:lda,1:3),lda, info)
+  if (info.ne.0) then
+    write(*,*)'hpface:  DPFTRS RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! copy load vector
-  uu(1:ndofH_face,:) = bb(1:ndofH_face,:)
-!
-! apply pivots to load vector
-  call dlaswp(3,uu,naH,1,ndofH_face,ipivH,1)
-!
-! triangular solves
-  call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, uu,naH)
-  call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, uu,naH)
-!
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-   write(*,*) 'hpface: k,uu(k) = '
+   write(*,*) 'hpface: k,bb(k) = '
    do k=1,ndofH_face
-     write(*,7015) k,uu(k,1:3)
+     write(*,7015) k,bb(k,1:3)
    enddo
    call pause
   endif
@@ -284,14 +280,14 @@
 !
 ! save the dof
   do i=1,3
-    Xdof(i,1:ndofH_face) = uu(1:ndofH_face,i)
+    Xdof(i,1:ndofH_face) = bb(1:ndofH_face,i)
   enddo
 !
 !..TIMER
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!   write(*,11) 'hpface: ', end_time-start_time
+!   write(*,11) 'hpface_opt: ', end_time-start_time
 !11 format(A,f12.5,' s')
 !   !$OMP END CRITICAL
 !
-  end subroutine hpface
+  end subroutine hpface_opt

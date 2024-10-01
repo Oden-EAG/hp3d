@@ -362,7 +362,7 @@ subroutine par_nested(mtype)
 ! ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_comm, ierr)
-   if (RANK .eq. ROOT) then
+   if (RANK .eq. ROOT .and. (.not. QUIET_MODE)) then
       write(*,2010) '       Number of dof   : nrdof_con      = ', NRDOF_CON,  &
                     '                         nrdof_bub      = ', nrdof_bub,  &
                     '                         nrdof_mdl      = ', nrdof_mdl,  &
@@ -370,7 +370,7 @@ subroutine par_nested(mtype)
                     '       Total interf nnz: nnz            = ', nnz
    endif
    call MPI_BARRIER(mumps_comm, ierr)
-   if (info) then
+   if (info .and. (.not. QUIET_MODE)) then
    write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
                        '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
                        '       Local interf nnz: nnz_loc        = ', nnz_loc,        &
@@ -764,7 +764,7 @@ subroutine par_nested(mtype)
 !
    ni = nrdof_subd_con; nb = mumps_bub%N
 !
-   call MPI_BARRIER(mumps_comm, ierr); time_stamp = MPI_Wtime()
+   if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if HP3D_COMPLEX
@@ -803,10 +803,12 @@ subroutine par_nested(mtype)
                               ni, nb, ZONE, Aii, ni)
 #endif
 !
-   call MPI_BARRIER(mumps_comm, ierr)
-   if (RANK.eq.ROOT) then
-      write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
-7891  format(A,F12.5)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_comm, ierr)
+      if (RANK.eq.ROOT) then
+         write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
+   7891  format(A,F12.5)
+      endif
    endif
 !
    mkl_stat = MKL_SPARSE_DESTROY(Aib_sparse)
@@ -875,8 +877,8 @@ subroutine par_nested(mtype)
       start_time = MPI_Wtime()
    endif
 !
-   call par_solve(mumps_par)
-   !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
+   !call par_solve(mumps_par)
+   call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
 !
   if (IPRINT_TIME .eq. 1) then
      call MPI_BARRIER(mumps_comm, ierr)

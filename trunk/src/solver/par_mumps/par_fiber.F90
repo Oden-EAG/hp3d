@@ -41,10 +41,11 @@
 ! -----------------------------------------------------------------------
 recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
-   use assembly  , only: NR_RHS
+   use assembly   , only: NR_RHS
+   use assembly_sc, only: IPRINT_TIME
    use mpi_wrapper
-   use parameters, only: ZERO,ZONE
-   use stc       , only: stc_bwd
+   use parameters , only: ZERO,ZONE
+   use stc        , only: stc_bwd
    use par_mumps
    use mkl_spblas
 !
@@ -131,7 +132,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
       goto 90
    endif
 !
-   if (mRANK .eq. ROOT) then
+   if (mRANK .eq. ROOT .and. (.not. QUIET_MODE)) then
       write(*,5010) '[',RANK,'] par_fiber (level ',level,'): mPROCS = ', mPROCS, &
                                                       ', mSUB_PROCS = ', mSUB_PROCS
       !write(*,*) ' - solving distributed sparse problem: mPROCS     = ',mPROCS
@@ -146,7 +147,9 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
       goto 90
    endif
 !
-   call MPI_BARRIER(mumps_comm, ierr); start_time = MPI_Wtime()
+   if (IPRINT_TIME.eq.1) then
+      call MPI_BARRIER(mumps_comm, ierr); start_time = MPI_Wtime()
+   endif
 !
 !..divide into "small enough" subproblems (groups) and solve separately
 !  [Step 1: define communicators for the subproblems]
@@ -481,7 +484,9 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !  each group (representative) works on assembling their part of the interface problem
    ni = dof_int; nb = dof_sub
 !
-   call MPI_BARRIER(mpi_comm_int, ierr); time_stamp = MPI_Wtime()
+   if (IPRINT_TIME.eq.1) then
+      call MPI_BARRIER(mpi_comm_int, ierr); time_stamp = MPI_Wtime()
+   endif
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if HP3D_COMPLEX
@@ -521,7 +526,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 #endif
 !
    call MPI_BARRIER(mpi_comm_int, ierr)
-   if (mINT_RANK.eq.ROOT .and. info) then
+   if (mINT_RANK.eq.ROOT .and. info  .and. IPRINT_TIME.eq.1) then
       write(*,7891) '[',RANK,'] INTERFACE ASSEMBLY Sparse MKL: ', MPI_Wtime()-time_stamp
 7891  format(A,I4,A,F12.5)
    endif
@@ -625,7 +630,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
  60 continue
 !
    call MPI_BARRIER(mumps_comm, ierr)
-   if (mRANK.eq.ROOT) then
+   if (mRANK.eq.ROOT .and. IPRINT_TIME.eq.1) then
       time_stamp = MPI_Wtime()-start_time
       write(*,9090) '[',RANK,'] par_fiber (level ',level,'): ',time_stamp,' seconds'
  9090 format(A,I6,A,I2,A,F12.5,A)

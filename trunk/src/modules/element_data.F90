@@ -821,57 +821,59 @@
 !  ...TRIANGLE
       case(TRIA,MDLT)
         NdofH=(Nord-2)*(Nord-1)/2
-        NdofE=(Nord-1)*Nord
-        NdofV=Nord*(Nord+1)/2
+        NdofE=(Nord-1)* Nord
+        NdofV= Nord   *(Nord+1)/2
         NdofQ=0
 !  ...QUAD
       case(RECT,MDLQ)
         call decode(Nord, nordx,nordy)
         NdofH=(nordx-1)*(nordy-1)
-        NdofE=nordx*(nordy-1)+nordy*(nordx-1)
-        NdofV=nordx*nordy
+        NdofE= nordx   *(nordy-1) + &
+              (nordx-1)* nordy
+        NdofV= nordx   * nordy
         NdofQ=0
 !  ...PRISM
       case(PRIS,MDLP)
         call decode(Nord, nordx,nordz)
         NdofH=(nordx-2)*(nordx-1)/2*(nordz-1)
-        NdofE= (nordx-1)*nordx*(nordz-1) + (nordx-2)*(nordx-1)/2*nordz
-        NdofV=(nordx-1)*nordx*nordz + nordx*(nordx+1)/2*(nordz-1)
-        NdofQ=(nordx+1)*nordx/2*nordz
+        NdofE=(nordx-1)* nordx     *(nordz-1) + &
+              (nordx-2)*(nordx-1)/2* nordz
+        NdofV=(nordx-1)* nordx     * nordz    + &
+               nordx   *(nordx+1)/2*(nordz-1)
+        NdofQ=(nordx+1)* nordx   /2* nordz
 !  ...HEXA
       case(BRIC,MDLB)
         call decode(Nord, naux,nordz)
         call decode(naux, nordx,nordy)
         NdofH=(nordx-1)*(nordy-1)*(nordz-1)
-        NdofE= nordx*(nordy-1)*(nordz-1) + (nordx-1)*nordy*(nordz-1) &
-                 + (nordx-1)*(nordy-1)*nordz
-        NdofV=(nordx-1)*nordy*nordz + nordx*(nordy-1)*nordz &
-                 + nordx*nordy*(nordz-1)
-        NdofQ=nordx*nordy*nordz
+        NdofE= nordx   *(nordy-1)*(nordz-1) + &
+              (nordx-1)* nordy   *(nordz-1) + &
+              (nordx-1)*(nordy-1)* nordz
+        NdofV=(nordx-1)* nordy   * nordz    + &
+               nordx   *(nordy-1)* nordz    + &
+               nordx   * nordy   *(nordz-1)
+        NdofQ= nordx   * nordy   * nordz
 !  ...TETRA
       case(TETR,MDLN)
         NdofH=(Nord-3)*(Nord-2)*(Nord-1)/6
-        NdofE=(Nord-2)*(Nord-1)*Nord/2
-        NdofV=(Nord-1)*Nord*(Nord+1)/2
-        NdofQ=Nord*(Nord+1)*(Nord+2)/6
+        NdofE=(Nord-2)*(Nord-1)* Nord   /2
+        NdofV=(Nord-1)* Nord   *(Nord+1)/2
+        NdofQ= Nord   *(Nord+1)*(Nord+2)/6
 !  ...PYRAMID
       case(PYRA,MDLD)
         n = Nord-1
 !  LD: value for the original pyramid of Paolo
 !!!        NdofH=(2*n**3+3*n**2+n)/6
-        NdofH=(Nord-1)**3
+        NdofH=  (Nord-1)**3
         NdofE=3*(Nord-1)**2*Nord
 !        NdofV=2*(Nord-1)*Nord**2+ Nord**3
-        NdofV=3*(Nord-1)*Nord**2
+        NdofV=3*(Nord-1)   *Nord**2
 !        NdofQ=Nord**2*(Nord+1)
-        NdofQ=Nord**3
+        NdofQ=   Nord**3
 
       case default
         write(*,*) 'Error!!! ndof_nod: Type = ', S_Type(Ntype)
-        NdofH=0
-        NdofE=0
-        NdofV=0
-        NdofQ=0
+        NdofH=0; NdofE=0; NdofV=0; NdofQ=0
         stop
       end select
 !!!      write(*,*) 'ndof_nod: S_Type(NType),Nord, NdofH,NdofE,NdofV,NdofQ = ', &

@@ -23,9 +23,9 @@
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------
-subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
-                    Nedge_orient,Nface_orient,Norder,Iface, &
-                    ZdofE, ZnodE)
+subroutine dhpfaceE_opt(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                        Nedge_orient,Nface_orient,Norder,Iface, &
+                        ZdofE, ZnodE)
   use control
   use parameters
   use physics
@@ -55,13 +55,13 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! quadrature
   integer                               :: l,nint
-  real(8), dimension(2, MAXquadH)       :: xi_list
-  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8), dimension(2, MAX_NINT2)      :: xi_list
+  real(8), dimension(   MAX_NINT2)      :: wa_list
   real(8)                               :: wa, weight
 !
 ! work space for shape3DH
   integer                               :: nrdofH
-  integer, dimension(19)                :: norder_1
+  integer, dimension(19)                :: norder_ifc
   real(8), dimension(  MAXbrickH)       :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
@@ -99,18 +99,24 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   integer, dimension(MAXmdlqH+MAXmdlqE) :: ipivE
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: zbE,zuE
+  VTYPE,   dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: zbE
 #if HP3D_COMPLEX
   real(8), dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: duE_real, duE_imag
 #endif
+!
+!..workspace for auxiliary matrix (storing info at integration points)
+   real(8) :: A_E (MAXmdlqE,3*MAX_NINT2)
+   real(8) :: A_CE(MAXmdlqE,3*MAX_NINT2)
+   real(8) :: A_GH(MAXmdlqH,3*MAX_NINT2)
+   integer :: lda,ldaE,ldaH,nE,nH,nda,noff
 !
 ! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
   integer, dimension(NRINDEX_HEV)       :: ibcnd
 !
 ! misc
-  integer :: nrv,nre,nrf,nsign,nflag,i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,info,ic,naE,&
-             ivarE,nvarE,ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,jH,iE,jE,kjE,kjH,k,kE,info,ic
+  integer :: ivarE,nvarE,ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
 !
 !..TIMER
 !   real(8) :: start_time,end_time
@@ -151,24 +157,24 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! check if a homogeneous Dirichlet node
   call homogenD(TANGEN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
-    zuE = ZERO
+    zbE = ZERO
     goto 100
   endif
 !
-! if # of dof is zero, return, nothing to do
+! if #dof is zero, return (nothing to do)
   if (ndofE_face.eq.0) return
 !
 ! set order and orientation for all element edge nodes and the face node
-  call initiate_order(Ntype, norder_1)
+  call initiate_order(Ntype, norder_ifc)
   do ie=1,nre
-     norder_1(ie) = Norder(ie)
+     norder_ifc(ie) = Norder(ie)
   enddo
-  norder_1(nre+Iface) = Norder(nre+Iface)
+  norder_ifc(nre+Iface) = Norder(nre+Iface)
 !
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-     write(*,7060) norder_1; call pause
-7060 format('dhpfaceE: norder_1 = ',20i4)
+     write(*,7060) norder_ifc; call pause
+7060 format('dhpfaceE: norder_ifc = ',20i4)
   endif
 #endif
 !
@@ -192,19 +198,19 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 !    compute element H1 shape functions
      call shape3DH(Ntype,xi, &
-                   norder_1,Nedge_orient,Nface_orient, &
+                   norder_ifc,Nedge_orient,Nface_orient, &
                    nrdofH,shapH,gradH)
 !
 !    compute element Hcurl shape functions
      call shape3DE(Ntype,xi, &
-                   norder_1,Nedge_orient,Nface_orient, &
+                   norder_ifc,Nedge_orient,Nface_orient, &
                    nrdofE,shapE,curlE)
 !
 !    evaluate reference coordinates of the point as needed by GMP
 !    brefgeom3D returns the outward normal as seen from the local element
      nsign = nsign_param(Ntype,Iface)
-     call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
-                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
+     call brefgeom3D(Mdle,xi,Etav,shapH(1:8),gradH(1:3,1:8),nrv,dxidt, &
+                     nsign, eta,detadxi,dxideta,rjac,detadt,rn,bjac)
      weight = wa*bjac
 !
 #if HP3D_DEBUG
@@ -259,16 +265,16 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
      endif
 #endif
 !
-!    use Piola transforms to transform the Dirichlet data to reference
-!    coordinates
+!    Piola transform Dirichlet data to reference coordinates
      zvalEeta (1:3,1:MAXEQNE) = ZERO
      zcurlEeta(1:3,1:MAXEQNE) = ZERO
      do i=1,3
        do j=1,3
-         zvalEeta(i,1:MAXEQNE) = zvalEeta(i,1:MAXEQNE) &
-                               + zvalE(j,1:MAXEQNE)*dxdeta(j,i)
+         zvalEeta(i,1:MAXEQNE)  = zvalEeta (i,1:MAXEQNE) &
+                                + zvalE    (j,1:MAXEQNE)*dxdeta(j,i)
          zcurlEeta(i,1:MAXEQNE) = zcurlEeta(i,1:MAXEQNE) &
-                           + detadx(i,j)*zcurlE(j,1:MAXEQNE)*rjacdxdeta
+                                + zcurlE   (j,1:MAXEQNE)*detadx(i,j) &
+                                                        *rjacdxdeta
        enddo
      enddo
 !
@@ -312,6 +318,9 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
      endif
 #endif
 !
+!    offset in auxiliary matrix
+     noff = 3*(l-1)
+!
 !    loop through element face test H(curl) functions
      do jE=1,ndofE_face
        kjE = nrdofE + jE
@@ -338,26 +347,9 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                          +  curlvE(2)*zcurlEeta(2,1:MAXEQNE) &
                          +  curlvE(3)*zcurlEeta(3,1:MAXEQNE))*weight
 !
-!      loop through the face trial H(curl) functions
-       do iE=1,ndofE_face
-         kiE = nrdofE + iE
-!
-!        transform the shape functions and their curl to reference coordinates
-         uE(1:3) = shapE(1,kiE)*dxideta(1,1:3) &
-                 + shapE(2,kiE)*dxideta(2,1:3) &
-                 + shapE(3,kiE)*dxideta(3,1:3)
-         curluE(1:3) = (detadxi(1:3,1)*curlE(1,kiE) &
-                     +  detadxi(1:3,2)*curlE(2,kiE) &
-                     +  detadxi(1:3,3)*curlE(3,kiE))/rjac
-!
-!        accumulate for the stiffness matrix
-         aaE(jE,iE) = aaE(jE,iE) &
-                    + (curlvE(1)*curluE(1) &
-                    +  curlvE(2)*curluE(2) &
-                    +  curlvE(3)*curluE(3))*weight
-!
-!      end of loop through H(curl) trial functions
-       enddo
+!      fill auxiliary matrices for stiffness (E, curl E)
+       A_E (jE,noff+1:noff+3) = vE(1:3)     * sqrt(weight)
+       A_CE(jE,noff+1:noff+3) = curlvE(1:3) * sqrt(weight)
 !
 !    end of loop through H(curl) test functions
      enddo
@@ -368,8 +360,8 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 !      compute gradient wrt reference coordinates
        dvHdeta(1:3) = gradH(1,kjH)*dxideta(1,1:3) &
-                   + gradH(2,kjH)*dxideta(2,1:3) &
-                   + gradH(3,kjH)*dxideta(3,1:3)
+                    + gradH(2,kjH)*dxideta(2,1:3) &
+                    + gradH(3,kjH)*dxideta(3,1:3)
 !
 !      subtract normal component
        call dot_product(dvHdeta,rn, prod)
@@ -381,21 +373,8 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                    +  zvalEeta(2,1:MAXEQNE)*dvHdeta(2) &
                    +  zvalEeta(3,1:MAXEQNE)*dvHdeta(3))*weight
 !
-!      loop through the face trial H(curl) functions
-       do iE=1,ndofE_face
-         kiE = nrdofE + iE
-!
-!        transform the shape functions and their curl to reference coordinates
-         uE(1:3) = shapE(1,kiE)*dxideta(1,1:3) &
-                 + shapE(2,kiE)*dxideta(2,1:3) &
-                 + shapE(3,kiE)*dxideta(3,1:3)
-!
-!        accumulate for the stiffness matrix
-         aaE(ndofE_face+jH,iE) = aaE(ndofE_face+jH,iE) &
-                 + (dvHdeta(1)*uE(1) &
-                 +  dvHdeta(2)*uE(2) &
-                 +  dvHdeta(3)*uE(3))*weight
-       enddo
+!      fill auxiliary matrix for stiffness (grad H)
+       A_GH(jH,noff+1:noff+3) = dvHdeta(1:3) * sqrt(weight)
 !
 !    end of loop through H1 test functions
      enddo
@@ -403,13 +382,37 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! end of loop through integration points
   enddo
 !
-! use symmetry to complete the stiffness matrix
-  do jH=1,ndofH_face
-  do iE=1,ndofE_face
-    aaE(iE,ndofE_face+jH) = aaE(ndofE_face+jH,iE)
-  enddo
-  enddo
-  ndofE_tot = ndofE_face + ndofH_face
+! compute stiffness matrix
+   nda = 3*nint
+   nE = ndofE_face
+   nH = ndofH_face
+   ldaE = MAXmdlqE
+   ldaH = MAXmdlqH
+   lda = ldaE + ldaH
+!
+!  aaE[1,1] = A_CE * A_CE^T (curl E, curl E)
+!  - compute upper triangle
+   call DSYRK('U','N',nE,nda,                  &
+              1.0d0,A_CE(1:ldaE,1:nda), ldaE,  &
+              0.0d0,aaE (1:lda ,1:nE ), lda)
+!  aaE[1,2] = A_E * A_GH^T  (E, grad u)
+   call DGEMM('N','T',nE,nH,nda,                     &
+               1.0d0,A_E (1:ldaE,   1:nda  ), ldaE,  &
+                     A_GH(1:ldaH,   1:nda  ), ldaH,  &
+               0.0d0,aaE (1:lda ,nE+1:nE+nH), lda)
+!  use symmetry to complete the stiffness matrix
+!  - fill lower triangle of aaE[1,1]
+   do iE=1,nE
+      aaE(iE+1:nE,iE) = aaE(iE,iE+1:nE)
+   enddo
+!  - aaE[2,1] = aaE[1,2]^T
+   do jH=1,nH
+      do iE=1,nE
+         aaE(nE+jH,iE) = aaE(iE,nE+jH)
+      enddo
+   enddo
+!
+   ndofE_tot = ndofE_face + ndofH_face
 !
 #if HP3D_DEBUG
   if (iprint.ge.1) then
@@ -431,46 +434,42 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !------------------------------------------------------
 !
 ! solve the linear system
-  naE = MAXmdlqH + MAXmdlqE
 !
 ! lu pivot
-  call dgetrf(ndofE_tot,ndofE_tot,aaE,naE,ipivE,info)
+  call DGETRF(ndofE_tot,ndofE_tot,aaE,lda,ipivE,info)
   if (info.ne.0) then
      write(*,*)'dhpfaceE: DGETRF RETURNED INFO = ',info
      call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! copy load vector
-  zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
-!
 #if HP3D_COMPLEX
 ! apply pivots to load vector
-  call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
+  call ZLASWP(MAXEQNE,zbE,lda,1,ndofE_tot,ipivE,1)
 !
-  duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
-  duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
+  duE_real(1:ndofE_tot,:) =  real(zbE(1:ndofE_tot,:))
+  duE_imag(1:ndofE_tot,:) = aimag(zbE(1:ndofE_tot,:))
 !
 ! triangular solves
-  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
-  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
+  call DTRSM('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,lda, duE_real,lda)
+  call DTRSM('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,lda, duE_real,lda)
 !
-  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
-  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
+  call DTRSM('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,lda, duE_imag,lda)
+  call DTRSM('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,lda, duE_imag,lda)
 !
-  zuE(1:ndofE_tot,:) = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
+  zbE(1:ndofE_tot,:) = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
 #else
 ! apply pivots to load vector
-  call dlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
+  call DLASWP(MAXEQNE,zbE,lda,1,ndofE_tot,ipivE,1)
 ! triangular solves
-  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
-  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
+  call DTRSM('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,lda, zbE,lda)
+  call DTRSM('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,lda, zbE,lda)
 #endif
 !
 #if HP3D_DEBUG
   if (iprint.ge.1) then
-     write(*,*) 'dhpfaceE: k,zuE(k) = '
+     write(*,*) 'dhpfaceE: k,zbE(k) = '
      do k=1,ndofE_tot
-        write(*,7015) k,zuE(k,1:MAXEQNE)
+        write(*,7015) k,zbE(k,1:MAXEQNE)
      enddo
      call pause
   endif
@@ -524,7 +523,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                 if (.not. PHYSAm(i)) exit
 !
 !  .............store Dirichlet dof
-                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_face) = zbE(1:ndofE_face,ivarE)
 !
               endif
 !
@@ -539,7 +538,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !..TIMER
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!   write(*,11) 'dhpfaceE: ', end_time-start_time
+!   write(*,11) 'dhpfaceE_opt: ', end_time-start_time
 !11 format(A,f12.5,' s')
 !   !$OMP END CRITICAL
 !
@@ -547,4 +546,4 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       if (iprint.eq.1) call result
 #endif
 !
-end subroutine dhpfaceE
+end subroutine dhpfaceE_opt

@@ -60,7 +60,8 @@ subroutine update_Ddof
 !..WARNING: "dirichlet" and other user-supplied routines must be thread-
 !           safe to use this routine; not recommended without proper
 !           verification
-   logical :: USE_THREADED = .false.
+   logical, parameter :: USE_THREADED = .false.
+   logical, parameter :: opt_blas = .true.
 !
 #if HP3D_DEBUG
    integer :: iprint
@@ -213,10 +214,17 @@ subroutine update_Ddof
                   if (iprint.eq.1) write(*,7040) mdle,ifc,nod
              7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
-                  call dhpfaceH(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
+                  if (opt_blas) then
+                     call dhpfaceH_opt(mdle,iflag,no,xsub,                     &
+                                       ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                       nedge_orient,nface_orient,norder,ifc,   &
+                                       zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
+                  else
+                     call dhpfaceH(mdle,iflag,no,xsub,                     &
+                                   ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
+                                   zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
+                  endif
                endif
                NODES(nod)%visit=1
             endif
@@ -227,10 +235,17 @@ subroutine update_Ddof
                   if (iprint.eq.1) write(*,7050) mdle,ifc,nod
              7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
-                  call dhpfaceE(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
+                  if (opt_blas) then
+                     call dhpfaceE_opt(mdle,iflag,no,xsub,                     &
+                                       ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                       nedge_orient,nface_orient,norder,ifc,   &
+                                       zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
+                  else
+                     call dhpfaceE(mdle,iflag,no,xsub,                     &
+                                   ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
+                                   zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
+                  endif
                endif
                NODES(nod)%visit=1
             endif
@@ -241,10 +256,17 @@ subroutine update_Ddof
                   if (iprint.eq.1) write(*,7060) mdle,ifc,nod
              7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
-                  call dhpfaceV(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                NODES(nod)%dof%zdofV(:,:,N_COMS))
+                  if (opt_blas) then
+                     call dhpfaceV_opt(mdle,iflag,no,xsub,                     &
+                                       ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                       nedge_orient,nface_orient,norder,ifc,   &
+                                       NODES(nod)%dof%zdofV(:,:,N_COMS))
+                  else
+                     call dhpfaceV(mdle,iflag,no,xsub,                     &
+                                   ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
+                                   NODES(nod)%dof%zdofV(:,:,N_COMS))
+                  endif
                endif
                NODES(nod)%visit=1
             endif
@@ -773,10 +795,10 @@ subroutine update_Ddof_omp
                   nvar = size(NODES(nod)%dof%zdofH,1)
                   ndof = size(NODES(nod)%dof%zdofH,2)
 !
-                  call dhpfaceH(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                zdofH, tempH(1:nvar,1:ndof))
+                  call dhpfaceH_opt(mdle,iflag,no,xsub,                     &
+                                    ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                    nedge_orient,nface_orient,norder,ifc,   &
+                                    zdofH, tempH(1:nvar,1:ndof))
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
@@ -800,10 +822,10 @@ subroutine update_Ddof_omp
                   nvar = size(NODES(nod)%dof%zdofE,1)
                   ndof = size(NODES(nod)%dof%zdofE,2)
 !
-                  call dhpfaceE(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                zdofE, tempE(1:nvar,1:ndof))
+                  call dhpfaceE_opt(mdle,iflag,no,xsub,                     &
+                                    ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                    nedge_orient,nface_orient,norder,ifc,   &
+                                    zdofE, tempE(1:nvar,1:ndof))
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
@@ -827,10 +849,10 @@ subroutine update_Ddof_omp
                   nvar = size(NODES(nod)%dof%zdofV,1)
                   ndof = size(NODES(nod)%dof%zdofV,2)
 !
-                  call dhpfaceV(mdle,iflag,no,xsub,                     &
-                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
-                                nedge_orient,nface_orient,norder,ifc,   &
-                                tempV(1:nvar,1:ndof))
+                  call dhpfaceV_opt(mdle,iflag,no,xsub,                     &
+                                    ntype,NODES(nod)%case,NODES(nod)%bcond, &
+                                    nedge_orient,nface_orient,norder,ifc,   &
+                                    tempV(1:nvar,1:ndof))
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.lt.3) then
