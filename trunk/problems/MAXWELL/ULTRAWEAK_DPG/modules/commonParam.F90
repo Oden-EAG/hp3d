@@ -38,10 +38,6 @@ module commonParam
    real(8) :: GAMMA
    integer :: IBCFLAG
 !
-!..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
-!  ||v||_V^2 := ||A^* v||^2 + ALPHA * ||v||^2
-   real(8) :: ALPHA_NORM
-!
 !..additional parameters including those required by the system
    integer :: IP
    integer :: NPX, NPY, NPZ
@@ -67,6 +63,19 @@ module commonParam
    integer, parameter :: INOREFINEMENT = 0
    integer, parameter :: IUNIFORM      = 1
    integer, parameter :: IADAPTIVE     = 2
+!
+!..DPG test norm
+!  - GRAPH_NORM: scaled adjoint graph norm
+!  - GRAPH_DIAG: diagonal part of adjoint graph norm
+!  - MATH_NORM : mathematician's norm
+   integer, parameter :: GRAPH_NORM = 1
+   integer, parameter :: GRAPH_DIAG = 2
+   integer, parameter ::  MATH_NORM = 3
+   integer, parameter ::  TEST_NORM = GRAPH_NORM
+!
+!..weight for L2 term in scaled adjoint graph norm
+!  ||v||_V^2 := ||A^* v||^2 + ALPHA * ||v||^2
+   real(8) :: ALPHA_NORM
 !
 !..I/O
    character(32) :: OUTPUT_DIR
