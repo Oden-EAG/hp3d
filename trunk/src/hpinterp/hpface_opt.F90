@@ -144,10 +144,6 @@
   call set_2Dint(face_type(Ntype,Iface),norder_face, &
                  nint,xi_list,wa_list)
 !
-!..allocate auxiliary matrix
-!   allocate(A_TEST(ndofH_face,nda))
-!   allocate(A_MAT(ndofH_face,ndofH_face))
-!
 ! initiate load vector
   bb = 0.d0
 !

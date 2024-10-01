@@ -877,8 +877,8 @@ subroutine par_nested(mtype)
       start_time = MPI_Wtime()
    endif
 !
-   !call par_solve(mumps_par)
-   call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
+   call par_solve(mumps_par)
+   !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
 !
   if (IPRINT_TIME .eq. 1) then
      call MPI_BARRIER(mumps_comm, ierr)

@@ -14,7 +14,7 @@ module parameters
    integer, parameter :: NSTD_ERR = 0
 !
 !..maximum order of approximation: 1,...,9
-   integer, parameter :: MAXP = 7
+   integer, parameter :: MAXP = 6
 !
 !..modulo to encode polynomial orders
 !  (do not change unless using stand-alone shape functions package)
