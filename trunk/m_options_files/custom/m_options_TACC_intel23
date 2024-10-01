@@ -7,13 +7,13 @@ HP3D_BASE_PATH  = ${WORK2}/hp3d/trunk
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-HP3D_COMPLEX ?= 0
+HP3D_COMPLEX ?= 1
 HP3D_DEBUG   ?= 0
 
 HP3D_USE_INTEL_MKL ?= 1
 HP3D_USE_MPI_F08   ?= 1
 HP3D_USE_OPENMP    ?= 1
-HP3D_USE_X11       ?= 1
+HP3D_USE_X11       ?= 0
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
@@ -98,31 +98,37 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
-PETSC_DIR = /home1/apps/intel19/impi19_0/petsc/3.15
-#PETSC_DIR ?= /home1/apps/intel23/impi21_9/petsc/3.19
+
+PETSC_DIR = /home1/apps/intel23/impi21_9/petsc/3.20.5
 
 ifeq ($(HP3D_COMPLEX),1)
-  TACC_PETSC32_LIB = $(PETSC_DIR)/clx-complex/lib
-  TACC_PETSC32_INC = $(PETSC_DIR)/clx-complex/include
-  TACC_PETSC64_LIB = $(PETSC_DIR)/clx-complexi64/lib
-  TACC_PETSC64_INC = $(PETSC_DIR)/clx-complexi64/include
+  TACC_PETSC32_LIB = $(PETSC_DIR)/3.20.5-complex/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/3.20.5-complex/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/3.20.5-complexi64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/3.20.5-complexi64/include
 else
-  TACC_PETSC32_LIB = $(PETSC_DIR)/clx/lib
-  TACC_PETSC32_INC = $(PETSC_DIR)/clx/include
-  TACC_PETSC64_LIB = $(PETSC_DIR)/clx-i64/lib
-  TACC_PETSC64_INC = $(PETSC_DIR)/clx-i64/include
+  TACC_PETSC32_LIB = $(PETSC_DIR)/3.20.5/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/3.20.5/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/3.20.5-i64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/3.20.5-i64/include
 endif
 
 MUMPS_LIBS  = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
                                     -lmumps_common -lpord
 
-MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
+MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps \
                                     -lmetis -lparmetis \
                                     -lscotch -lscotcherr \
                                     -lptscotch -lptscotcherr
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC)
 
-MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
-             -I$(PETSC_DIR)/include
+ifeq ($(HP3D_COMPLEX),1)
+  MUMPS_LIBS += -L/home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/lib -lzoltan
+  MUMPS_INCS += -I/home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/include
+else
+  MUMPS_LIBS += -L/home1/apps/intel19/impi19_0/petsc/3.15/clx/lib -lzoltan
+  MUMPS_INCS += -I/home1/apps/intel19/impi19_0/petsc/3.15/clx/include
+endif
 
 #MUMPS_LIBS += -L/opt/apps/intel19/impi19_0/fftw3/3.3.8/lib -lfftw3 -lm
 #MUMPS_INCS += -I/opt/apps/intel19/impi19_0/fftw3/3.3.8/include
@@ -134,8 +140,8 @@ MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
 # TACC HDF5
 #
 
-# module load phdf5/1.12.2
-VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+# module load phdf5/1.14.3
+VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5_hl_fortran
 VIS_INCS   = -I${TACC_HDF5_INC}
 
 #------------------------------------------------------------------
@@ -231,3 +237,4 @@ PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
                 -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_X11=$(HP3D_USE_X11)"
+
