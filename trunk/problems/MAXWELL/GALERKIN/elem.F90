@@ -4,7 +4,7 @@
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!     latest revision:  - Apr 2024
 !
 !> @brief         - driver for the element routine
 !
@@ -31,6 +31,8 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: norder(19)
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
+   logical, parameter :: opt_blas = .true.
+!
 !-------------------------------------------------------------------------
 !
 !..activate one physics variable (H(curl)) for assembly
@@ -43,7 +45,11 @@ subroutine elem(Mdle, Itest,Itrial)
    call celndof(NODES(Mdle)%ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..call element integration routine
-   call elem_maxwell(Mdle,nrdofE, ALOC(1,1)%array,BLOC(1)%array)
+   if (opt_blas) then
+      call elem_opt(Mdle,nrdofE, ALOC(1,1)%array,BLOC(1)%array)
+   else
+      call elem_maxwell(Mdle,nrdofE, ALOC(1,1)%array,BLOC(1)%array)
+   endif
 !
 end subroutine elem
 !
@@ -206,7 +212,4 @@ subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
 !..end of loop through integration points
    enddo
 !
-!
 end subroutine elem_maxwell
-
-
