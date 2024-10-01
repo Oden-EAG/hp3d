@@ -637,6 +637,7 @@ subroutine elem_heat(Mdle,                   &
       stop
    endif
 !
+   deallocate(gramP)
    allocate(raloc(NrTrial+1,NrTrial+1)); raloc = rZERO
 !
 !..C. Matrix multiply: B^T G^-1 B (=B~^T B~)
