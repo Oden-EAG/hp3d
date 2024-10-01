@@ -18,6 +18,7 @@ SRC_PRIMAL = \
             exec_case.F90 \
             exec_job.F90 \
             elem.F90 \
+            elem_opt.F90 \
             elem_residual.F90 \
             main.F90 \
             set_initial_mesh.F90 \
