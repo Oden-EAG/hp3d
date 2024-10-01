@@ -14,6 +14,7 @@ SRC_COMMON = \
 
 SRC_GALERKIN = \
             elem.F90 \
+            elem_opt.F90 \
             celem.F90 \
             set_initial_mesh.F90 \
             exec_case.F90 \
