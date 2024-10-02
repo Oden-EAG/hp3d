@@ -304,12 +304,15 @@
       real(8),dimension(3,8),intent(in ) :: Dvshape
       real(8),dimension(2  ),intent(out) :: T
       real(8),dimension(2,3),intent(out) :: Dtdxi
+      real(8) :: daux(3)
 !----------------------------------------------------------------------
 !
 !  ...project on 1st axis
-      call proj_b2e(Iv1,Iv2,Vshape,Dvshape, T(1),Dtdxi(1,1:3))
+      call proj_b2e(Iv1,Iv2,Vshape,Dvshape, T(1),daux)
+      Dtdxi(1,1:3) = daux(1:3)
 !  ...project on 2nd axis
-      call proj_b2e(Iv1,Iv4,Vshape,Dvshape, T(2),Dtdxi(2,1:3))
+      call proj_b2e(Iv1,Iv4,Vshape,Dvshape, T(2),daux)
+      Dtdxi(2,1:3) = daux(1:3)
 !
 !
    end subroutine proj_b2f

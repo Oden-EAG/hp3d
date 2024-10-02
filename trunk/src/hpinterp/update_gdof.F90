@@ -56,7 +56,8 @@ subroutine update_gdof
    real(8), dimension(:,:), pointer :: buf
 !
 !..use threaded routine; not recommended without proper verification first
-   logical :: USE_THREADED = .false.
+   logical, parameter :: USE_THREADED = .false.
+   logical, parameter :: opt_blas = .true.
 !
 !-----------------------------------------------------------------------
 !
@@ -186,9 +187,15 @@ subroutine update_gdof
             if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
-               call hpface(mdle,iflag,no,xsub,ntype,             &
-                           nedge_orient,nface_orient,norder,ifc, &
-                           xnod,NODES(nod)%dof%coord)
+               if (opt_blas) then
+                  call hpface_opt(mdle,iflag,no,xsub,ntype,             &
+                                  nedge_orient,nface_orient,norder,ifc, &
+                                  xnod,NODES(nod)%dof%coord)
+               else
+                  call hpface(mdle,iflag,no,xsub,ntype,             &
+                              nedge_orient,nface_orient,norder,ifc, &
+                              xnod,NODES(nod)%dof%coord)
+               endif
             endif
             NODES(nod)%visit=1
 !
@@ -414,9 +421,15 @@ subroutine update_gdof
          call find_orient(mdle, nedge_orient,nface_orient)
          call find_order(mdle, norder)
          call nodcor(mdle, xnod)
-         call hpmdle(mdle,iflag,no,xsub,ntype,          &
-                     nedge_orient,nface_orient,norder,  &
-                     xnod,NODES(mdle)%dof%coord)
+         if (opt_blas) then
+            call hpmdle_opt(mdle,iflag,no,xsub,ntype,          &
+                            nedge_orient,nface_orient,norder,  &
+                            xnod,NODES(mdle)%dof%coord)
+         else
+            call hpmdle(mdle,iflag,no,xsub,ntype,          &
+                        nedge_orient,nface_orient,norder,  &
+                        xnod,NODES(mdle)%dof%coord)
+         endif
       endif
    enddo
 !$OMP END PARALLEL DO
@@ -688,9 +701,9 @@ subroutine update_gdof_omp
             sz = size(NODES(nod)%dof%coord,2)
 !
             if (mdltype .ne. 'Linear') then
-               call hpface(mdle,iflag,no,xsub,ntype,             &
-                           nedge_orient,nface_orient,norder,ifc, &
-                           xnod,coord(1:3,1:sz))
+               call hpface_opt(mdle,iflag,no,xsub,ntype,             &
+                               nedge_orient,nface_orient,norder,ifc, &
+                               xnod,coord(1:3,1:sz))
 !
 !$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
@@ -933,9 +946,9 @@ subroutine update_gdof_omp
          call find_orient(mdle, nedge_orient,nface_orient)
          call find_order(mdle, norder)
          call nodcor(mdle, xnod)
-         call hpmdle(mdle,iflag,no,xsub,ntype,          &
-                     nedge_orient,nface_orient,norder,  &
-                     xnod,NODES(mdle)%dof%coord)
+         call hpmdle_opt(mdle,iflag,no,xsub,ntype,          &
+                         nedge_orient,nface_orient,norder,  &
+                         xnod,NODES(mdle)%dof%coord)
       endif
    enddo
 !$OMP END PARALLEL DO

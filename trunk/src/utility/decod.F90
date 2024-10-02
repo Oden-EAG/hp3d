@@ -34,7 +34,7 @@ subroutine decod(Nick,Mod,N, Narray)
       Narray(N+1-i) = nick1 - nick2*Mod
       nick1 = nick2
    enddo
-   Narray(1)=nick1
+   Narray(1) = nick1
 !
 end subroutine decod
 !

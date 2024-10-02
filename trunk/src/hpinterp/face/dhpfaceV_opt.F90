@@ -2,9 +2,9 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> @brief    determine H1 face dof interpolating H1 Dirichlet data using
-!!           PB interpolation; NOTE: the interpolation (projection) is
-!!           done in the reference space
+!> @brief    determine H(div) face dof interpolating H(div) Dirichlet data
+!!           using PB interpolation; NOTE: the interpolation (projection)
+!!           is done in the reference space
 !!
 !> @param[in]  Mdle         - element (middle node) number
 !> @param[in]  Iflag        - a flag specifying which of the objects the
@@ -13,20 +13,19 @@
 !> @param[in]  Etav         - reference coordinates of the element vertices
 !> @param[in]  Ntype        - element (middle node) type
 !> @param[in]  Icase        - the face node case
-!> @param[in]  Bcond        - the face node BC flag
-!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Bcond        - the edge node BC flag
+!> @param[in]  Nedge_orient - edge orientation, never used
 !> @param[in]  Nface_orient - face orientation
 !> @param[in]  Norder       - element order
 !> @param[in]  Iface        - face number
-!> @param[in]  ZdofH        - H1 dof for the element (vertex and edge values)
 !!
-!> @param[in,out] ZnodH     - H1 dof for the face
+!> @param[in,out] ZnodV     - H(div) dof for the face
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------
-subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
-                    Nedge_orient,Nface_orient,Norder,Iface, &
-                    ZdofH, ZnodH)
+subroutine dhpfaceV_opt(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                        Nedge_orient,Nface_orient,Norder,Iface, &
+                        ZnodV)
   use control
   use parameters
   use physics
@@ -44,8 +43,7 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   integer, dimension(6),   intent(in)  :: Nface_orient
   integer, dimension(19),  intent(in)  :: Norder
 !
-  VTYPE,   dimension(MAXEQNH,MAXbrickH),     intent(in)    :: ZdofH
-  VTYPE,   dimension(NRRHS*NREQNH(Icase),*), intent(inout) :: ZnodH
+  VTYPE,   dimension(NRRHS*NREQNH(Icase),*), intent(inout) :: ZnodV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -55,60 +53,69 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! quadrature
   integer                               :: l,nint
-  real(8), dimension(2, MAXquadH)       :: xi_list
-  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8), dimension(2, MAX_NINT2)      :: xi_list
+  real(8), dimension(   MAX_NINT2)      :: wa_list
   real(8)                               :: wa, weight
 !
 ! work space for shape3DH
   integer                               :: nrdofH
-  integer, dimension(19)                :: norder_1
+  integer, dimension(19)                :: norder_ifc,norder_1
+!
   real(8), dimension(  MAXbrickH)       :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
-! derivatives of a shape function wrt reference coordinates
-  real(8), dimension(3)                 :: duHdeta,dvHdeta
+! work space for shape3DV
+  integer                               :: nrdofV
+  real(8), dimension(3,MAXbrickV)       :: shapV
+  real(8), dimension(  MAXbrickV)       :: divV
+!
+! H(div) test and trial shape function in reference coordinates
+  real(8), dimension(3)                 :: vVeta
 !
 ! dot product
   real(8)                               :: prod
 !
 ! geometry
-  real(8)                               :: rjac,bjac
+  real(8)                               :: rjac,bjac,rjacdxdeta
   real(8), dimension(2)                 :: t
   real(8), dimension(3)                 :: xi,eta,rn,x
   real(8), dimension(3,2)               :: dxidt,detadt
-  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta,detadx
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
            zvalE(3,MAXEQNE), zdvalE(3,MAXEQNE,3), &
            zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3)
 !
-! derivatives of Dirichlet date wrt reference coordinates
-  VTYPE :: zdvalHdeta(MAXEQNH,3)
+! H(div) Dirichlet data in reference coordinates
+  VTYPE :: zvalVeta(3,MAXEQNV)
 !
 ! work space for linear solvers
-  integer                               :: naH,info
-  real(8), dimension(MAXmdlqH,MAXmdlqH) :: aaH
-  integer, dimension(MAXmdlqH)          :: ipivH
+  integer                                     :: info
+  real(8), dimension(MAXmdlqV*(MAXmdlqV+1)/2) :: aaV_RFP
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXmdlqH,MAXEQNH)  :: zbH,zuH
+  VTYPE,   dimension(MAXmdlqV,MAXEQNV)  :: zbV
 #if HP3D_COMPLEX
-  real(8), dimension(MAXmdlqH,MAXEQNH)  :: duH_real,duH_imag
+  real(8), dimension(MAXmdlqV,MAXEQNV)  :: uV_real,uV_imag
 #endif
 !
-! decoded case and BC flags for the edge node
+!..workspace for auxiliary matrix (storing info at integration points)
+   real(8) :: A_TEST(MAXmdlqV,3*MAX_NINT2)
+   integer :: lda,nda,noff,nRFP
+!
+! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
   integer, dimension(NRINDEX_HEV)       :: ibcnd
 !
 ! misc work space
-  integer :: nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign,ic
-!
-  logical :: is_homD
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,k,ivarV,nvarV,kj,ic
+  integer :: ndofH_face,ndofE_face,ndofV_face,ndofQ_face
 !
 !..TIMER
 !   real(8) :: start_time,end_time
+!
+  logical :: is_homD
 !
 #if HP3D_DEBUG
   integer :: iprint
@@ -124,7 +131,7 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 #if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,S_Type(Ntype)
-7010 format('dhpfaceH: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,a4)
+7010 format('dhpfaceV: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('          Etav = ',8(3f6.2,1x))
      write(*,7030) Nedge_orient(1:nre)
@@ -142,26 +149,24 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD(CONTIN,Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD(NORMAL,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
-    zuH = ZERO
+    zbV = ZERO
     goto 100
   endif
 !
-! if # of dof is zero, return, nothing to do
-  if (ndofH_face.eq.0) return
+! if #dof is zero, return (nothing to do)
+  if (ndofV_face.eq.0) return
 !
 ! set order and orientation for all element edge nodes and the face node
   call initiate_order(Ntype, norder_1)
-  do ie=1,nre
-    norder_1(ie) = Norder(ie)
-  enddo
-  norder_1(nre+Iface) = Norder(nre+Iface)
+  norder_ifc = norder_1
+  norder_ifc(nre+Iface) = Norder(nre+Iface)
 !
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-     write(*,7060) norder_1; call pause
-7060 format('dhpfaceH: norder_1 = ',20i4)
+     write(*,7060) norder_ifc; call pause
+7060 format('dhpfaceV: norder_ifc = ',20i4)
   endif
 #endif
 !
@@ -173,7 +178,7 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   INTEGRATION=0   ! reset
 !
 ! initiate stiffness matrix and load vector
-  zbH = ZERO; aaH = 0.d0
+  zbV = ZERO
 !
 ! loop through integration points
   do l=1,nint
@@ -185,14 +190,19 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !   get the corresponding master element coordinates and Jacobian
     call face_param(Ntype,Iface,t, xi,dxidt)
 !
-!   compute element H1 shape functions
+!   compute element H1 shape functions (for geometry)
     call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
+!   compute element H(div) shape functions
+    call shape3DV(Ntype,xi,norder_ifc,Nface_orient, &
+                  nrdofV,shapV,divV)
+
 !   evaluate reference coordinates of the point as needed by GMP
+!   brefgeom3D returns the outward normal as seen from the local element
     nsign = nsign_param(Ntype,Iface)
-    call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
-                    eta,detadxi,dxideta,rjac,detadt,rn,bjac)
+    call brefgeom3D(Mdle,xi,Etav,shapH(1:8),gradH(1:3,1:8),nrv,dxidt, &
+                    nsign, eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
 !   call GMP routines to evaluate physical coordinates and their
@@ -203,93 +213,78 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
     case(7);        call tetra(No,eta, x,dxdeta)
     case(8);        call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'dhpfaceH: Type = ', S_Type(Ntype)
+      write(*,*) 'dhpfaceV: Type = ', S_Type(Ntype)
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     end select
+!
+!   compute inverse Jacobian (for Piola transform)
+    call geom(dxdeta, detadx,rjacdxdeta,nflag)
+    if (nflag.ne.0) then
+      write(*,*) 'dhpfaceV: rjacdxdeta = ',rjacdxdeta
+      stop 1
+    endif
 !
 !   get Dirichlet data at the point
     call dirichlet(Mdle,x,Icase, &
                    zvalH,zdvalH, zvalE,zdvalE, zvalV,zdvalV)
 !
-!   evaluate derivatives of Dirichlet data wrt reference coordinates
-    zdvalHdeta(1:MAXEQNH,1:3) = ZERO
+!   evaluate H(div) Dirichlet data in reference coordinates
+    zvalVeta(1:3,1:MAXEQNV) = ZERO
     do i=1,3
       do j=1,3
-        zdvalHdeta(1:MAXEQNH,i) = zdvalHdeta(1:MAXEQNH,i) &
-                                + zdvalH(1:MAXEQNH,j)*dxdeta(j,i)
+        zvalVeta(i,1:MAXEQNV) = zvalVeta(i,1:MAXEQNV) &
+                     + detadx(i,j)*zvalV(j,1:MAXEQNV)*rjacdxdeta
       enddo
     enddo
 !
-!   remove the contributions from vertices and edges...
+!   number of unused shape functions
+    nrdofV = Iface-1
 !
-!   loop through vertex and edge shape functions
-    nrdofH = nrdofH - ndofH_face
-    do k=1,nrdofH
-!
-!     compute derivatives of the shape function wrt reference coordinates
-      duHdeta(1:3) = gradH(1,k)*dxideta(1,1:3) &
-                   + gradH(2,k)*dxideta(2,1:3) &
-                   + gradH(3,k)*dxideta(3,1:3)
-!
-!     subtract...
-      do i=1,3
-        zdvalHdeta(1:MAXEQNH,i) = zdvalHdeta(1:MAXEQNH,i) &
-                                - ZdofH(1:MAXEQNH,k)*duHdeta(i)
-      enddo
-    enddo
+!   offset in auxiliary matrix
+    noff = 3*(l-1)
 !
 !   loop through element face test functions
-    do j=1,ndofH_face
-      kj = nrdofH + j
+    do j=1,ndofV_face
+      kj = nrdofV + j
 !
-!     compute gradient wrt reference coordinates
-      dvHdeta(1:3) = gradH(1,kj)*dxideta(1,1:3) &
-                   + gradH(2,kj)*dxideta(2,1:3) &
-                   + gradH(3,kj)*dxideta(3,1:3)
+!     compute test function in reference coordinates
+      vVeta(1:3) = (detadxi(1:3,1)*shapV(1,kj) &
+                 +  detadxi(1:3,2)*shapV(2,kj) &
+                 +  detadxi(1:3,3)*shapV(3,kj))/rjac
 !
-!     subtract normal component
-      call dot_product(dvHdeta,rn, prod)
-      dvHdeta(1:3) = dvHdeta(1:3) - prod*rn(1:3)
+!     leave normal component only
+      call dot_product(vVeta,rn, prod)
+      vVeta(1:3) = prod*rn(1:3)
 !
 !     accumulate for the load vector
-      zbH(j,1:MAXEQNH) = zbH(j,1:MAXEQNH) &
-                       + (zdvalHdeta(1:MAXEQNH,1)*dvHdeta(1) &
-                       +  zdvalHdeta(1:MAXEQNH,2)*dvHdeta(2) &
-                       +  zdvalHdeta(1:MAXEQNH,3)*dvHdeta(3))*weight
+      zbV(j,1:MAXEQNV) = zbV(j,1:MAXEQNV) &
+                       + (zvalVeta(1,1:MAXEQNV)*vVeta(1) &
+                       +  zvalVeta(2,1:MAXEQNV)*vVeta(2) &
+                       +  zvalVeta(3,1:MAXEQNV)*vVeta(3))*weight
 !
-!     loop through element face trial functions
-      do i=1,ndofH_face
-        ki = nrdofH + i
+!     fill auxiliary matrix for stiffness
+      A_TEST(j,noff+1:noff+3) = vVeta(1:3) * sqrt(weight)
 !
-!       compute gradient wrt reference coordinates
-        duHdeta(1:3) = gradH(1,ki)*dxideta(1,1:3) &
-                     + gradH(2,ki)*dxideta(2,1:3) &
-                     + gradH(3,ki)*dxideta(3,1:3)
-!
-!       no need to subtract normal component...
-!
-!       accumulate for the stiffness matrix
-        aaH(j,i) = aaH(j,i) &
-                 + (dvHdeta(1)*duHdeta(1) &
-                 +  dvHdeta(2)*duHdeta(2) &
-                 +  dvHdeta(3)*duHdeta(3))*weight
-!
-!     end of loop through trial functions
-      enddo
-!
-!   end of loop through test functions
+!   end of loop through face test functions
     enddo
 !
 ! end of loop through integration points
   enddo
 !
+!  compute stiffness matrix in RFP format
+   nda = 3*nint; lda = MAXmdlqV
+   nRFP = ndofV_face*(ndofV_face+1)/2
+   call DSFRK('N','U','N',ndofV_face,nda,       &
+               1.0d0,A_TEST(1:lda,1:nda),lda,   &
+               0.0d0,aaV_RFP(1:nRFP))
+!
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-    write(*,*) 'dhpfaceH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
-               'ndofH_face = ',ndofH_face
-    do j=1,ndofH_face
-      write(*,7015) j, zbH(j,1:MAXEQNH)
-      write(*,7016) aaH(j,1:ndofH_face)
+    write(*,*) 'dhpfaceV: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
+               'ndofV_face = ',ndofV_face
+    do j=1,ndofV_face
+      write(*,7015) j, zbV(j,1:MAXEQNV)
+      !write(*,7016) aaV(j,1:ndofV_face)
     enddo
   endif
 #if HP3D_COMPLEX
@@ -297,50 +292,50 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 #else
   7015 format(i5,2x,10e12.5)
 #endif
-  7016 format(10e12.5)
+  !7016 format(10e12.5)
 #endif
 !
 !-----------------------------------------------------------------------
 !
-! invert the stiffness matrix
-  naH = MAXmdlqH
-  call dgetrf(ndofH_face,ndofH_face,aaH,naH,ipivH,info)
+! compute Cholesky decomposition
+  call DPFTRF('N','U',ndofV_face,aaV_RFP(1:nRFP),info)
   if (info.ne.0) then
-    write(*,*)'dhpfaceH: H1 DGETRF RETURNED INFO = ',info
+    write(*,*)'dhpfaceV: DPFTRF RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! copy load vector
-  zuH(1:ndofH_face,:) = zbH(1:ndofH_face,:)
-!
 #if HP3D_COMPLEX
-! apply pivots to load vector
-  call zlaswp(MAXEQNH,zuH,naH,1,ndofH_face,ipivH,1)
 !
-  duH_real(1:ndofH_face,:) = real(zuH(1:ndofH_face,:))
-  duH_imag(1:ndofH_face,:) = aimag(zuH(1:ndofH_face,:))
+  uV_real(1:ndofV_face,:) =  real(zbV(1:ndofV_face,:))
+  uV_imag(1:ndofV_face,:) = aimag(zbV(1:ndofV_face,:))
 !
-! triangular solves
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_real,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_real,naH)
+! solve linear system
+  call DPFTRS('N','U',ndofV_face,MAXEQNV,aaV_RFP(1:nRFP), &
+              uV_real(1:lda,1:MAXEQNV),lda, info)
+  call DPFTRS('N','U',ndofV_face,MAXEQNV,aaV_RFP(1:nRFP), &
+              uV_imag(1:lda,1:MAXEQNV),lda, info)
+  if (info.ne.0) then
+    write(*,*)'dhpfaceV: DPFTRS RETURNED INFO = ',info
+    call logic_error(FAILURE,__FILE__,__LINE__)
+  endif
 !
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_imag,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_imag,naH)
-!
-  zuH(1:ndofH_face,:) = dcmplx(duH_real(1:ndofH_face,:), duH_imag(1:ndofH_face,:))
+  zbV(1:ndofV_face,:) = dcmplx(uV_real(1:ndofV_face,:), uV_imag(1:ndofV_face,:))
 #else
-! apply pivots to load vector
-  call dlaswp(MAXEQNH,zuH,naH,1,ndofH_face,ipivH,1)
-! triangular solves
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, zuH,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, zuH,naH)
+!
+! solve linear system
+  call DPFTRS('N','U',ndofV_face,MAXEQNV,aaV_RFP(1:nRFP), &
+              zbV(1:lda,1:MAXEQNV),lda, info)
+  if (info.ne.0) then
+    write(*,*)'dhpfaceV: DPFTRS RETURNED INFO = ',info
+    call logic_error(FAILURE,__FILE__,__LINE__)
+  endif
 #endif
 !
 #if HP3D_DEBUG
   if (iprint.eq.1) then
-   write(*,*) 'dhpfaceH: k,zu(k) = '
-   do k=1,ndofH_face
-     write(*,7015) k,zuH(k,1:MAXEQNH)
+   write(*,*) 'dhpfaceV: k,zu(k) = '
+   do k=1,ndofV_face
+     write(*,7015) k,zbV(k,1:MAXEQNV)
    enddo
    call pause
   endif
@@ -351,12 +346,12 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 #if HP3D_DEBUG
       if (iprint.eq.1) then
-        write(*,*) 'dhpfaceH: ncase = ', ncase
+        write(*,*) 'dhpfaceV: ncase = ', ncase
       endif
 #endif
 !
 !  ...initialize global variable counter, and node local variable counter
-      ivarH=0 ; nvarH=0
+      ivarV=0; nvarV=0
 !
 !  ...loop through multiple loads
       do j=1,NRRHS
@@ -376,27 +371,27 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !  .........select the discretization type
             select case(D_TYPE(i))
 !
-!  .........H1 component
-            case(CONTIN)
+!  .........H(div) component
+            case(NORMAL)
 !
 !  ...........update global counter
-              ivarH = ivarH + 1
+              ivarV = ivarV + 1
 !
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update the node local counter
-                nvarH = nvarH + 1
+!  .............update node local counter
+                nvarV = nvarV + 1
 !
 !  .............do not write dof if physics attribute is deactivated
                 if (.not. PHYSAm(i)) exit
 !
 !  .............store Dirichlet dof
-                if (ibcnd(ic).eq.1) ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
+                if (ibcnd(ic).eq.1) ZnodV(nvarV,1:ndofV_face) = zbV(1:ndofV_face,ivarV)
 !
               endif
-!
             end select
+!
 !  .......loop through components
           enddo
 !  .....loop through physical attributes
@@ -407,7 +402,7 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !..TIMER
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!   write(*,11) 'dhpfaceH: ', end_time-start_time
+!   write(*,11) 'dhpfaceV_opt: ', end_time-start_time
 !11 format(A,f12.5,' s')
 !   !$OMP END CRITICAL
 !
@@ -415,4 +410,4 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       if (iprint.eq.1) call result
 #endif
 !
-end subroutine dhpfaceH
+end subroutine dhpfaceV_opt
