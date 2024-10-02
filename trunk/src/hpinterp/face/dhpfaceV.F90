@@ -30,6 +30,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   use parameters
   use physics
   use element_data
+  use mpi_wrapper
   implicit none
 !
 ! ** Arguments
@@ -60,13 +61,13 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
 !
-  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(  MAXbrickH)       :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! work space for shape3DV
   integer                               :: nrdofV
   real(8), dimension(3,MAXbrickV)       :: shapV
-  real(8), dimension(MAXbrickV)         :: divV
+  real(8), dimension(  MAXbrickV)       :: divV
 !
 ! H(div) test and trial shape function in reference coordinates
   real(8), dimension(3)                 :: uVeta,vVeta
@@ -108,6 +109,9 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   integer :: nrv,nre,nrf,nsign,nflag,i,j,k,ivarV,nvarV,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_face,ic
 !
+!..TIMER
+!   real(8) :: start_time,end_time
+!
   logical :: is_homD
 !
 #if HP3D_DEBUG
@@ -116,6 +120,8 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 #endif
 !
 !-----------------------------------------------------------------------
+!..TIMER
+!   start_time = MPI_Wtime()
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
@@ -398,6 +404,13 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
         enddo
 !  ...loop through multiple loads
       enddo
+!
+!..TIMER
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'dhpfaceV: ', end_time-start_time
+!11 format(A,f12.5,' s')
+!   !$OMP END CRITICAL
 !
 #if HP3D_DEBUG
       if (iprint.eq.1) call result

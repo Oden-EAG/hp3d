@@ -14,11 +14,12 @@
 !
 !   arguments :
 !     in:
-!             Ntype    - element type
-!             Xp       - physical coordinates of a point
-!             Norder   - element order
-!             Nedge_orient, Nface_orient - edge and face orientations
-!             Xnod     - element geometry dof
+!             Ntype        - element type
+!             Xp           - physical coordinates of a point
+!             Norder       - element order
+!             Nedge_orient - edge orientations
+!             Nface_orient - face orientations
+!             Xnod         - element geometry dof
 !     out:
 !             Idec     = 1 if the point is within the element
 !                        0 otherwise or NR iterations have not converged

@@ -28,7 +28,7 @@ subroutine encod(Narray,Mod,N, Nick)
 !
    integer :: i
 !
-   Nick=Narray(1)
+   Nick = Narray(1)
    do i=2,N
       Nick = Nick*Mod + Narray(i)
    enddo
