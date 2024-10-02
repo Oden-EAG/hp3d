@@ -31,6 +31,9 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: norder(19)
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
+!..use blas3 optimized assembly
+   logical, parameter :: opt_blas = .true.
+!
 !----------------------------------------------------------------------
 !
 !..activate one physics variable (H1) for assembly
@@ -43,7 +46,11 @@ subroutine elem(Mdle, Itest,Itrial)
    call celndof(NODES(Mdle)%ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..call element integration routine
-   call elem_poisson(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
+   if (opt_blas) then
+      call elem_opt(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
+   else
+      call elem_poisson(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
+   endif
 !
 end subroutine elem
 !

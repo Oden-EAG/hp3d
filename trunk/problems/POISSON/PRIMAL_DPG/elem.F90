@@ -4,9 +4,9 @@
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!> @date  Apr 2024
 !
-!> @brief         - driver for the element routine
+!> @brief Driver for the element routine
 !
 !     arguments:
 !        in:
@@ -20,6 +20,7 @@
 subroutine elem(Mdle, Itest,Itrial)
 !
    use data_structure3D
+   use mpi_wrapper
    use parametersDPG
    use physics  , only: NR_PHYSA
    use assembly , only: ALOC,BLOC
@@ -41,6 +42,13 @@ subroutine elem(Mdle, Itest,Itrial)
 !
 !..element type
    integer :: etype
+!
+!..TIMER
+   real(8) :: start_time, end_time
+   logical, parameter :: timer = .false.
+!
+!..use blas3 optimized assembly
+   logical, parameter :: opt_blas = .true.
 !
 !-------------------------------------------------------------------------
 !
@@ -83,12 +91,33 @@ subroutine elem(Mdle, Itest,Itrial)
    nrTest  = nrdofHH
    nrTrial = nrdofH + nrdofVi
 !
+!..TIMER
+   if (timer) start_time = MPI_Wtime()
+!
 !..call element integration routine
-   call elem_poisson(Mdle,nrTest,nrTrial,                               &
-            nrdofHH,nrdofH,nrdofV,nrdofVi,                              &
-            BLOC(1)%nrow,BLOC(2)%nrow,                                  &
-            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,              &
-            BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array)
+   if (opt_blas) then
+      call elem_opt(Mdle,nrTest,nrTrial,                        &
+               nrdofHH,nrdofH,nrdofV,nrdofVi,                   &
+               BLOC(1)%nrow,BLOC(2)%nrow,                       &
+               BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,   &
+               BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array)
+   else
+      call elem_poisson(Mdle,nrTest,nrTrial,                    &
+               nrdofHH,nrdofH,nrdofV,nrdofVi,                   &
+               BLOC(1)%nrow,BLOC(2)%nrow,                       &
+               BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,   &
+               BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array)
+   endif
+!
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      if (      opt_blas) write(*,11) 'elem_opt: '    , end_time-start_time
+      if (.not. opt_blas) write(*,11) 'elem_poisson: ', end_time-start_time
+      !$OMP END CRITICAL
+   11 format(A,f12.5,' s')
+   endif
 !
 end subroutine elem
 !
@@ -98,9 +127,9 @@ end subroutine elem
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!> @date  Oct 2021
 !
-!> @brief         - compute element stiffness and load
+!> @brief Compute element stiffness and load
 !
 !     arguments:
 !        in:
@@ -138,7 +167,7 @@ subroutine elem_poisson(Mdle,                   &
    use data_structure3D
    use element_data
    use parametersDPG
-   use mpi_param, only: RANK
+   use mpi_wrapper
 !
    implicit none
 !
@@ -213,12 +242,18 @@ subroutine elem_poisson(Mdle,                   &
    real(8) :: q, v, sn, aux
    real(8) :: dq(3), dp(3), dv(3), s(3)
 !
+!..TIMER
+   real(8) :: start_time, end_time
+   logical, parameter :: timer = .false.
+!
    integer, external :: ij_upper_to_packed
 !
 !---------------------------------------------------------------------
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
+!..TIMER
+   if (timer) start_time = MPI_Wtime()
 !
 !..allocate auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
@@ -257,7 +292,7 @@ subroutine elem_poisson(Mdle,                   &
 !..determine nodes coordinates
    call nodcor(Mdle, xnod)
 !
-!..clear space for stiffness matrix and load vector:
+!..clear space for stiffness matrix and load vector
    BlocH = ZERO; AlocHH = ZERO; AlocHV = ZERO
    BlocV = ZERO; AlocVH = ZERO; AlocVV = ZERO
 !
@@ -284,13 +319,13 @@ subroutine elem_poisson(Mdle,                   &
       wa=waloc(l)
 !
 !  ...H1 shape functions (for geometry)
-      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 !
 !  ...discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
 !
 !  ...geometry map
-      call geom3D(Mdle,xi,xnod,shapH,gradH,nrdofH, x,dxdxi,dxidx,rjac,iflag)
+      call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
 !  ...integration weight
       weight = rjac*wa
@@ -310,7 +345,7 @@ subroutine elem_poisson(Mdle,                   &
          bload_H(k1) = bload_H(k1) + fval*v*weight
 !
 !     ...loop through H1 trial functions
-         do k2=1,nrdofH
+         do k2=1,NrdofH
 !        ...Piola transformation
             dp(1:3) = gradH(1,k2)*dxidx(1,1:3) &
                     + gradH(2,k2)*dxidx(2,1:3) &
@@ -345,6 +380,16 @@ subroutine elem_poisson(Mdle,                   &
       enddo
 !..end of loop through integration points
    enddo
+!
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem INTEGR Vol: ', end_time-start_time
+      !$OMP END CRITICAL
+      11 format(A,f12.5,' s')
+      start_time = MPI_Wtime()
+   endif
 !
 !---------------------------------------------------------------------
 !    B O U N D A R Y    I N T E G R A L S                            |
@@ -390,8 +435,8 @@ subroutine elem_poisson(Mdle,                   &
                        nrdof,shapV,divV)
 !
 !     ...geometry
-         call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
-                  x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+         call bgeom3D(Mdle,xi,xnod,shapH,gradH,NrdofH,dxidt,nsign, &
+                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
          weight = bjac*wtloc(l)
 !
 !     ...loop through enriched H1 test functions
@@ -419,6 +464,15 @@ subroutine elem_poisson(Mdle,                   &
 !..end loop through element faces
    enddo
 !
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem INTEGR Bdr: ', end_time-start_time
+      !$OMP END CRITICAL
+      start_time = MPI_Wtime()
+   endif
+!
 !---------------------------------------------------------------------
 !  Construction of DPG system
 !---------------------------------------------------------------------
@@ -437,17 +491,18 @@ subroutine elem_poisson(Mdle,                   &
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
    call DPPTRF('U',NrTest,gramP,info)
    if (info.ne.0) then
-      write(*,*) 'elem_heat: DPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_poisson: DPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^T X = [B|l]
    call DTPTRS('U','T','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
    if (info.ne.0) then
-      write(*,*) 'elem_heat: DTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_poisson: DTPTRS: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
+   deallocate(gramP)
    allocate(raloc(NrTrial+1,NrTrial+1)); raloc = ZERO
 !
 !..C. Matrix multiply: B^T G^-1 B (=B~^T B~)
@@ -455,7 +510,7 @@ subroutine elem_poisson(Mdle,                   &
 !
    deallocate(stiff_ALL)
 !
-!..D. Fill lower triangular part of Hermitian matrix
+!..D. Fill lower triangular part of symmetric matrix
    do i=1,NrTrial
       raloc(i+1:NrTrial+1,i) = raloc(i,i+1:NrTrial+1)
    enddo
@@ -471,6 +526,14 @@ subroutine elem_poisson(Mdle,                   &
    AlocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
 !
    deallocate(raloc)
+!
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem DPG LinAlg: ', end_time-start_time
+      !$OMP END CRITICAL
+   endif
 !
 end subroutine elem_poisson
 

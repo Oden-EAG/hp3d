@@ -108,9 +108,9 @@ program main
 !
    if (JOB .ne. 0) then
 !..for adaptive refinements
-      call exec_job_adap_ref
+      !call exec_job_adap_ref
 !..for uniform refinements
-      ! call exec_job
+      call exec_job
    else
       if (RANK .eq. ROOT) then
          call master_main

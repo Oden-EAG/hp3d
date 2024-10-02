@@ -58,6 +58,17 @@ module common_prob_data
    integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
    integer :: IDOMAIN_SMOOTHE = 0
 !
+!..DPG test norm
+!  - GRAPH_NORM: scaled adjoint graph norm
+!  - MATH_NORM : mathematician's norm
+   integer, parameter :: GRAPH_NORM = 1
+   integer, parameter ::  MATH_NORM = 2
+   integer, parameter ::  TEST_NORM = GRAPH_NORM
+!
+!..weight for L2 term in scaled adjoint graph norm
+!  ||v||_V^2 := ||A^* v||^2 + ALPHA * ||v||^2
+   real(8), parameter :: ALPHA_NORM = 1.0d0
+!
    character(32) :: OUTPUT_DIR
 !
 !
