@@ -44,6 +44,7 @@ PETSc configure may look like this:
             --download-parmetis=yes \
             --download-ptscotch=yes \
             --download-zoltan=yes \
+            --with-zoltan-fortran-bindings=1 \
             --download-hdf5=yes \
             --with-hdf5-fortran-bindings=1 \
             --with-shared-libraries=0 \
