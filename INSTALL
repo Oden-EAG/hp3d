@@ -11,13 +11,13 @@ hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
    (note: other versions may be compatible but have not been tested)
 
  - PETSc
-   Versions: 3.11 - 3.20.4
+   Versions: 3.11 - 3.22.1
 
  - HDF5
-   Versions: 1.10.4 - 1.12.2
+   Versions: 1.10.4 - 1.14.3
 
  - MUMPS
-   Versions: 5.1 - 5.6.1
+   Versions: 5.1 - 5.7.3
 
  - METIS
    Versions: 5.1.0
@@ -29,9 +29,9 @@ hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
    (macOS: requires recent versions of bison and flex;
            e.g. bison version >= 3.0, flex version 2.64)
    Versions: 6.0.9
-             7.0.1 - 7.0.3
+             7.0.1 - 7.0.5
 
  - Zoltan
-   Versions: 3.83
+   Versions: 3.83 - 3.901
 
 *****************************************************************************
