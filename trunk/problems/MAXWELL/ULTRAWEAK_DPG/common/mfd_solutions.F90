@@ -62,25 +62,21 @@
       real(8) :: x1, x2, x3, xshift, yshift, zshift
       real(8) :: r, alpha
 !
-!TODO: Fix this
-      integer :: iprob
-!
 !---------------------------------------------------------------------------------------
 !
       x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
 !
-      iprob = Isol
-!
-      select case (iprob)
+      select case (ISOL)
 !
 !  ...polynomial of order NPX*NPY*NPZ
+!     TODO: implement
       case(0)
 !
          p = ZERO
          Gradp = ZERO
          Grad2p = ZERO
 !
-!..sin solution
+!  ...sin solution
       case(1)
 !
          pi_mod = OMEGA
@@ -136,14 +132,14 @@
          dzf_y = -ZIMG*OMEGA*zf_y
          dzf_z = -ZIMG*OMEGA*zf_z
 !
-!  ...second order derivatives
+!     ...second order derivatives
          ddzf_x = -OMEGA**2*zf_x
          ddzf_y = -OMEGA**2*zf_y
          ddzf_z = -OMEGA**2*zf_z
 !
          p = zf_x*zf_y*zf_z
 
-!  ...1st order derivatives
+!     ...1st order derivatives
          Gradp(1) = dzf_x*zf_y*zf_z
          Gradp(2) = zf_x*dzf_y*zf_z
          Gradp(3) = zf_x*zf_y*dzf_z

@@ -83,7 +83,7 @@
       VTYPE, allocatable :: gramP(:)
 !
 !  ...intermediate values
-      real(8) :: FF
+      real(8) :: FF, CC, afac
       real(8) :: fldE(3), crlE(3)
       real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
       complex(8) :: epsTfldE(3), epsTfldF(3), epscrlE(3)
@@ -117,7 +117,6 @@
       integer :: nrf
 !
 !  ...various variables for the problem
-      real(8) :: CC
       integer :: k1,k2,m,n,nint,k,l,ivar,iflag
       integer :: nordP,nsign,ifc,info,nrdof
       VTYPE   :: za(3,3),zc(3,3),zc1
@@ -130,6 +129,15 @@
 #endif
 !
 !--------------------------------------------------------------------------
+!
+      select case(TEST_NORM)
+         case(GRAPH_NORM); afac = ALPHA_NORM
+         case(GRAPH_DIAG); afac = ALPHA_NORM
+         case( MATH_NORM); afac = 1.d0
+         case default
+            write(*,*) 'elem_residual_maxwell: invalid test norm!'
+            stop
+      end select
 !
       allocate(gramP(NrTest*(NrTest+1)/2))
 !
@@ -303,11 +311,30 @@
 !              (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
                n = 2*k1-1; m = 2*k2-1
                k = ij_upper_to_packed(n,m)
-               zaux = conjg(epsTfldF(1))*epsTfldE(1) + &
-                      conjg(epsTfldF(2))*epsTfldE(2) + &
-                      conjg(epsTfldF(3))*epsTfldE(3)
+               if (TEST_NORM .eq. MATH_NORM) then
+                  zaux = ZERO
+               else
+                  zaux = conjg(epsTfldF(1))*epsTfldE(1) + &
+                         conjg(epsTfldF(2))*epsTfldE(2) + &
+                         conjg(epsTfldF(3))*epsTfldE(3)
+               endif
                gramP(k) = gramP(k) &
-                        + (zaux + ALPHA_NORM*FF + CC)*weight
+                        + (zaux + afac*FF + CC)*weight
+!
+!              (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
+               n = 2*k1; m = 2*k2
+               k = ij_upper_to_packed(n,m)
+               if (TEST_NORM .eq. MATH_NORM) then
+                  zcux = ZERO
+               else
+                  zcux = abs(zc1)**2*(fldF(1)*fldE(1) + &
+                                      fldF(2)*fldE(2) + &
+                                      fldF(3)*fldE(3) )
+               endif
+               gramP(k) = gramP(k) &
+                        + (zcux + afac*FF + CC)*weight
+!
+               if (TEST_NORM .ne. GRAPH_NORM) cycle
 !
 !              (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
                n = 2*k1-1; m = 2*k2
@@ -334,15 +361,6 @@
                               fldF(3)*crlE(3) )
                   gramP(k) = gramP(k) + (zaux+zcux)*weight
                endif
-!
-!              (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
-               n = 2*k1; m = 2*k2
-               k = ij_upper_to_packed(n,m)
-               zcux = abs(zc1)**2*(fldF(1)*fldE(1) + &
-                                   fldF(2)*fldE(2) + &
-                                   fldF(3)*fldE(3) )
-               gramP(k) = gramP(k) &
-                        + (zcux + ALPHA_NORM*FF + CC)*weight
 !
 !        ...end of loop through enriched H(curl) test functions
             enddo
@@ -382,7 +400,7 @@
             call face_param(ntype,ifc,t, xi,dxidt)
 !
 !        ...determine discontinuous H(curl) shape functions
-            call shape3EE(ntype,xi,nordP, NrdofEE,shapEE,curlEE)
+            call shape3EE(ntype,xi,nordP, nrdof,shapEE,curlEE)
 !
 !        ...determine element H1 shape functions (for geometry)
             call shape3DH(ntype,xi,norder,norient_edge,norient_face, &
