@@ -17,6 +17,7 @@
 subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !
       implicit none
+!
       real(8), dimension(3), intent(in ) :: X,Point,Axis1,Axis2
       real(8)              , intent(in ) :: Rs1,Rs2,Pw1,Pw2
       real(8)              , intent(out) :: Fval
@@ -28,11 +29,14 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
       real(8), dimension(3)   :: vecV
 !  ...projections onto unit axes
       real(8)                 :: xx,yy,sgnxx,sgnyy,s
-      integer                 :: iprint
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !------------------------------------------------------------------------------------
 !
-      iprint=0
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) Point(1:3),Axis1(1:3),Axis2(1:3),Rs1,Rs2,Pw1,Pw2,X(1:3)
  7000   format(' superellipse: Point = ',3e12.5,/, &
@@ -44,6 +48,7 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
                '               Pw2   = ', e12.5,/, &
                '               X     = ',3e12.5    )
       endif
+#endif
 !
 !  ...superellipse has two orthogonal semiaxes, each with a radius and power
 !     associated to it. In 2D it satisfies
@@ -60,11 +65,12 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !  ...evaluate the relative position vector of X
       vecV(1:3) = X(1:3) - Point(1:3)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) unit1(1:3),unit2(1:3),vecV(1:3)
  7001   format(' superellipse: unit1 = ',3e12.5,' unit2 = ',3e12.5,' vecV = ',3e12.5)
       endif
+#endif
 !
 !  ...project vecV to the relevant axes
       call scalar_product(vecV,unit1, xx)
@@ -77,10 +83,12 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
       Dfdx(1:3) = ((1.d0/Rs1)**Pw1)*Pw1*(abs(xx)**(Pw1-1))*unit1(1:3)*sgnxx &
                 + ((1.d0/Rs2)**Pw2)*Pw2*(abs(yy)**(Pw2-1))*unit2(1:3)*sgnyy
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7004) Fval,Dfdx(1:3)
  7004   format(' superellipse: Fval,Dfdx = ',e12.5,2x,3e12.5)
         call pause
       endif
+#endif
 !
 end subroutine superellipse

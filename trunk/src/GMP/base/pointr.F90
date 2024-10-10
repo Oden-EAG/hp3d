@@ -31,13 +31,18 @@
 !  ...point type
       character(len=10) :: type     
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No
  7001   format('pointr: No = ',i4)
       endif
+#endif
 !
 !  ...get the point's type
       type = POINTS(No)%Type
@@ -65,9 +70,12 @@
         write(*,*) 'pointr: type = ',type
         stop
       end select
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) X
  7002   format('pointr: X = ',3f8.3)
       endif
+#endif
 !
    end subroutine pointr

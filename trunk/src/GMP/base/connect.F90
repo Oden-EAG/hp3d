@@ -23,14 +23,18 @@ subroutine connect
 !  ...an auxiliary list
       integer :: listaux(20)
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
+!----------------------------------------------------------------------
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: DEBUGGING...'
       endif
-!
-!----------------------------------------------------------------------
+#endif
 !
 !
 !  Step 1: Reconstruct points to curves connectivities
@@ -65,14 +69,22 @@ subroutine connect
         do j=1,POINTS(np)%NrCurv
           POINTS(np)%CurvNo(j) = iwork(j,np)
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7037) np
  7037     format('connect: CURVES CONNECTED TO POINT ',i6)
           write(*,7038) POINTS(np)%CurvNo(1:POINTS(np)%NrCurv)
  7038     format(10i7)
         endif
+#endif
+!
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) call pause
+#endif
+!
       deallocate(iwork)
 !
 !----------------------------------------------------------------------
@@ -168,10 +180,13 @@ subroutine connect
 !
 !  .....end of loop through triangle edges
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7010) nt,TRIANGLES(nt)%EdgeNo(1:3)
  7010     format('connect: nt, EDGES = ',i8,3x,3i8)
         endif
+#endif
 !
 !  ...end of loop through triangles
       enddo
@@ -382,10 +397,13 @@ subroutine connect
 !
 !  ...loop through prisms
       do np=1,NRPRISM
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8001) np
  8001     format('connect: PRISM np = ',i8)
         endif
+#endif
 !
 !  .....loop through the prism edges
         do j=1,9
@@ -425,10 +443,13 @@ subroutine connect
 !
 !  .....end of loop through edges
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8002) PRISMS(np)%EdgeNo(1:9)
  8002     format('connect: edges = ',9i8)
         endif
+#endif
 !
 !  .....loop through the prism faces
         do j=1,5
@@ -551,10 +572,13 @@ subroutine connect
 !
 !  .....end of loop through faces
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8003) PRISMS(np)%FigNo(1:5)
  8003     format('connect: faces = ',9i8)
         endif
+#endif
 !
 !  ...end of loop through prisms
       enddo
@@ -690,10 +714,13 @@ subroutine connect
 !
 !  ...loop through pyramids
       do npyr=1,NRPYRAM
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7101) npyr
  7101     format('connect: PYRAMID npyr = ',i8)
         endif
+#endif
 !
 !  .....loop through the pyramid edges
         do j=1,8
@@ -735,9 +762,12 @@ subroutine connect
 !
 !  .....end of loop through edges
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8002) PYRAMIDS(npyr)%EdgeNo(1:8)
         endif
+#endif
 !
 !  .....loop through the pyramid faces
         do j=1,5
@@ -863,9 +893,12 @@ subroutine connect
 !
 !  .....end of loop through faces
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8003) PYRAMIDS(npyr)%FigNo(1:5)
         endif
+#endif
 !
 !  ...end of loop through pyramids
       enddo
@@ -897,9 +930,12 @@ subroutine connect
 !
 !  ...end of loop through hexa
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED HEXAS TO RECTANGLES'
       endif
+#endif
 !
 !  ...loop through prisms
       do np=1,NRPRISM
@@ -924,9 +960,12 @@ subroutine connect
 !
 !  ...end of loop through prisms
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED PRISMS TO RECTANGLES'
       endif
+#endif
 !
 !  ...loop through pyramids
       do npyr=1,NRPYRAM
@@ -948,10 +987,12 @@ subroutine connect
 !
 !  ...end of loop through pyramids
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED PYRAMIDS TO RECTANGLES'
       endif
-!
+#endif
 !
 !----------------------------------------------------------------------
 !
@@ -981,9 +1022,12 @@ subroutine connect
 !
 !  ...end of loop through prisms
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED PRISMS TO TRIANGLES'
       endif
+#endif
 !
 !  ...loop through tets
       do ntet=1,NRTETRA
@@ -1008,9 +1052,12 @@ subroutine connect
 !
 !  ...end of loop through tetras
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED TETS TO TRIANGLES'
       endif
+#endif
 !
 !  ...loop through pyramids
       do npyr=1,NRPYRAM
@@ -1035,10 +1082,12 @@ subroutine connect
 !
 !  ...end of loop through pyramids
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'connect: HAVE CONNECTED PYRAMIDS TO TRIANGLES'
       endif
-!
+#endif
 !
 end subroutine connect
 !

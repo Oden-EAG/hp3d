@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> @Purpose : routine switches from 2D Cartesian to polar coordinates
+!> @brief      routine switches from 2D Cartesian to polar coordinates
 !
 !> @param[in]  X       - Cartesian coordinates of a point
 !> @param[out] R,Theta - polar coordinates of the point
@@ -34,10 +34,13 @@ subroutine cart_to_polar(Xp, R,Theta)
       real(8) :: x,y
       real(8), parameter :: PI = acos(-1.d0)
       real(8), parameter :: eps=1.d-13
-      integer :: iprint
-!----------------------------------------------------------------------
 !
-      iprint=0
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint = 0
+#endif
+!
+!----------------------------------------------------------------------
 !
       x=Xp(1) ; y=Xp(2)
 !
@@ -58,11 +61,13 @@ subroutine cart_to_polar(Xp, R,Theta)
         endif
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) x,y,R,Theta
  7001   format(' cart_to_polar: x,y,R,Theta = ',2f8.3,3x,2f8.3)
         call pause
       endif
+#endif
 !
 !
 end subroutine cart_to_polar

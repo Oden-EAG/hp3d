@@ -20,10 +20,13 @@ subroutine surf(No,X, Fval,Dfdx)
 !------------------------------------------------------------------------------------
       real(8), dimension(3) :: x0
       character(len=10)     :: stype
-      integer               :: iprint,no1,nsign,np
-!------------------------------------------------------------------------------------
+      integer               :: no1,nsign,np
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!------------------------------------------------------------------------------------
 !
 !  ...determine surface orientations
       no1=abs(No) ; nsign=No/no1
@@ -33,10 +36,13 @@ subroutine surf(No,X, Fval,Dfdx)
 !
 !  ...find the surface type
       stype = SURFACES(no1)%Type
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) No,stype
  7000   format(' surf: No,type = ',i5,2x,a10)
       endif
+#endif
 !
 !  ...select the surface
       select case(stype)

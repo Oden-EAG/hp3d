@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> @Purpose : Routine checks orientation of a GMP block by computing
+!> @brief     Routine checks orientation of a GMP block by computing
 !>            Jacobian of the linear parametrization at its 1st vertex,
 !>            and changes enumeration of vertices in the case of a
 !>            negative Jacobian
@@ -7,7 +7,7 @@
 !> @param[in] Lab  = 1 (prism), 2(hexa), 3(tet), 4(pyramid)
 !> @param[in] Nb   - block number
 !
-!> @date Feb 13
+!> @date Oct 2024
 !---------------------------------------------------------------------
 subroutine check_orientation(Lab,Nb)
 !
@@ -16,11 +16,15 @@ subroutine check_orientation(Lab,Nb)
       integer, intent(in)     :: Lab,Nb
 !
       real(8), dimension(3,3) :: vect
-      integer                 :: np1,np2,np3,np4,iprint
+      integer                 :: np1,np2,np3,np4
       real(8)                 :: det
-!---------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!
+!---------------------------------------------------------------------
 !
       select case(Lab)
       case(1)
@@ -42,10 +46,12 @@ subroutine check_orientation(Lab,Nb)
       vect(1:3,3) = POINTS(np4)%Rdata(1:3) - POINTS(np1)%Rdata(1:3)
       call mixed_product(vect(1:3,1),vect(1:3,2),vect(1:3,3), det)
 !
+#if HP3D_DEBUG
       if (iprint == 1) then
         write(*,7001) Lab,Nb,det
  7001   format(' check_orientation: Lab,Nb,det = ',i2,i6,e12.5)
       endif
+#endif
 !
       if (det <= 0.d0) then
         select case(Lab)
