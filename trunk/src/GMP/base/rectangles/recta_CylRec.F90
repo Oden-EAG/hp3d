@@ -9,14 +9,14 @@
 !   purpose            - routine evaluates physical coordinates
 !                        and its derivatives wrt to reference
 !                        coordinates for a point on the image
-!                        of a linear rectagle through a global system
+!                        of a linear rectangle through a global system
 !                        of coordinates: x,y=rcos(\theta),z=rsin(\theta)
 !                        and their  derivative wrt to reference
 !                        coordinates
 !
 !   arguments :
 !     in:
-!               No     - a GMP rectagle number
+!               No     - a GMP rectangle number
 !               Eta    - reference coordinates of a point
 !                        in the rectangle
 !     out:

@@ -75,7 +75,7 @@
 !       beta  = -F
 !
 !  .....printing statements
-        if (iprint .eq. 1) then
+        if (iprint.eq.1) then
           select case(Nusf)
 !
 !  .......implicit curve

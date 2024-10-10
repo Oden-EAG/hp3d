@@ -21,10 +21,8 @@ subroutine curveK(No,T,Norient, X,Dxdt)
       real(8),dimension(3),intent(out) :: X,Dxdt
 !
       real(8) :: blend,dblend
-      integer :: iprint
-!----------------------------------------------------------------------
 !
-      iprint=0
+!----------------------------------------------------------------------
 !
 !  ...check input
       if ((T.lt.GEOM_TOL).or.(T.gt.1.d0-GEOM_TOL)) then
@@ -73,11 +71,9 @@ subroutine curveB(No,T,Norient, X,Dxdt)
       real(8) :: t_aux,smax
       integer :: i,iv,np,ivar
       integer :: icheck
-      integer :: iprint
 !----------------------------------------------------------------------
 !
       icheck=1
-      iprint=0
 !
 !  ...collect curve endpoints wrt LOCAL coordinate T
       do i=1,2
@@ -139,11 +135,8 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       real(8) :: blend
       real(8) :: dblend(2)
       integer :: i
-      integer :: iprint
 !
 !----------------------------------------------------------------------
-!
-      iprint=0
 !
 !  ...evaluate blending shape functions
       blend = (1.d0 - T(1) - T(2))*T(1)*T(2)
