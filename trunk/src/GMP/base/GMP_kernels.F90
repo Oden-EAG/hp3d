@@ -812,7 +812,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
  7002     format(' rectaB: No,ie,smax,dmax = ',i5,i2,2e12.5)          !
 !!          call pause                                                !
 !!!          if (iprint.eq.1) call my_tests                         !
-!!!          iprint = 1                                               !
+!!!          iprint=1                                                 !
 !!!          write(*,9000) No                                         !
  9000     format(' trianB: rerunning rountine for triangle No = ', &  !
                            I6,' with printing flag on.')              !

@@ -23,7 +23,6 @@
 !                        reference coordinate
 !
 !-----------------------------------------------------------------------
-!
    subroutine curve_CylCoord(No,Eta, X,Dxdeta)
 !
       use GMP
@@ -39,13 +38,17 @@
       integer :: iv,np
       real(8) :: costhet,dr_deta,dthet_deta,pi,r,sinthet,theta,twopi
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) No,Eta
  7000   format('curve_CylCoord: DEBUGGING FOR No,Eta = ',i4,2x,f8.3)
       endif
+#endif
 !
       pi = acos(-1.d0)
       twopi = pi*2.d0
@@ -87,11 +90,13 @@
       Dxdeta(2) = dr_deta*costhet - r*sinthet*dthet_deta
       Dxdeta(3) = dr_deta*sinthet + r*costhet*dthet_deta
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003) No,X,Dxdeta
  7003   format('curve_CylCoord: No,X,Dxdeta = ', i4,2x,2(3e12.5,2x))
         call pause
       endif
+#endif
 !
 !
    end subroutine curve_CylCoord

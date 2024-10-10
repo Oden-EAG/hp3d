@@ -22,7 +22,6 @@
 !                        reference coordinate
 !
 !----------------------------------------------------------------------
-!
    subroutine curve_QuaSEl(No,Eta, X,Dxdeta)
 !
       use GMP
@@ -35,10 +34,12 @@
       real(8), dimension(3)   :: aG,bG,center,aC,bC,xL,dxLdeta
       real(8), dimension(3,3) :: rotM
       real(8) :: rx,ry,px,py,tt,pihalf
-      integer :: iprint,i
-!----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: i,iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
       if (CURVES(No)%Type.ne.'QuaSEl') then
         write(*,7001)
@@ -46,10 +47,12 @@
         stop
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) No, Eta
  7002   format(' curve_QuaSEl: No,Eta = ',i4,2x,f8.3)
       endif
+#endif
 !
 !  ...get the endpoints physical (global) coordinates
       call pointr(CURVES(No)%EndPoNo(1), aG)
@@ -69,7 +72,7 @@
       call norm(aC, rx)
       call norm(bC, ry)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7011) aG(1:3)
@@ -83,6 +86,7 @@
         write(*,7010) ry,py
  7010   format(' ry,py = ',2(e12.5,2x))
       endif
+#endif
 !
 !  ...now calculate the coordinates in 2D x-y plane
 !  ...first rescale Eta to between 0 and pi/2
@@ -100,7 +104,7 @@
                    (sin(tt)**(2.d0/py-1.d0))
       dxLdeta(3) = 0.d0
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7013) tt
@@ -110,6 +114,7 @@
         write(*,7007) dxLdeta(1:3)
  7007   format(' dxLdeta = ',3(e12.5,2x))
       endif
+#endif
 !
 !  ...the idea is to map these coordinates to the global physical
 !     coordinates
@@ -127,13 +132,14 @@
       call cross_product(aC(1:3),bC(1:3), rotM(1:3,3))
       rotM(1:3,3) = (1.d0/(rx*ry))*rotM(1:3,3)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,rotM(i,1:3)
  7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !  ...finally compute X and Dxdeta
       X(1:3) = rotM(1:3,1)*xL(1) + rotM(1:3,2)*xL(2) + &
@@ -141,7 +147,7 @@
       Dxdeta(1:3) = rotM(1:3,1)*dxLdeta(1) + rotM(1:3,2)*dxLdeta(2) + &
                     rotM(1:3,3)*dxLdeta(3)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7003) X(1:3)
@@ -149,5 +155,6 @@
  7003   format(' X      = ',3(e12.5,2x))
  7004   format(' Dxdeta = ',3(e12.5,2x))
       endif
+#endif
 !
    end subroutine curve_QuaSEl

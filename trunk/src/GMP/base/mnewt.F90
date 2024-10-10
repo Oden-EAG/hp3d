@@ -119,7 +119,7 @@
         call saruss(alpha,beta, aux,ifl)
 !  .....if system is not solved
         if (ifl .ne. 0) then
-          iprint = 1
+          iprint=1
           goto 10
         endif
 !
@@ -140,7 +140,7 @@
         if (k .eq. ntrial) then
           write(*,*)'mnewt: NEWTON-RAPSON METHOD HAS NOT CONVERGED!'
           call pause
-          iprint = 1
+          iprint=1
           goto 10
         endif
 !

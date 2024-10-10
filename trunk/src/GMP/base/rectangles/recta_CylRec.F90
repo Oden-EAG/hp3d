@@ -47,11 +47,11 @@
       real(8), dimension(3) :: drdeta,dthetadeta
 !----------------------------------------------------------------------
 !     misc.
-      integer :: iv,np,i
+      integer :: iv,np
       real(8) :: pi,twopi,costhet,sinthet
 !
 #if HP3D_DEBUG
-      integer :: iprint
+      integer :: i,iprint
       iprint=0
 #endif
 !----------------------------------------------------------------------

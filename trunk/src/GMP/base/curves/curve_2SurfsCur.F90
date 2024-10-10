@@ -20,7 +20,6 @@
 !                      = 1 otherwise
 !
 !-----------------------------------------------------------------------
-!
    subroutine curve_2SurfsCur(No,I1,I2,Eta, X,Dxdeta,Ierror)
 !
       use control

@@ -37,7 +37,7 @@ subroutine cart_to_polar(Xp, R,Theta)
 !
 #if HP3D_DEBUG
       integer :: iprint
-      iprint = 0
+      iprint=0
 #endif
 !
 !----------------------------------------------------------------------

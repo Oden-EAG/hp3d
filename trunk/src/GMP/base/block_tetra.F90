@@ -50,7 +50,7 @@
       X = 0; Dxdeta = 0
 !
 #if HP3D_DEBUG
-      if (No.eq.7) iprint = 0
+      if (No.eq.7) iprint=0
 !
       if (iprint.eq.1) then
         write(*,7001) No,Eta,TETRAS(No)%Type

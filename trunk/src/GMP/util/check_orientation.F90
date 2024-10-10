@@ -47,7 +47,7 @@ subroutine check_orientation(Lab,Nb)
       call mixed_product(vect(1:3,1),vect(1:3,2),vect(1:3,3), det)
 !
 #if HP3D_DEBUG
-      if (iprint == 1) then
+      if (iprint.eq.1) then
         write(*,7001) Lab,Nb,det
  7001   format(' check_orientation: Lab,Nb,det = ',i2,i6,e12.5)
       endif

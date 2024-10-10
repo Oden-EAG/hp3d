@@ -18,7 +18,6 @@
 !                        reference coordinate
 !
 !----------------------------------------------------------------------
-!
    subroutine curve_ImpCir(No,Eta, X,Dxdeta)
 !
       use GMP
