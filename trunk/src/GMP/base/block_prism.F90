@@ -72,7 +72,7 @@ subroutine prism(No,Eta, X,Dxdeta)
         write(*,7002) PRISMS(No)%Type
  7002   format('prism: unknown prism type = ',a10)
         stop
-      endselect
+      end select
 !
 !
    end subroutine prism

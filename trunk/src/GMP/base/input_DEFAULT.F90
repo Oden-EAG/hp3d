@@ -217,7 +217,7 @@ subroutine input_DEFAULT(Fp)
           write(*,7004) SURFACES(ns)%Type
  7004     format(' input_DEFAULT: unknown surface! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -291,7 +291,7 @@ subroutine input_DEFAULT(Fp)
         case default
           write(*,1002) POINTS(np)%Type
  1002     format(' input_DEFAULT: unknown point type! Type = ',a10)
-        endselect
+        end select
 !
       enddo
 !
@@ -378,7 +378,7 @@ subroutine input_DEFAULT(Fp)
 !        case('CylCur')
         case('CylCoord')
 !
-        endselect
+        end select
 !
       enddo
 !
@@ -443,7 +443,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1003)type
  1003     format(' input_DEFAULT: unknown triangle type! Type = ',a10)
           stop
-        endselect
+        end select
 !
       enddo
 !
@@ -496,7 +496,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1004) RECTANGLES(nr)%Type
  1004     format(' input_DEFAULT: unknown rectangle type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -523,7 +523,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1005) PRISMS(npri)%Type
  1005     format(' input_DEFAULT: unknown prism type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -549,7 +549,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1006) HEXAS(nh)%Type
  1006     format(' input_DEFAULT: unknown hexa type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -581,7 +581,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1007) type
  1007     format(' input_DEFAULT: unknown tet type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -613,7 +613,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1008) PYRAMIDS(npyr)%Type
  1008     format(' input_DEFAULT: unknown pyramid type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
       if (.not. QUIET_MODE) write(*,*)''

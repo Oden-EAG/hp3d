@@ -1260,7 +1260,7 @@
             do i=0,7
               write(*,7405)i,CURVES(nc)%Rdata(3*i:3*i+2)
             enddo
-          endselect
+          end select
         endif
 !
       case(4)
@@ -1513,7 +1513,7 @@
       case default
         write(*,*) 'Ndomain_GMP: lab = ',lab
         stop
-      endselect
+      end select
 !
       end function Ndomain_GMP
 !

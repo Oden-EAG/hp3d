@@ -20,12 +20,13 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
       integer :: No
       real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
-      integer :: i,ns
+      integer :: ns
 !
-!-----------------------------------------------------------------------
-!
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: i,iprint
       iprint=0
+#endif
+!-----------------------------------------------------------------------
 !
       if (RECTANGLES(No)%Type.ne.'PTIRec') then
         write(*,7000)RECTANGLES(No)%Type
@@ -33,10 +34,12 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
         stop
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001)
  7001   format(' recta_PTIRec: No,Eta = ',i8,2x,2(e12.5,2x))
       endif
+#endif
 
       if (.not.associated(RECTANGLES(No)%Idata)) then
         write(*,7002) No
@@ -46,10 +49,13 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
       endif
 
       ns=RECTANGLES(No)%Idata(1)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003)ns,SURFACES(ns)%Type
  7003   format('     ns,type = ',i2,2x,a15)
       endif
+#endif
 !
 !  ...select surface type
       select case(SURFACES(ns)%Type)
@@ -63,8 +69,9 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
                 i7,2x,a15)
         call print_GMP
         stop
-      endselect
+      end select
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7004)X(1:3)
  7004   format('                X = ',3(e12.5,2x))
@@ -74,6 +81,7 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
  7005   format('  i,Dxdeta(1:3,i) = ',i1,2x,3(e12.5,2x))
         call pause
       endif
+#endif
 !
 !
 end subroutine recta_PTIRec
@@ -130,23 +138,27 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !  ...workspace
       real(8) :: void(3),dblend(2)
 !
-      integer :: i,icheck,ie,ieta,ile,iv,iv1,iv2,ivar,j
+      integer :: i,icheck,ie,ieta,ile,iv,iv1,iv2,j
       integer :: nc,norient,np,ns
       real(8) :: blend,dsdse,fval,r,r_aux,rad,radnew,rsinpsi
       real(8) :: s,s1,s2,se
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
+      iprint=0
+#endif
 !
 !-----------------------------------------------------------------------
 !
       icheck=1
 !
-      iprint=0
-      if (iprint .eq. 1) then
+#if HP3D_DEBUG
+      if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta(1:2)
  7001   format(' recta_sphere: No,Eta = ',i4,2x,2e12.5)
       endif
+#endif
 !
 !  ...check surface type
       ns = RECTANGLES(No)%Idata(1)
@@ -240,8 +252,8 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         endif
       enddo
 !
-!  ...printing statement
-      if (iprint .eq. 1) then
+#if HP3D_DEBUG
+      if (iprint.eq.1) then
         write(*,*) 'recta_sphere: RELATIVE VERTEX COORDINATES = '
         do iv=1,4
           write(*,7031) iv,xrelsv(1:3,iv),xparv(1:2,iv)
@@ -249,6 +261,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
                  ' PSI,THETA = ',2e12.5)
         enddo
       endif
+#endif
 !-----------------------------------------------------------------------
 !  ...evaluate bilinear shape functions...
       shapH(1) = (1.d0 - Eta(1)) * (1.d0 - Eta(2))
@@ -275,13 +288,14 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing statement
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_sphere: AFTER VERT xpar,dxpardeta = '
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
         enddo
       endif
+#endif
 !
 !----------------------------------------------------------------------
 !     E D G E    B U B B L E S
@@ -293,10 +307,13 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         if (nc .lt. 0) then
           nc = -nc; norient = 1
         endif
-        if (iprint .eq. 1) then
+!
+#if HP3D_DEBUG
+        if (iprint.eq.1) then
           write(*,7003) ie, nc, CURVES(nc)%Type
  7003     format('recta_sphere: ie,nc,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....get the edge vertices specifying the local edge orientation
         iv1=QUADR_EDGE_TO_VERT(1,ie) ; iv2=QUADR_EDGE_TO_VERT(2,ie)
@@ -329,17 +346,21 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         call cart_to_polar((/xerels(3),rsinpsi/), r,xepar(1))
 !
 !  .....geometry consistency check and printing statements
-        if (iprint .eq. 1) then
+#if HP3D_DEBUG
+        if (iprint.eq.1) then
           write(*,7032) s,xerels(1:3),xepar(1:2)
  7032     format('s = ',e12.5,' COORDINATES = ',3e12.5,                &
                  ' PSI,THETA = ',2e12.5)
         endif
+#endif
+!
         if (abs(rad-r).gt.GEOM_TOL) then
           write(*,7004) rad,r
  7004     format('recta_sphere: rad,r = ',2e12.5)
           write(*,*)'no,ie = ',No,ie
 !          call pause
         endif
+!
         if (abs(sin(xepar(1))).lt.GEOM_TOL) then
           write(*,*) 'recta_sphere: POINT ON A POLE'
           stop
@@ -358,10 +379,14 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           ile = ile + 1
           s2 =  s2/xerels(1); dxepardeta(2) = s2
         endif
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7027) dxepardeta(1),s1,s2
  7027     format('recta_sphere: dxepardeta(1),s1,s2 = ',3e12.5)
         endif
+#endif
+!
         if (ile.eq.2) then
           if (abs(s1-s2).gt.GEOM_TOL) then
             write(*,7005) s1,s2
@@ -369,6 +394,8 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !            call pause
           endif
         endif
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'ie,xepar,dxepardeta = ',ie
           do ivar=1,2
@@ -376,6 +403,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
  7038       format(e12.5,2x,2e12.5)
           enddo
         endif
+#endif
 !
 !  .....compute the bubble
         xepar(1:2) = xepar(1:2)                                    &
@@ -392,19 +420,26 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
                            + dxepardeta(1:2)*dsedeta(j)*blend      &
                            + xepar(1:2)*dblend(j)
         enddo
-        if (iprint .eq. 1) then
+!
+#if HP3D_DEBUG
+        if (iprint.eq.1) then
           write(*,*) 'ie,xpar,dxpardeta = ',ie
           do ivar=1,2
             write(*,7038) xpar(ivar),dxpardeta(ivar,1:2)
           enddo
         endif
+#endif
+!
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_sphere: FINAL xpar,dxpardeta = '
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -449,7 +484,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !  ...add center
       X(1:3) = X(1:3) + SURFACES(ns)%Rdata(1:3)
 !
-!  ...printing statement
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_sphere: X,Dxdeta = '
         do ivar=1,3
@@ -458,6 +493,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 end subroutine recta_sphere
 !
@@ -517,19 +553,23 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
 !  ...work space
       real(8) :: void(3),dblend(2)
 !
-      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,np,ns,norient
+      integer :: i,ie,ile,iv,iv1,iv2,j,nc,np,ns,norient
       real(8) :: blend,dsdse,fval,r,rad,s,s1,s2,se
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
+      iprint=0
+#endif
 !
 !-----------------------------------------------------------------------
 !
-      iprint=0
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta(1:2)
  7001   format(' recta_cylinder: No,Eta = ',i4,2x,2e12.5)
       endif
+#endif
 !
       ns=RECTANGLES(No)%Idata(1)
       if (SURFACES(ns)%Type.ne.'Cylinder') then
@@ -601,6 +641,8 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         endif
         xparv(2,iv) = xrelsv(3,iv)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cylinder: RELATIVE VERTEX COORDINATES ='
         do iv=1,3
@@ -609,6 +651,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
                  ' THETA,Z = ',2e12.5)
         enddo
       endif
+#endif
 !
 !  ...evaluate bilinear shape functions...
       shapH(1) = (1.d0 - Eta(1)) * (1.d0 - Eta(2))
@@ -636,12 +679,15 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
                            + xparv(1:2,iv)*dshapH(j,iv)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cylinder: AFTER VERT xpar,dxpardeta ='
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !     E D G E    B U B B L E S
@@ -653,10 +699,13 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         if (nc.lt.0) then
           nc = -nc; norient=1
         endif
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ie,nc,CURVES(nc)%Type
  7003     format('recta_cylinder: ie,nc,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....get the edge vertices specifying the local edge orientation
         iv1=QUADR_EDGE_TO_VERT(1,ie) ; iv2=QUADR_EDGE_TO_VERT(2,ie)
@@ -685,11 +734,15 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
 !  .....transform to the parametric space
         call cart_to_polar(xerels(1:2), r,xepar(1))
         xepar(2) = xerels(3)
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7032) s,xerels(1:3),xepar(1:2)
  7032     format('s = ',e12.5,' COORDINATES = ',3e12.5,          &
                  ' THETA,Z = ',2e12.5)
         endif
+#endif
+!
         if (abs(rad-r).gt.GEOM_TOL) then
           write(*,7004) rad,r
  7004     format('recta_cylinder: rad,r = ',2e12.5)
@@ -711,10 +764,14 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
           ile=ile+1
           s2 =  s2/xerels(1); dxepardeta(1) = s2
         endif
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7027) s1,s2,dxepardeta(2)
  7027     format('recta_cylinder: s1,s2,dxepardeta(2) = ',3e12.5)
         endif
+#endif
+!
         if (ile.eq.2) then
           if (abs(s1-s2).gt.GEOM_TOL) then
             write(*,7005) s1,s2
@@ -722,6 +779,8 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
             call pause
           endif
         endif
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'ie,xepar,dxepardeta = ',ie
           do ivar=1,2
@@ -729,6 +788,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
  7038       format(e12.5,2x,2e12.5)
           enddo
         endif
+#endif
 !
 !  .....compute the bubble
         xepar(1:2) = xepar(1:2)                                     &
@@ -745,19 +805,26 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
                            + dxepardeta(1:2)*dsedeta(j)*blend       &
                            + xepar(1:2)*dblend(j)
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'ie,xpar,dxpardeta = ',ie
           do ivar=1,2
             write(*,7038) xpar(ivar),dxpardeta(ivar,1:2)
           enddo
         endif
+#endif
+!
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cylinder: FINAL xpar,dxpardeta = '
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -778,6 +845,8 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         enddo
         X(i) = X(i) + center(i)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cylinder: X,Dxdeta = '
         do ivar=1,3
@@ -786,6 +855,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 !
 end subroutine recta_cylinder
@@ -845,19 +915,22 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
 !  ...work space
       real(8) :: void(3),dblend(2)
 !
-      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,norient,np,ns
+      integer :: i,ie,ile,iv,iv1,iv2,j,nc,norient,np,ns
       real(8) :: blend,c,dsdse,fval,r,rnorm,s,s1,s2,se
 !
-      integer :: iprint
-!
+#if HP3D_DEBUG
+      integer :: ivar,iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
-      iprint=0
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta(1:2)
  7001   format('recta_cone: No,Eta = ',i4,2x,2e12.5)
       endif
+#endif
 !
       ns = RECTANGLES(No)%Idata(1)
       if (SURFACES(ns)%Type.ne.'Cone') then
@@ -918,6 +991,8 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         endif
         xparv(2,iv) = xrelcv(3,iv)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cone: RELATIVE VERTEX COORDINATES = '
         do iv=1,3
@@ -926,6 +1001,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
                  ' THETA,Z = ',2e12.5)
         enddo
       endif
+#endif
 !
 !  ...evaluate bilinear shape functions...
       shapH(1) = (1.d0 - Eta(1)) * (1.d0 - Eta(2))
@@ -953,12 +1029,15 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
                            + xparv(1:2,iv)*dshapH(j,iv)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cone: AFTER VERT xpar,dxpardeta = '
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !     E D G E    B U B B L E S
@@ -977,10 +1056,13 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
 !  .....project s onto the edge
         call proj_r2e(iv1,iv2,shapH,dshapH, se,dsedeta)
         if ((se.lt.GEOM_TOL).or.(se.gt.1.d0-GEOM_TOL)) cycle
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ie,nc,CURVES(nc)%Type
  7003     format('recta_cone: ie,nc,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....compute the edge parametrization
         select case(norient)
@@ -1001,11 +1083,15 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
 !
 !  .....transform to the parametric space
         call cart_to_polar(xerelc(1:2), r,xepar(1))
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7032) s,xerelc(1:3),xepar(1:2)
  7032     format('s = ',e12.5,' COORDINATES = ',3e12.5,  &
                  ' THETA,Z = ',2e12.5)
         endif
+#endif
+!
         if (abs(c*xerelc(3)-r).gt.GEOM_TOL) then
           write(*,7004) c*xerelc(3),r
  7004     format('recta_cone: c*xerelc(3),r = ',2e12.5)
@@ -1070,6 +1156,8 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         enddo
         X(i) = X(i) + SURFACES(ns)%Rdata(i)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_cone: X,Dxdeta = '
         do ivar=1,3
@@ -1078,6 +1166,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 !
 end subroutine recta_cone

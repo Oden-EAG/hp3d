@@ -161,7 +161,7 @@ subroutine trian(No,Eta, X,Dxdeta)
  7003 format(' trian: unknown Type = ',a10)
       stop
 !
-      endselect
+      end select
 !
 !
 end subroutine trian

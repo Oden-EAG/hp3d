@@ -39,7 +39,7 @@ subroutine check_orientation(Lab,Nb)
       case(4)
         np1=PYRAMIDS(Nb)%VertNo(1); np2=PYRAMIDS(Nb)%VertNo(2)
         np3=PYRAMIDS(Nb)%VertNo(4); np4=PYRAMIDS(Nb)%VertNo(5)
-      endselect
+      end select
 !
       vect(1:3,1) = POINTS(np2)%Rdata(1:3) - POINTS(np1)%Rdata(1:3)
       vect(1:3,2) = POINTS(np3)%Rdata(1:3) - POINTS(np1)%Rdata(1:3)
@@ -66,7 +66,7 @@ subroutine check_orientation(Lab,Nb)
         case(4)
           call swap(PYRAMIDS(Nb)%VertNo(1),PYRAMIDS(Nb)%VertNo(2))
           call swap(PYRAMIDS(Nb)%VertNo(3),PYRAMIDS(Nb)%VertNo(4))
-        endselect
+        end select
       endif
 !
 !

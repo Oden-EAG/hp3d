@@ -74,7 +74,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
          write(*,7004) HEXAS(No)%Type
  7004    format(' hexa: unknown type! Type = ',a10)
          stop
-       endselect
+       end select
 !
 !
 end subroutine hexa

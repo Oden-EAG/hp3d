@@ -155,7 +155,7 @@ subroutine recta(No,Eta, X,Dxdeta)
    7003 format(' recta: unknown Type = ',a10)
       stop
 !
-      endselect
+      end select
 !
 !
 end subroutine recta

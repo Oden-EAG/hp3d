@@ -105,7 +105,7 @@ subroutine surf(No,X, Fval,Dfdx)
       case default
            write(*,*)' surf: WRONG SURFACE TYPE'
            stop
-      endselect
+      end select
 !
 !  ...account for surface orientation
       Fval=Fval*nsign ; Dfdx(1:3)=Dfdx(1:3)*nsign

@@ -58,7 +58,7 @@
         case(3,4)
           write(*,1002) Eta(1:2)
  1002     format(' Eta = ',2(e12.5,2x))
-        endselect
+        end select
       endif
 !
 !  ...set X equal to initial guess Xs
@@ -352,11 +352,11 @@
         stop
 !
 !  ...end select geometry entity
-      endselect
+      end select
 !
 !--------------------------------------------------------------------
 !  ...printing statement
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*) 'usrfun: Beta, Alpha = '
         do i=1,3
           write(*,7003) Beta(i), Alpha(i,1:3)

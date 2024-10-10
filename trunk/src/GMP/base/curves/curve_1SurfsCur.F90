@@ -38,7 +38,7 @@ subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
       case('Cylinder') ; call cylinder_geodesic(nc, eta, r, Dr)
       case('Cone')     ; call cone_geodesic(nc, eta, r, Dr)
 !
-      endselect
+      end select
 !
 !
 end subroutine curve_1SurfsCur
@@ -96,7 +96,7 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
         write(*,*) 'ERROR: inconsistent surface type.'
         write(*,*) '---------------------------------'
         stop
-      end if
+      endif
 !
 !  ...get the data for the plane
       x0       = SURFACES(ns)%Rdata(1)
@@ -218,7 +218,7 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
         write(*,*) 'ERROR: inconsistent surface type.'
         write(*,*) '---------------------------------'
         stop
-      end if
+      endif
 !
 !  ...get sphere data
       cen(1:3) = SURFACES(ns)%Rdata(1:3)

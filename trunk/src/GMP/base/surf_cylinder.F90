@@ -27,9 +27,10 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !  ...gradient of xvecp
       real(8), dimension(3,3) :: dxvecpdx
       integer                 :: i
-      real(8)                 :: s,s1
+      real(8)                 :: s
 !
 #if HP3D_DEBUG
+      real(8) :: s1
       integer :: iprint
       iprint=0
 #endif

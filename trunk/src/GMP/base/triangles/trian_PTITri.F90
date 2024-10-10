@@ -193,7 +193,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
       enddo
 !
 !  ...printing statement
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*) 'spherical_triangle: RELATIVE VERTEX COORDINATES = '
         do iv=1,3
           write(*,7031) iv,xrelsv(1:3,iv),xparv(1:2,iv)
@@ -220,7 +220,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
       enddo
 !
 !  ...printing statement
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*) 'spherical_triangle: AFTER VERT xpar,dxpardeta = '
         do ivar=1,2
           write(*,7035) xpar(ivar),dxpardeta(ivar,1:2)
@@ -238,7 +238,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
         if (nc.lt.0) then
           nc = -nc; norient = 1
         endif
-        if (iprint .eq. 1) then
+        if (iprint.eq.1) then
           write(*,7003) ie, nc, CURVES(nc)%Type
  7003     format('spherical_triangle: ie,nc,Type = ',i2,i5,2x,a5)
         endif
@@ -344,7 +344,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
                            + dxepardeta(1:2)*dsedeta(j)*blend   &
                            + xepar(1:2)*dblend(j)
         enddo
-        if (iprint .eq. 1) then
+        if (iprint.eq.1) then
           write(*,*) 'ie,xpar,dxpardeta = ',ie
           do ivar=1,2
             write(*,7038) xpar(ivar),dxpardeta(ivar,1:2)

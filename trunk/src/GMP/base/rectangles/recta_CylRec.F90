@@ -47,16 +47,23 @@
       real(8), dimension(3) :: drdeta,dthetadeta
 !----------------------------------------------------------------------
 !     misc.
-      integer :: iprint,iv,np,i
+      integer :: iv,np,i
       real(8) :: pi,twopi,costhet,sinthet
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
       select case(No)
       case(1)
         iprint=0
       case default
         iprint=0
       end select
+#endif
 !
       if ((RECTANGLES(No)%Type.ne.'CylRec'.or.(NDIM.ne.3))) then
         write(*,7001) RECTANGLES(No)%Type
@@ -64,10 +71,12 @@
         stop 1
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) No,Eta
  7002   format('recta_CylRec: No,Eta = ',i4,2x,2f8.3)
       endif
+#endif
 !
 !  ...initiate
       X(1:3) = 0.d0; Dxdeta(1:3,1:3) = 0.d0
@@ -115,6 +124,8 @@
       X(3) = r*sinthet
       Dxdeta(2,1:3) = drdeta(1:3)*costhet - r*sinthet*dthetadeta(1:3)
       Dxdeta(3,1:3) = drdeta(1:3)*sinthet + r*costhet*dthetadeta(1:3)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'theta = ', theta
         write(*,*) 'r = ', r
@@ -126,6 +137,7 @@
                '         ',3f8.3)
         call pause
       endif
+#endif
 !
 !
    end subroutine recta_CylRec
