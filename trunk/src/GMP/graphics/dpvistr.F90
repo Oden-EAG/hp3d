@@ -33,9 +33,6 @@
       integer :: i,iblno,icolor,itr,ivar,k,ncar,ncol,nickb,nvoid
       integer :: nblack,ngreen,norange,nred,nyellow
 !
-      integer :: iprint
-      iprint=0
-!
 !  ...define colors
       nblack  = npcol(2)
       ngreen  = npcol(5)

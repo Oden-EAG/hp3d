@@ -30,13 +30,14 @@
       real(8) :: dblend(2)
 !
       real(8) :: blend,se
-      integer :: ie,iv,iv1,iv2,ivar,j,nc,norient,np
+      integer :: ie,iv,iv1,iv2,j,nc,norient,np
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
+      iprint=0
+#endif
 !
 !-----------------------------------------------------------------------
-!
-      iprint=0
 !
 !  ...evaluate linear shape functions
       shapH(1) = 1.d0-Eta(1)-Eta(2); dshapH(1:2,1) = -1.d0
@@ -54,6 +55,8 @@
                         + POINTS(np)%Rdata(1:3)*dshapH(j,iv)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'trian_TransTri: AFTER VERTICES X,Dxdeta = '
         do ivar=1,3
@@ -61,6 +64,7 @@
  7035     format(e12.5,3x,3e12.5)
         enddo
       endif
+#endif
 !
 !  ...add edge bubbles
       do ie=1,3
@@ -78,10 +82,13 @@
 !  .....project s onto the edge
         call proj_t2e(iv1,iv2,shapH,dshapH, se,dseds)
         if ((se.lt.GEOM_TOL).or.(se.gt.1.d0-GEOM_TOL)) cycle
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ie,nc,CURVES(nc)%Type
  7003     format(' trian_TransTri: ie,nc,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....compute the kernel function
         call curveK(nc,se,norient, xc,dxcdse)
@@ -99,6 +106,8 @@
                         + xc(1:3)*dblend(j)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'trian_TransTri: AFTER EDGES X,Dxdeta = '
         do ivar=1,3
@@ -106,6 +115,7 @@
         enddo
         call pause
       endif
+#endif
 !
 !
    end subroutine trian_TransTri

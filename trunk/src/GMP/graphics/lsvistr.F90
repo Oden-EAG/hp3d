@@ -44,14 +44,17 @@
       integer :: i,iclip,iflag,ii,iloc,inv2,is,isub,ivar,j,k,l,lab
       integer :: nb,nbb,nbl,ndom,nhalf,nick,nickb,nnn,nr,nsub1,nsub2,nt
 !
+#if HP3D_DEBUG
       integer :: iprint
+#endif
 !
       real(8) :: bigp,bign,small,one
       data bigp,bign,small,one /1.d30,-1.d30,1.d-6,1.d0/
 !
 !-----------------------------------------------------------------------
-!
+#if HP3D_DEBUG
       iprint=0
+#endif
 !
 !  ...set default bounds for the picture
       do ivar=1,3
@@ -61,6 +64,7 @@
         xmax(ivar)    = bign
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7011) NRSUB
  7011   format('lsvistr: NRSUB = ', i2)
@@ -70,6 +74,7 @@
  7013   format('lsvistr: NRRECTA,NRTRIAN = ', 2i8)
         call pause
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -131,9 +136,12 @@
 !
 !  .......end of loop through sides of the triangle
           enddo
+!
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7003) nt,nvis_flag
           endif
+#endif
 !
 !  .......the triangle will be visible if only one of the flags
 !         is raised
@@ -165,11 +173,14 @@
 !
 !  .......check if on the list of curvilinear blocks
           call locate(nb,NLINBLOCKS,NRCURVBL, iloc)
+!
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7010) nt,nb,iloc
  7010       format('lsvistr: DISPLAYING TRIANGLE nt,nb,iloc = ',3i8)
             call pause
           endif
+#endif
 !
 !  .......find the orientation of the triangle wrt the adjacent block
           call decode(abs(nb), nbl,lab)
@@ -181,11 +192,15 @@
               call decode(PRISMS(nbl)%FigNo(is), &
                           nsid_tria(is),nsid_orient(is))
             enddo
+!
+#if HP3D_DEBUG
             if (iprint.eq.2) then
               write(*,7067) nbl,nsid_tria(1:2),nsid_orient(1:2)
  7067         format('lsvistr: PRISM = ',i6,' SIDES WITH ORIENT = ', &
                       2i6,2x,2i2)
             endif
+#endif
+!
             call locate(nt,nsid_tria(1:2),2, ii)
             if (ii.eq.0) then
               write(*,*) 'lsvistr: INCONSISTENCY 1 !'
@@ -240,9 +255,11 @@
             stop 1
           end select
 !
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7002) nbl,ii,nsid_orient(ii),sign
           endif
+#endif
 !
 !  .....the case of a 2D manifold
         elseif (MANDIM.eq.2) then
@@ -266,11 +283,14 @@
         do j=1,NRSUB
           do i=1,NRSUB-j+1
             do l=1,2
+!
+#if HP3D_DEBUG
               if (iprint.eq.2) then
                 write(*,7039) j,i,l
  7039           format('lsvistr: LOOPING THROUGH SUBTRIANGLES j,i,l = ', &
                         3i3)
               endif
+#endif
 !
 !  ...........find coordinates of vertices and transform them
               select case(l)
@@ -435,10 +455,14 @@
 !
 !  .........the adjacent block is
             nb = RECTANGLES(nr)%BlockNo(is)
+!
+#if HP3D_DEBUG
             if (iprint.ge.1) then
               write(*,7035) nr,is,nb
  7035         format('lsvistr: nr,is,nb = ',i6,i3,i7)
             endif
+#endif
+!
             if (nb.eq.0) then
 !
 !  ...........there is no block, this side is on the boundary,
@@ -450,9 +474,12 @@
 !  ...........the block exists, check if not on the list
 !             of invisible blocks
               call locate(nb,IGINV,NRINVBL, iloc)
+!
+#if HP3D_DEBUG
               if (iprint.ge.1) then
                 write(*,7029) nr,is,iloc
               endif
+#endif
 !
 !  ...........check if the block belongs to an invisible subdomain
               call decode(nb, nbb,lab)
@@ -460,7 +487,9 @@
               case(1)
                 ndom = PRISMS(nbb)%domain
                 if (NDOMAIN(ndom).eq.0) iloc=1
+#if HP3D_DEBUG
                 if (iprint.ge.1) write(*,*) 'is = ',is
+#endif
               case(2)
                 ndom = HEXAS(nbb)%domain
                 if (NDOMAIN(ndom).eq.0) iloc=1
@@ -471,10 +500,14 @@
                 write(*,*) 'lsvistr: nb = ',nb
                 stop 1
               end select
+!
+#if HP3D_DEBUG
               if (iprint.ge.1) then
                 write(*,7029) nr,is,iloc
  7029           format('lsvistr: nr,is,iloc = ',i6,i2,i4)
               endif
+#endif
+!
               if (iloc.ne.0) then
 !
 !  .............the block is invisible, this side should be visible
@@ -483,13 +516,18 @@
               endif
             endif
 !
-!  .......end of loop through sides
+#if HP3D_DEBUG
             if (iprint.ge.1) write(*,*) 'is = ',is
+#endif
+!  .......end of loop through sides
           enddo
+!
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7003) nr,nvis_flag
  7003       format('lsvistr: nr,nvis_flag = ',i8,2x,2i2)
           endif
+#endif
 !
 !  .......the rectangle will be visible if only one of the flags
 !         is raised
@@ -521,11 +559,14 @@
 !
 !  .......check if on the list of curvilinear blocks
           call locate(nb,NLINBLOCKS,NRCURVBL, iloc)
+!
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7001) nr,nb,iloc
  7001       format('lsvistr: DISPLAYING RECTANGLE nr,nb,iloc = ',2i6,i2)
             call pause
           endif
+#endif
 !
 !  .......find the orientation of the rectangle wrt the adjacent block
           call decode(abs(nb), nbl,lab)
@@ -598,10 +639,12 @@
             stop 1
           end select
 !
+#if HP3D_DEBUG
           if (iprint.ge.1) then
             write(*,7002) nbl,is,nsid_orient(is),sign
  7002       format('lsvistr: nbl,is,nsid_orient(is),sign = ',3i4,f7.2)
           endif
+#endif
 !
 !  .....the case of a 2D manifold
         elseif (MANDIM.eq.2) then

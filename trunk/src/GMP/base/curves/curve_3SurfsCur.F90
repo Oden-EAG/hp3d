@@ -18,6 +18,7 @@ subroutine curve_3SurfsCur(Nc,Eta, R,Dr)
       real(8),dimension(3),intent(out) :: Dr
 !
       integer :: iflag
+!
 !----------------------------------------------------------------------------
 !
 !  ...try all possible choices of 2 out of 3 surfaces

@@ -32,20 +32,21 @@
       real(8) :: aux(3)
       real(8), parameter :: eps = 1.d-12
 !
-      integer :: i,ifl,j,k,ntrial
+      integer :: i,ifl,k,ntrial
       real(8) :: errf,errx
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: j,iprint
       iprint=0
 !
+   10 continue
+#endif
 !-----------------------------------------------------------------------
-!
- 10   continue
 !
 !  ...maximum number of iterations
       ntrial = 10
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,1000)Nusf,Nsurf
  1000   format(' Nusf,Nsurf = ',7(i1,2x))
@@ -58,8 +59,9 @@
         case(3,4)
           write(*,1002) Eta(1:2)
  1002     format(' Eta = ',2(e12.5,2x))
-        endselect
+        end select
       endif
+#endif
 !
 !  ...set X equal to initial guess Xs
       X(1:3)=Xs(1:3)
@@ -74,8 +76,9 @@
 !       alpha = DF^T (still needs to be inverted!)
 !       beta  = -F
 !
+#if HP3D_DEBUG
 !  .....printing statements
-        if (iprint .eq. 1) then
+        if (iprint.eq.1) then
           select case(Nusf)
 !
 !  .......implicit curve
@@ -106,6 +109,7 @@
           call pause
 !  .....end of printing statements
         endif
+#endif
 !
 !  .....compute L^1 norm of beta
         errf = 0.d0
@@ -119,8 +123,13 @@
         call saruss(alpha,beta, aux,ifl)
 !  .....if system is not solved
         if (ifl .ne. 0) then
-          iprint = 1
+#if HP3D_DEBUG
+          iprint=1
           goto 10
+#else
+          write(*,*) 'mnewt: singular system. stop.'
+          stop
+#endif
         endif
 !
         beta(1) = aux(1)
@@ -138,10 +147,14 @@
 !
 !  .....if maximum number of iterations has been reached
         if (k .eq. ntrial) then
-          write(*,*)'mnewt: NEWTON-RAPSON METHOD HAS NOT CONVERGED!'
+          write(*,*)'mnewt: NEWTON-RAPHSON METHOD HAS NOT CONVERGED!'
+#if HP3D_DEBUG
           call pause
-          iprint = 1
+          iprint=1
           goto 10
+#else
+          stop
+#endif
         endif
 !
 !  ...end of loop through iterations
@@ -174,7 +187,6 @@
 !
 !> @date Mar 2023
 !-----------------------------------------------------------------------
-!
    subroutine usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, Alpha,Beta)
 !
       implicit none
@@ -193,8 +205,11 @@
       integer :: i
       real(8) :: fval,fval1,fval2,fval3,fval4,fval5,tt,tt2,xf1,xf2
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
 !  ...select geometry entity
       select case(Nusf)
@@ -220,11 +235,14 @@
 !----------------------------------------------------------------------
 !  ...implicit curve
       case(2)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7004) Eta(1), X(1:3)
  7004   format(' usrfun: IMPLICIT CURVE Eta = ',f8.3, &
                ' ITERATE X = ', 3f10.5)
       endif
+#endif
 !
       call surf(Nsurf(1),X, Fval,der1)
       Beta(1) = -Fval
@@ -278,6 +296,8 @@
         Alpha(3,i) = Eta(1)*(xf1*der5(i)+Feta(1)*der3(i)) &
                   +  Eta(2)*(xf2*der5(i)+Feta(4)*der3(i))
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*)'usrfun:'
          write(*,1000) ctr50
@@ -286,6 +306,8 @@
          write(*,*)'der2,der4',der2,der4
          write(*,*)'der3,der5',der3,der5
       endif
+#endif
+!
       return
 !
 !----------------------------------------------------------------------
@@ -341,10 +363,12 @@
                    +  Eta(1)*dtt2(i)
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7002) fval1,fval2,fval3,fval4,fval5
  7002    format(' usrfun: fval1,...,5 = ',5(e12.5,2x))
       endif
+#endif
 !
       case default
         write(*,7001) Nusf
@@ -352,16 +376,17 @@
         stop
 !
 !  ...end select geometry entity
-      endselect
+      end select
 !
 !--------------------------------------------------------------------
-!  ...printing statement
-      if (iprint .eq. 1) then
+#if HP3D_DEBUG
+      if (iprint.eq.1) then
         write(*,*) 'usrfun: Beta, Alpha = '
         do i=1,3
           write(*,7003) Beta(i), Alpha(i,1:3)
  7003     format(e12.5,4x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
    end subroutine usrfun

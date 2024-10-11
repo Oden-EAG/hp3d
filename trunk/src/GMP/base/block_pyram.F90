@@ -114,18 +114,21 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       integer :: i,ie,ifig,iv,ivar,nc,norient,np,nr,nt
       real(8) :: te,xz,yz
 !
+#if HP3D_DEBUG
       integer :: iprint
-!----------------------------------------------------------------------
-!
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
 !  ...initialize
       blend_edge(1:4)=0.d0 ; dblend_edge(1:3,1:4)=0.d0
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:3)
  7001   format(' pyram_TI: No,Eta = ',i5,2x,3e12.5)
       endif
+#endif
 !
 !  ...check type
       if (PYRAMIDS(No)%type.ne.'TIpyram') then
@@ -171,7 +174,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...loop over vertices
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'pyram_TI: VERTEX INTERPOLANT = '
         do ivar=1,3
@@ -179,6 +182,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
  7011     format(e12.5,3x,3e12.5)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !    E D G E    C O N T R I B U T I O N S
@@ -196,10 +200,13 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  .....project Eta onto the edge
         call proj_d2e(Eta,ie,shapH(1:5),dshapH(1:3,1:5), te,dtedeta)
         if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7012) ie,nc,CURVES(nc)%Type
  7012     format(' pyram_TI: ie,nc,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....compute kernel functions for ALL edges [YES, they are the right ones]
         call curveK(nc,te,norient, xe,dxedt)
@@ -247,6 +254,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
                            + xe(1:3)*dblend(ivar)
         enddo
 !
+#if HP3D_DEBUG
         if (iprint.eq.2) then
           write(*,9998)xe(1:3),blend
  9998     format( ' xe,blend = ',3(e12.5,2x),2x,e12.5)
@@ -262,16 +270,19 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
  2001       format(' i,Dxdeta(i,:) = ',i2,2x,3(e12.5,2x))
           enddo
         endif
+#endif
 !
 !  ...loop over edges
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'pyram_TI: AFTER EDGES = '
         do ivar=1,3
           write(*,7011) Xp(ivar),Dxdeta(ivar,1:3)
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !     F A C E    C O N T R I B U T I O N S :    B O T T O M
@@ -283,10 +294,13 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...skip if face contributions is not needed
       if (RECTANGLES(nr)%Type.eq.'BilQua') goto 20
       if (RECTANGLES(nr)%Type.eq.'TraQua') goto 20
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7014) ifig,nr,RECTANGLES(nr)%Type
  7014   format(' pyram_TI: ifig,nr,Type = ',i2,i5,2x,a5)
       endif
+#endif
 !
 !  ...blending function
       blend = shapH(1)*shapH(3)
@@ -309,21 +323,20 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
                             xf(1:3)*dblend(ivar)
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'pyram_TI: ADDED BOTTOM FACE CONTRIBUTION'
       endif
 !
-        if (iprint.eq.1) then
-          write(*,2002)ifig
- 2002     format(' after FACE = ',i2)
-          do i=1,3
-            write(*,2001)i,Dxdeta(i,1:3)
-          enddo
-        endif
-
-
-
+      if (iprint.eq.1) then
+        write(*,2002)ifig
+ 2002   format(' after FACE = ',i2)
+        do i=1,3
+          write(*,2001)i,Dxdeta(i,1:3)
+        enddo
+      endif
+#endif
+!
  20   continue
 !
 !-----------------------------------------------------------------------
@@ -344,10 +357,13 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  .....if point is on the edge, then the bubble contribution is zero
         if ((abs(tf(2)).lt.GEOM_TOL).or.(abs(tf(1)).lt.GEOM_TOL) .or. &
             (abs(1.d0-tf(1)-tf(2)).lt.GEOM_TOL)) cycle
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7013) ifig,nt,TRIANGLES(nt)%Type
  7013     format('pyram_TI: ifig,nt,Type = ',i2,i5,2x,a5)
         endif
+#endif
 !
 !  .....compute the face kernel
         call trianK(nt,tf,norient, xf,dxfdtf)
@@ -366,7 +382,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
                            + xf(1:3)*dblend(ivar)
         enddo
 !
-!  .....printing
+#if HP3D_DEBUG
         if (iprint.eq.1) then
            write(*,7015)ifig
  7015     format(' pyram_TI: ADDED CONTRIBUTIONS FOR LATERAL FACE ',i1)
@@ -378,6 +394,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
             write(*,2001)i,Dxdeta(i,1:3)
           enddo
         endif
+#endif
 !
 !  ...loop over lateral faces
       enddo

@@ -51,14 +51,18 @@
       integer :: ii,ip,ir,j,k,lab,nc,ncol,np,npoint
       integer :: nr,nr_curv,nr_curves,nr_rect,nr_segments,nrsub1
 !
+#if HP3D_DEBUG
       integer :: iprint
+#endif
 !
       real(8) :: bigp,bign,small,pi
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
       data pi /3.14159265358979312d0/
 !
 !***********************************************************************
+#if HP3D_DEBUG
       iprint=0
+#endif
 !
 !  ...set up default values for control parameters
       idec_Hermite=0
@@ -105,10 +109,12 @@
       ic=0; nr_curves=0
       do nc=1,NRCURVE
 !
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7051) nc
  7051     format('GMPwireframe: nc = ',i6)
         endif
+#endif
 !
         ncol=NPCOL(2)
         call check_edge(nc, ii)
@@ -165,10 +171,14 @@
           SEGMENTS(1:2,2,ic) = xob(1:2)
           xmax(1:2) = max(xmax(1:2),xob(1:2))
           xmin(1:2) = min(xmin(1:2),xob(1:2))
+!
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7003) ic,SEGMENTS(1:2,1,ic),SEGMENTS(1:2,2,ic)
  7003       format('GMPwframe: ic, COORD = ',i4,2(2f8.3,2x))
           endif
+#endif
+!
         enddo
 !
 !  .....display the normals

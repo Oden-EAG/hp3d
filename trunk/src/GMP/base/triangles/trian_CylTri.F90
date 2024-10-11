@@ -42,8 +42,10 @@
       real(8) :: costhet,dr_deta1,dr_deta2,dthet_deta1,dthet_deta2
       real(8) :: pi,twopi,r,sinthet,theta
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
       if ((TRIANGLES(No)%Type.ne.'CylTri'.or.(NDIM.ne.3))) then
         write(*,7001) TRIANGLES(No)%Type
@@ -51,10 +53,12 @@
         stop 1
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) No,Eta
  7002   format('trian_CylTri: No,Eta = ',i4,2x,2f8.3)
       endif
+#endif
 !
       pi = acos(-1.d0)
       twopi = pi*2.d0

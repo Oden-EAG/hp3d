@@ -45,9 +45,6 @@
       integer :: i,i_min,if,ifg,ii,is,ivis,j,lab
       integer :: nbl,nfl,norient,nr,nr_fig,nh,nick,nvoid
 !
-      integer :: iprint
-      iprint=0
-!
       nr_fig=0
 !
 !.....loop through hexahedra

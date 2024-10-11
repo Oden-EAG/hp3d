@@ -34,10 +34,12 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       real(8),dimension(2)   :: detac
 !
       integer                :: k,i,j,np,ns
-      integer                :: iprint
-!-----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!-----------------------------------------------------------------------
 !
 !  ...check consistency
       select case(RECTANGLES(No)%Type)
@@ -52,7 +54,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       case default
         write(*,7000) No,RECTANGLES(No)%Type
         stop
-      endselect
+      end select
 !
 !  ...get the edge curves and orientations
       noc(1:4)=abs(RECTANGLES(No)%EdgeNo(1:4))
@@ -62,11 +64,12 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       if (RECTANGLES(No)%EdgeNo(3).lt.0) norientc(3)=1
       if (RECTANGLES(No)%EdgeNo(4).lt.0) norientc(4)=1
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:2),noc(1:4),norientc(1:4)
  7001   format(' recta_TraQua: No,Eta,noc,norientc = ',i7,2(e12.5,2x),2x,4i4,2x,4i2)
       endif
+#endif
 !
 !  ...calculate the blending functions
       call recta_blend(Eta, val,dval)
@@ -88,7 +91,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002)
  7002   format(' recta_TraQua: AFTER VERTEX CONTRIBUTIONS')
@@ -99,6 +102,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
  7004   format(' i,Dxdeta(:,i) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 !  STEP 2 : add edge bubbles
@@ -112,7 +116,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
         select case(i)
         case(1,3) ; etac=Eta(1) ; detac(1)=1.d0
         case(2,4) ; etac=Eta(2) ; detac(2)=1.d0
-        endselect
+        end select
 !
 !  .....accumulate
         call curve_local(noc(i),norientc(i),etac, xp,dxp)
@@ -123,7 +127,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
                            + xp(1:3)*dval(j,k)
         enddo
 !
-!  .....printing
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,6999) i
  6999     format(' recta_TraQua: AFTER EDGE ',i1)
@@ -133,6 +137,8 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
           enddo
           call pause
         endif
+#endif
+!
       enddo
 !
 !

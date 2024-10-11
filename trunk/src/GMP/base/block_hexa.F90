@@ -24,10 +24,8 @@ subroutine hexa(No,Eta, X,Dxdeta)
       real(8),dimension(3,8) :: dvshape
 !
       integer :: i,nc,nr,lab,np,j
-      integer :: iprint
-!------------------------------------------------------------------------------------
 !
-      iprint=0
+!------------------------------------------------------------------------------------
 !
       select case(HEXAS(No)%Type)
 !
@@ -79,7 +77,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
          write(*,7004) HEXAS(No)%Type
  7004    format(' hexa: unknown type! Type = ',a10)
          stop
-      endselect
+       endselect
 !
 !
 end subroutine hexa
@@ -131,10 +129,12 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
       real(8),dimension(3,2)  :: dxfdtf
 !
       integer                 :: i,j,np,nc,norient,nr,iv1,iv2,iv4
-      integer                 :: iprint
-!------------------------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!------------------------------------------------------------------------------------
 !
 !  ...vertex shape functions
       call vshape3(BRIC,Eta, vshape,dvshape)
@@ -187,7 +187,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'after vertices:'
         write(*,2000) X(1:3)
@@ -197,6 +197,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
 1000      format(' j,Dxdeta(j,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !------------------------------------------------------------------------------------
 !     E D G E S    C O N T R I B U T I O N S
@@ -225,12 +226,13 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'after edges:'
         write(*,2000) X(1:3)
         do j=1,3 ; write(*,1000) j,Dxdeta(j,1:3) ; enddo
       endif
+#endif
 !
 !------------------------------------------------------------------------------------
 !     F A C E S    C O N T R I B U T I O N S
@@ -259,12 +261,13 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'after faces:'
         write(*,2000) X(1:3)
         do j=1,3 ; write(*,1000) j,Dxdeta(j,1:3) ; enddo
       endif
+#endif
 !
 !
 end subroutine hexa_TraHex
@@ -319,11 +322,14 @@ end subroutine hexa_TraHex
       real(8), dimension(3) :: drdeta,dthetadeta
 !----------------------------------------------------------------------
 !     misc.
-      integer :: iprint,iv,np,i
+      integer :: iv,np
       real(8) :: pi,twopi,costhet,sinthet
-!----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: i,iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
       if ((HEXAS(No)%Type.ne.'CylHex'.or.(NDIM.ne.3))) then
         write(*,7001) HEXAS(No)%Type
@@ -331,10 +337,12 @@ end subroutine hexa_TraHex
         stop 1
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) No,Eta
  7002   format('Hexa_CylHex: No,Eta = ',i4,2x,3f8.3)
       endif
+#endif
 !
       pi = acos(-1.d0)
       twopi = pi*2.d0
@@ -384,6 +392,8 @@ end subroutine hexa_TraHex
       X(3) = r*sinthet
       Dxdeta(2,1:3) = Drdeta(1:3)*costhet - r*sinthet*Dthetadeta(1:3)
       Dxdeta(3,1:3) = Drdeta(1:3)*sinthet + r*costhet*Dthetadeta(1:3)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'theta = ', theta
         write(*,*) 'r = ', r
@@ -395,6 +405,7 @@ end subroutine hexa_TraHex
                '         ',3f8.3)
         call pause
       endif
+#endif
 !
 !
    end subroutine hexa_CylHex
