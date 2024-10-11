@@ -40,23 +40,27 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       integer, dimension(6  ) :: nsurf_aux
 
       real(8) :: fval,fval1,fval2,fval3,fval4,fval5,t
-      integer :: i,j,iv1,iv2,norient,ifl1,ifl2,ii
-      integer :: iprint
+      integer :: i,j,iv1,iv2,norient,ifl1,ifl2
+!
+#if HP3D_DEBUG
+      integer :: ii,iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
-      iprint=0
       if ((RECTANGLES(No)%Type.ne.'ImpRec')) then
         write(*,7000) RECTANGLES(No)%Type
  7000   format(' recta_ImpRec: WRONG CALL! Type = ',a10)
         stop
       endif
 !
- 5    continue
-!
+#if HP3D_DEBUG
+    5 continue
       if (iprint.eq.1) then
         write(*,7001) No,Eta
  7001   format(' recta_ImpRec: No,Eta = ',i4,2x,2f8.3)
       endif
+#endif
 !
 !  ...vertex shape functions
       shapH(1)=(1.d0-Eta(1))*(1.d0-Eta(2))
@@ -95,12 +99,15 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !
 !  ...get surface numbers
       nsurf(1:5)=RECTANGLES(No)%Idata(1:5)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) ncurv, npoint, nsurf
  7002   format(' recta_ImpRec: CURVES   = ',4i6, &
              /,'               POINTS   = ',4i6, &
              /,'               SURFACES = ',5i6)
       endif
+#endif
 !
 !  ...determine the sign factors to adjust orientation of surfaces
 !
@@ -127,10 +134,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       if (fval.gt.0) sfact(3) = -1.d0
       call surf(nsurf(5),xmid, fval,de)
       if (fval.lt.0) sfact(4) = -1.d0
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,8003) (sfact(ii),ii=1,4)
  8003   format(' recta_ImpRec: sfact = ',4f8.3)
       endif
+#endif
 !
 !  ...verify the compatibility of vertex data
       do i=1,4
@@ -183,10 +193,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...adjust orientations
       fval1=fval1*sfact(4) ; der1(1:3)=der1(1:3)*sfact(4)
       fval2=fval2*sfact(2) ; der2(1:3)=der2(1:3)*sfact(2)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,8888) fval1,fval2
  8888   format(' recta_ImpRec: 1st EDGE, fval1,fval2 = ',2(e12.5,2x))
       endif
+#endif
 !
 !  ...evaluate the value of the stretching function and its derivative
       fxi(1)  = fval1/(fval1-fval2)
@@ -213,10 +226,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...adjust orientations
       fval1=fval1*sfact(1) ; der1(1:3)=der1(1:3)*sfact(1)
       fval2=fval2*sfact(3) ; der2(1:3)=der2(1:3)*sfact(3)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,8889)fval1,fval2
  8889   format(' recta_ImpRec: 2nd EDGE, fval1,fval2 = ',2(e12.5,2x))
       endif
+#endif
 !
 !  ...evaluate the value of the stretching function and its derivative
       fxi(2)  = fval1/(fval1-fval2)
@@ -244,10 +260,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...adjust orientations
       fval1=fval1*sfact(4) ; der1(1:3)=der1(1:3)*sfact(4)
       fval2=fval2*sfact(2) ; der2(1:3)=der2(1:3)*sfact(2)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,8890)fval1,fval2
  8890   format(' recta_ImpRec: 3rd EDGE, fval1,fval2 = ',2(e12.5,2x))
       endif
+#endif
 !
       fxi(3) = fval1/(fval1-fval2)
       dfxi(3) = ((1.d0-fxi(3))*dot_product(der1,dxcdt)                &
@@ -274,16 +293,19 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...adjust orientations
       fval1=fval1*sfact(1) ; der1(1:3)=der1(1:3)*sfact(1)
       fval2=fval2*sfact(3) ; der2(1:3)=der2(1:3)*sfact(3)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,8891)fval1,fval2
  8891   format(' recta_ImpRec: 4th EDGE, fval1,fval2 = ',2(e12.5,2x))
       endif
+#endif
 !
       fxi(4) = fval1/(fval1-fval2)
       dfxi(4) = ((1.d0-fxi(4))*dot_product(der1,dxcdt)          &
                      + fxi(4) *dot_product(der2,dxcdt))/(fval1-fval2)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*)'NCURV =',ncurv
          write(*,7003) ((xv(i,j), i=1,3), j=1,4)
@@ -295,6 +317,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
          write(*,7006) (fxi(i),dfxi(i),i=1,4)
  7006    format(' recta_ImpRec: fxi,dfxi = ',4(2f8.3,3x))
       endif
+#endif
 !
 !-----------------------------------------------------------------------
 ! STEP 2 : solve the linear system defining the point
@@ -349,6 +372,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...stiffness matrices are identical for both derivatives
       adx2(1:3,1:3)=adx1(1:3,1:3)
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'recta_ImpRec: MATRICES FOR dx/dxi1 = '
         do i=1,3
@@ -361,13 +385,19 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 !  ...solve for the derivatives
       call saruss(adx1,aux1, Dxdeta(1,1),ifl1)
       call saruss(adx2,aux2, Dxdeta(1,2),ifl2)
       if (ifl1.ne.0.or.ifl2.ne.0) then
+#if HP3D_DEBUG
         iprint=1
         goto 5
+#else
+        write(*,*) 'recta_ImpRec: singular system. stop.'
+        stop
+#endif
       endif
 !
 !

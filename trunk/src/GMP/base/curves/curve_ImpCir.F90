@@ -46,10 +46,13 @@
       real(8) :: fval,fval3,fval4,s1,s2
       integer :: i,ifl,j,np
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 !
- 5    continue
+    5 continue
+#endif
+!
       nsurf(1:6)=0 ; void(1:4)=0.d0 ; sfact(1:4)=0.d0
 !
       if ((CURVES(No)%Type.ne.'ImpCir').or.(NDIM.ne.3)) then
@@ -74,6 +77,8 @@
 !
 !  ...get surface numbers
       nsurf(1:4) = CURVES(No)%Idata(1:4)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) xv, xs, Eta,nsurf
  7002   format('curve_ImpCir: ENDPOINS        = ',2(3e12.5,2x), &
@@ -81,6 +86,7 @@
              /,'              Eta             = ',f8.3, &
              /,'              SURFACE NUMBERS = ',4i5)
       endif
+#endif
 !
 !  ...check consistency of data and determine the renormalization
 !     factors
@@ -132,9 +138,16 @@
 !  ...solve for derivatives
       call saruss(aij,aux, Dxdeta,ifl)
       if (ifl.ne.0) then
+#if HP3D_DEBUG
         iprint=1
         goto 5
+#else
+        write(*,*) 'curve_ImpCir: singular system. stop.'
+        stop
+#endif
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) X(1:3)
  7006   format('curve_IMPCir: X      = ',3e12.5)
@@ -142,6 +155,7 @@
  7007   format('              Dxdeta = ',3e12.5)
         call pause
       endif
+#endif
 !
 !
    end subroutine curve_ImpCir

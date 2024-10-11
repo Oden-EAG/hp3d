@@ -108,10 +108,12 @@ subroutine input_DEFAULT(Fp)
       character(len=10) :: type
       integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr,isurf_flag
       integer :: istat
-      integer :: iprint
-!-----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!-----------------------------------------------------------------------
 !
       open(unit=nin,file=Fp, &
          form='formatted',access='sequential',status='old',action='read')
@@ -140,10 +142,13 @@ subroutine input_DEFAULT(Fp)
 !  ...loop over surfaces
       do ns=1,NRSURFS
         read(nin,*) SURFACES(ns)%Type
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ns,SURFACES(ns)%Type
  7003     format('   ns = ',i4,'; type = ',a10)
         endif
+#endif
 !
         select case(SURFACES(ns)%Type)
 !
@@ -255,10 +260,13 @@ subroutine input_DEFAULT(Fp)
 !  ...loop over points
       do np=1,NRPOINT
         read(nin,*) POINTS(np)%Type
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,1010) np,POINTS(np)%Type
  1010     format('   np = ',i4,'; type = ',a10)
         endif
+#endif
 !
         select case(POINTS(np)%Type)
 !
@@ -564,11 +572,13 @@ subroutine input_DEFAULT(Fp)
         write(*,*) 'input_DEFAULT: increase MAXTE!'
         stop
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'input_DEFAULT: READING TETRAS...'
         write(*,*) '           NRTETRA = ',NRTETRA
       endif
-!
+#endif
 !
       do ntet=1,NRTETRA
         read(nin,*) TETRAS(ntet)%Type
@@ -596,11 +606,13 @@ subroutine input_DEFAULT(Fp)
         write(*,*) 'input_DEFAULT: increase MAXPY!'
         stop
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'input_DEFAULT: READING PYRAMIDS...'
         write(*,*) '           NRPYRAM = ',NRPYRAM
       endif
-!
+#endif
 !
       do npyr=1,NRPYRAM
         read(nin,*) PYRAMIDS(npyr)%Type

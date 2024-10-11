@@ -624,13 +624,12 @@
       integer :: nc,nh,nl,nn,np,nr,ns,nt
       integer :: npri,npyr,ntet
 !
-      integer :: iprint
-      iprint=0
+      integer, parameter :: verbose = 0
 !
       open(unit=ndump,file='files/dumpGMP', &
            form='formatted',access='sequential',status='unknown')
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping GENERAL PARAMETRS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping GENERAL PARAMETRS'
       write(ndump,*) &
                  NDIM,MANDIM, &
                  NRSURFS, &
@@ -644,17 +643,17 @@
                  MAXBT,MAXHE,MAXTE,MAXPY
 
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping SURFACES'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping SURFACES'
       do ns=1,MAXSU
-        if (iprint.eq.1) write(*,*) 'dumpGMP: ns = ',ns
+        if (verbose.eq.1) write(*,*) 'dumpGMP: ns = ',ns
         write(ndump,*) SURFACES(ns)%Type
-        if (iprint.eq.1) write(*,*) 'dumpGMP: SURFACES(ns)%Type = ', &
-                                              SURFACES(ns)%Type
+        if (verbose.eq.1) write(*,*) 'dumpGMP: SURFACES(ns)%Type = ', &
+                                               SURFACES(ns)%Type
 !  .....Idata
         if (associated(SURFACES(ns)%Idata)) then
           nn = ubound(SURFACES(ns)%Idata,1)
           nl = lbound(SURFACES(ns)%Idata,1)
-          if (iprint.eq.1) write(*,*) 'dumpGMP: nn FOR Idata= ',nn
+          if (verbose.eq.1) write(*,*) 'dumpGMP: nn FOR Idata= ',nn
           write(ndump,*) nn
           write(ndump,*) nl
           write(ndump,*) SURFACES(ns)%Idata
@@ -665,7 +664,7 @@
         if (associated(SURFACES(ns)%Rdata)) then
           nn = ubound(SURFACES(ns)%Rdata,1)
           nl = lbound(SURFACES(ns)%Rdata,1)
-          if (iprint.eq.1) write(*,*) 'dumpGMP: nn FOR Rdata= ',nn
+          if (verbose.eq.1) write(*,*) 'dumpGMP: nn FOR Rdata= ',nn
           write(ndump,*) nn
           write(ndump,*) nl
           write(ndump,*) SURFACES(ns)%Rdata
@@ -674,7 +673,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping POINTS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping POINTS'
       do np=1,MAXNP
         write(ndump,*) POINTS(np)%Type
         write(ndump,*) POINTS(np)%NrCurv
@@ -707,7 +706,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping CURVES'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping CURVES'
       do nc=1,MAXNC
         write(ndump,*) CURVES(nc)%Type
         write(ndump,*) CURVES(nc)%EndPoNo(1:2)
@@ -741,7 +740,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping TRIANGLES'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping TRIANGLES'
       do nt=1,MAXTR
         write(ndump,*) TRIANGLES(nt)%Type
         write(ndump,*) TRIANGLES(nt)%VertNo(1:3)
@@ -770,7 +769,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping RECTANGLES'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping RECTANGLES'
       do nr=1,MAXRE
         write(ndump,*) RECTANGLES(nr)%Type
         write(ndump,*) RECTANGLES(nr)%VertNo(1:4)
@@ -799,7 +798,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping PRISMS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping PRISMS'
       do npri=1,MAXBT
         write(ndump,*) PRISMS(npri)%Type
         write(ndump,*) PRISMS(npri)%VertNo(1:6)
@@ -818,7 +817,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping HEXAS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping HEXAS'
       do nh=1,MAXHE
         write(ndump,*) HEXAS(nh)%Type
         write(ndump,*) HEXAS(nh)%VertNo(1:8)
@@ -837,7 +836,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping TETRAS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping TETRAS'
       do ntet=1,MAXTE
         write(ndump,*) TETRAS(ntet)%Type
         write(ndump,*) TETRAS(ntet)%VertNo(1:4)
@@ -856,7 +855,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: dumping PYRAMIDS'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: dumping PYRAMIDS'
       do npyr=1,MAXPY
         write(ndump,*) PYRAMIDS(npyr)%Type
         write(ndump,*) PYRAMIDS(npyr)%VertNo(1:5)
@@ -875,7 +874,7 @@
         endif
       enddo
 !
-      if (iprint.eq.1) write(*,*) 'dumpGMP: closing file'
+      if (verbose.eq.1) write(*,*) 'dumpGMP: closing file'
       close(ndump)
 !
    end subroutine dumpout_GMP
@@ -891,8 +890,10 @@
       integer :: nc,nh,nl,nn,np,nr,ns,nt
       integer :: npri,npyr,ntet
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
       open(unit=ndump,file=Fp, &
            form='formatted',access='sequential',status='unknown')
@@ -931,6 +932,7 @@
 !!!        stop 1
 !!!      endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'---------------------------------------------'
         write(*,*)'dumpin_GMP: '
@@ -961,6 +963,7 @@
         write(*,*)'---------------------------------------------'
         call pause
       endif
+#endif
 !
       call alloc_GMP
 !
@@ -1409,7 +1412,10 @@
       integer, intent(in) :: MAXTE_loc
       integer, intent(in) :: MAXPY_loc
 !
-      integer, parameter :: iprint=0
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !
 !  ...GMP control parameters...........................................
       NDIM   = NDIM_loc
@@ -1428,6 +1434,7 @@
       NRPO_FG  = 0
       MAXNP_FG = MAXNP_loc
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'-- GMP Control Parameters --'
         write(*,8050)NDIM
@@ -1458,6 +1465,7 @@
  8062   format(' MAXNP_FG = ',i12)
         write(*,*)''
       endif
+#endif
 !
    end subroutine set_gmp_parameters
 !
