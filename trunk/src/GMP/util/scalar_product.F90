@@ -1,30 +1,24 @@
 !-----------------------------------------------------------------------
-!> @Purpose : routine computes the scalar product of two 3D vectors
-!
-!> @param[in]  Vec1 - 1st vector
-!> @param[in]  Vec2 - 2nd vector
+!> @brief   routine computes the scalar product of two 3D vectors
+!!
+!> @param[in]  A    - 1st vector
+!> @param[in]  B    - 2nd vector
 !> @param[out] Prod - dot product
-!
-!> @date Feb 13
-!
-!! Remark : the intrinsic Fortran fuction dot_product( , ) could be
+!!
+!> @date    Oct 2024
+!!
+!> @note    the intrinsic Fortran function dot_product( , ) could be
 !!          used instead
 !-----------------------------------------------------------------------
-subroutine scalar_product(Vec1,Vec2, Prod)
+subroutine scalar_product(A,B, Prod)
 !
    implicit none
 !
-   real(8), intent(in ) :: Vec1(3),Vec2(3)
+   real(8), intent(in)  :: A(3),B(3)
    real(8), intent(out) :: Prod
 !
-   integer :: i
-!
 !-----------------------------------------------------------------------
-!
-      Prod=0.d0
-      do i=1,3
-         Prod = Prod + Vec1(i)*Vec2(i)
-      enddo
+
+   Prod = A(1)*B(1) + A(2)*B(2) + A(3)*B(3)
 !
 end subroutine scalar_product
-

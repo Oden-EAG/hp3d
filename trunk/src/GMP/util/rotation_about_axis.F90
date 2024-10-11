@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
-!> @Purpose - routine rotates a point R by an angle Alpha about an axis
-!!            Ax through point Pt
+!> @brief   routine rotates a point R by an angle Alpha about an axis
+!!          Ax through point Pt
 !
 !> @param[in]    Ax         - axis
 !> @param[in]    Pt         - a point on the axis

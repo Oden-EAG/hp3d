@@ -11,14 +11,17 @@
 subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
 !
       use GMP
+!
       implicit none
+!
       integer             ,intent(in ) :: Nc
       real(8)             ,intent(in ) :: Eta
       real(8),dimension(3),intent(out) :: R
       real(8),dimension(3),intent(out) :: Dr
-      !
+!
       real(8),dimension(3,2) :: v
       integer                :: nv,ns,i
+!
 !----------------------------------------------------------------------------
 !
       ns=CURVES(nc)%Idata(1)
@@ -38,7 +41,7 @@ subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
       case('Cylinder') ; call cylinder_geodesic(nc, eta, r, Dr)
       case('Cone')     ; call cone_geodesic(nc, eta, r, Dr)
 !
-      endselect
+      end select
 !
 !
 end subroutine curve_1SurfsCur
@@ -72,21 +75,26 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
 !  ...endpoints, point in the parametric domain,
       real(8) :: eta_v(2,2),etap(2)
 !
-      integer :: iv,ivar,ns,nv
+      integer :: iv,ns,nv
       real(8) :: dr,dr_deta,dtheta_deta
       real(8) :: r,r2,rmax,rmin,theta,theta1,x0
 !
       real(8) :: pi
-      integer :: iprint
+!
+#if HP3D_DEBUG
+      integer :: ivar,iprint
       iprint=0
+#endif
 !----------------------------------------------------------------------
 !
       pi = acos(-1.d0)
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000)Nc,Eta
  7000   format(' diag_segment: Nc,Eta = ',i5,2x,e12.5)
       endif
+#endif
 !
 !  ...check surface
       ns = CURVES(Nc)%Idata(1)
@@ -96,17 +104,20 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
         write(*,*) 'ERROR: inconsistent surface type.'
         write(*,*) '---------------------------------'
         stop
-      end if
+      endif
 !
 !  ...get the data for the plane
       x0       = SURFACES(ns)%Rdata(1)
       rmin     = SURFACES(ns)%Rdata(2)
       rmax     = SURFACES(ns)%Rdata(3)
       dr = rmax - rmin
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) x0,rmin,rmax,dr
  7001   format('diag_segment: x0,rmin,rmax,dr = ',4f8.3)
       endif
+#endif
 !
 !  ...check radii consistency
       if ((rmin.le.GEOM_TOL).or.(rmax-rmin.le.GEOM_TOL)) then
@@ -141,10 +152,14 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
           theta = theta1
         end select
         eta_v(1,iv) = (pi/2.d0 - theta)/2.d0/pi
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) iv,eta_v(1:2,iv)
  7002     format('diag_segment: iv, eta(1:2,iv) = ',i2,2x,2f8.3)
         endif
+#endif
+!
       enddo
 !
 !  ...plane reference coordinates of the point
@@ -164,6 +179,7 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
       dX_dEta(2) = dr_deta*sin(theta) + r*cos(theta)*dtheta_deta
       dX_dEta(3) = dr_deta*cos(theta) - r*sin(theta)*dtheta_deta
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7020)
  7020   format(' diag_segment: X,dX_dEta = ')
@@ -173,6 +189,7 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
         enddo
         call pause
       endif
+#endif
 !
 !
 end subroutine diag_segment
@@ -202,13 +219,18 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
       integer :: ns,nv1,nv2
       real(8) :: alpha,dalpha_dEta,rad,rnorm1,rnorm2,sp,theta
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !----------------------------------------------------------------------
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000)Nc,Eta
  7000   format(' circular_segment: Nc,Eta = ',i5,2x,e12.5)
       endif
+#endif
 !
 !  ...check surface
       ns = CURVES(Nc)%Idata(1)
@@ -218,7 +240,7 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
         write(*,*) 'ERROR: inconsistent surface type.'
         write(*,*) '---------------------------------'
         stop
-      end if
+      endif
 !
 !  ...get sphere data
       cen(1:3) = SURFACES(ns)%Rdata(1:3)
@@ -244,18 +266,24 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
       call scalar_product(r1(1:3),r2(1:3), sp)
       theta = acos(sp/(rnorm1*rnorm2))
       alpha = Eta*theta  ; dalpha_dEta = theta
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001)theta,alpha
  7001   format(' circular_segment: theta,alpha = ',2(e12.5,2x))
       endif
+#endif
 !
       X = POINTS(nv1)%Rdata(1:3)
       call rotation_about_axis(ax,cen,alpha, X,dX_dalpha)
       dX_dEta = dX_dalpha(1:3)*dalpha_dEta
+!
+#if HP3D_DEBUG
       if(iprint.eq.1) then
         write(*,7002)X,dX_dEta
  7002   format(' circular_segment: X,dX_dEta = ',4(e12.5,2x))
       endif
+#endif
 !
 !
 end subroutine circular_segment
@@ -308,18 +336,22 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
 !  ...work space
       real(8) :: void(3)
 !
-      integer :: i,iv,ivar,j,np,ns
+      integer :: i,iv,j,np,ns
       real(8) :: fval,rad,r,s
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
       iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta
  7001   format('cylinder_geodesic: No,Eta = ',i4,2x,e12.5)
       endif
+#endif
 !
       ns = CURVES(No)%Idata(1)
       if (SURFACES(ns)%Type.ne.'Cylinder') then
@@ -369,13 +401,14 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
 !  ...y axis
       call cross_product(transf(3,1:3),transf(1,1:3), transf(2,1:3))
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,3
           write(*,9999)i,transf(i,1:3)
 9999      format(' i,transf(i,1:3) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !  ...compute endpoint coordinates in the cylinder Cartesian system
       do iv=1,2
@@ -388,13 +421,14 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,2
           write(*,9998)i,xrelsv(1:3,i)
 9998      format(' i,xrelsv(1:3,i) = ',i1,2x,3(e12.5,2x))
-       enddo
+        enddo
       endif
+#endif
 !
 !  ...compute the vertex coordinates in the cylinder parametric space
       do iv=1,2
@@ -407,13 +441,14 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
         xparv(2,iv) = xrelsv(3,iv)
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do iv=1,2
           write(*,7031) iv,xparv(1:2,iv)
  7031     format(' i,xparv(1:2,i)  = ',i1,2x,2(e12.5,2x))
         enddo
       endif
+#endif
 !
 !  ...geodesics on the cylinder is simply a straight line in the
 !     (\theta,z) parameter space
@@ -429,13 +464,14 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
       xrels(3) = xpar(2)
       dxrelsdeta(3) = dxpardeta(2)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,9997)xpar(1:2)
  9997   format(' xpar(1:2)  = ',2(e12.5,2x))
         write(*,9996)xrels(1:3)
  9996   format(' xrels(1:3) = ',3(e12.5,2x))
       endif
+#endif
 !
 !  ...transform to the global Cartesian system
       X(1:3)=0.d0 ; Dxdeta(1:3)=0.d0
@@ -447,6 +483,7 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
       enddo
       X(1:3)= X(1:3) + center(1:3)
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'cylinder_geodesic: X,Dxdeta = '
         do ivar=1,3
@@ -455,6 +492,7 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 !
 end subroutine cylinder_geodesic
@@ -580,18 +618,22 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
 !  ...work space
       real(8) :: void(3)
 !
-      integer :: i,iv,ivar,j,np,ns
+      integer :: i,iv,j,np,ns
       real(8) :: ap,fval,r,s
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
       iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta
  7001   format('cone_geodesic: No,Eta = ',i4,2x,e12.5)
       endif
+#endif
 !
       ns = CURVES(No)%Idata(1)
       if (SURFACES(ns)%Type.ne.'Cone') then
@@ -666,6 +708,8 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
         call cart_to_polar(xrelsv(1:2,iv), r,xparv(1,iv))
         xparv(2,iv) = xrelsv(3,iv)*tan(ap)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'cone_geodesic: RELATIVE VERTEX COORDINATES ='
         do iv=1,2
@@ -674,6 +718,7 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
                  ' THETA,Z = ',2e12.5)
         enddo
       endif
+#endif
 !
 !  ...geodesics on the cone is simply a straight line in the
 !     (\theta,r) parameter space
@@ -699,6 +744,8 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
         enddo
         X(i) = X(i) + vertex(i)
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'cone_geodesic: X,Dxdeta = '
         do ivar=1,3
@@ -707,6 +754,7 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
         enddo
         call pause
       endif
+#endif
 !
 !
 end subroutine cone_geodesic

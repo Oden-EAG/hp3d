@@ -20,7 +20,6 @@
 !                      = 1 otherwise
 !
 !-----------------------------------------------------------------------
-!
    subroutine curve_2SurfsCur(No,I1,I2,Eta, X,Dxdeta,Ierror)
 !
       use control
@@ -49,15 +48,20 @@
       integer :: i,ifl,j,np,ns1,ns2
       real(8) :: fval,fval3,fval4,s,s1,s2
 !
+#if HP3D_DEBUG
       integer :: iprint
-!
       iprint=0
+#endif
+!
       Ierror=0
- 5    continue
+!
+#if HP3D_DEBUG
+    5 continue
       if (iprint.eq.1) then
         write(*,7001) No
  7001   format('curve_2SurfsCur: No = ',i5)
       endif
+#endif
 !
 !  ...get endpoints for the curve
       do i=1,2
@@ -96,6 +100,7 @@
         nsurf(2+i)=NRSURFS
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) xv, xs, Eta,nsurf
  7002   format('curve_2SurfsCur: ENDPOINS        = ',2(3e12.5,2x), &
@@ -103,6 +108,7 @@
              /,'                 Eta             = ',f8.3, &
              /,'                 SURFACE NUMBERS = ',4i5)
       endif
+#endif
 !
 !  ...check consistency of data and determine the renormalization
 !     factors
@@ -159,9 +165,16 @@
 !  ...solve for derivatives
       call saruss(aij,aux, Dxdeta,ifl)
       if (ifl.ne.0) then
+#if HP3D_DEBUG
         iprint=1
         goto 5
+#else
+        write(*,*) 'curve_2SurfsCur: singular system. stop.'
+        stop
+#endif
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) X(1:3)
  7006   format('curve_2SurfsCur: X      = ',3e12.5)
@@ -170,6 +183,7 @@
         call pause
         call print_GMP
       endif
+#endif
 !
 !  ...delete the two temporary planes
       do i=1,2

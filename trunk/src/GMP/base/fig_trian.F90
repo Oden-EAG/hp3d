@@ -25,15 +25,20 @@ subroutine trian_local(No,T,Norient, X,Dxdt)
       real(8),dimension(2  ) :: eta
       real(8),dimension(2,2) :: detadt
       real(8),dimension(3,2) :: dxdeta
-      integer :: i,iprint
+      integer :: i
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
-      iprint=0
-!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) No,T,Norient
  7000   format(' trian_local: No,T,Norient = ',i6,2x,2(e12.5,2x,i1))
       endif
+#endif
 !
 !  ...GIVEN -> GLOBAL REFERENCE
       call local2global(TRIA,T,Norient, eta,detadt)
@@ -47,13 +52,14 @@ subroutine trian_local(No,T,Norient, X,Dxdt)
                       dxdeta(1:3,2)*detadt(2,i)
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,3
           write(*,7001) i,X(i),Dxdt(i,1:2)
  7001     format(' i = ',i1,'; X(i),Dxdt(i,1:2) = ',3(e12.5,2x))
         enddo
       endif
-!
+#endif
 !
 end subroutine trian_local
 !
@@ -85,17 +91,20 @@ subroutine trian(No,Eta, X,Dxdeta)
       real(8),dimension(3,3) :: xv
 !  ...edge curves
       integer,dimension(3) :: ncurv
-      integer :: iprint, np, nc, i
+      integer :: np, nc, i
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
-      iprint=0
-!
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No,Eta,TRIANGLES(No)%Type
  7001   format(' trian: No,Eta,Type = ',i8,2x,2f8.3,2x,a10)
       endif
-!
+#endif
 !
       select case(TRIANGLES(No)%Type)
 !
@@ -152,7 +161,7 @@ subroutine trian(No,Eta, X,Dxdeta)
  7003 format(' trian: unknown Type = ',a10)
       stop
 !
-      endselect
+      end select
 !
 !
 end subroutine trian

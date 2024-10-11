@@ -21,10 +21,8 @@ subroutine curveK(No,T,Norient, X,Dxdt)
       real(8),dimension(3),intent(out) :: X,Dxdt
 !
       real(8) :: blend,dblend
-      integer :: iprint
-!----------------------------------------------------------------------
 !
-      iprint=0
+!----------------------------------------------------------------------
 !
 !  ...check input
       if ((T.lt.GEOM_TOL).or.(T.gt.1.d0-GEOM_TOL)) then
@@ -73,11 +71,9 @@ subroutine curveB(No,T,Norient, X,Dxdt)
       real(8) :: t_aux,smax
       integer :: i,iv,np,ivar
       integer :: icheck
-      integer :: iprint
 !----------------------------------------------------------------------
 !
       icheck=1
-      iprint=0
 !
 !  ...collect curve endpoints wrt LOCAL coordinate T
       do i=1,2
@@ -139,11 +135,8 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       real(8) :: blend
       real(8) :: dblend(2)
       integer :: i
-      integer :: iprint
 !
 !----------------------------------------------------------------------
-!
-      iprint=0
 !
 !  ...evaluate blending shape functions
       blend = (1.d0 - T(1) - T(2))*T(1)*T(2)
@@ -544,7 +537,7 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
         case(2) ; blend=eta(1)        ; dblend(1:2)=(/ 1.d0,  0.d0/)
         case(3) ; blend=eta(2)        ; dblend(1:2)=(/ 0.d0,  1.d0/)
         case(4) ; blend=1.d0 - eta(1) ; dblend(1:2)=(/-1.d0,  0.d0/)
-        endselect
+        end select
 !
 !  .....compute curve bubble
         call curveB(nc,te,norientc, xc,dxcdte)
@@ -669,10 +662,10 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         write(*,7000)Norient
  7000   format(' rectaB: UNKNOWN ORIENTATION = ',i1)
         stop
-      endselect
+      end select
 !
 !  ...printing statement
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*) '---------------------------------------------------'
         nss = RECTANGLES(No)%Idata(1)
         write(*,*)'surface = ',nss
@@ -697,7 +690,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !
 !  ...start by evaluating rectangle parametrization
       call recta(No,s(1:2), X(1:3),dxds(1:3,1:2))
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*)'rectaB: ORIGINAL X,dxds'
         do ivar = 1, 3
           write(*,7011) X(ivar),dxds(ivar,1:2)
@@ -818,8 +811,8 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
           write(*,7002) No,ie,smax,dmax                               !
  7002     format(' rectaB: No,ie,smax,dmax = ',i5,i2,2e12.5)          !
 !!          call pause                                                !
-!!!          if (iprint .eq. 1) call my_tests                         !
-!!!          iprint = 1                                               !
+!!!          if (iprint.eq.1) call my_tests                         !
+!!!          iprint=1                                                 !
 !!!          write(*,9000) No                                         !
  9000     format(' trianB: rerunning rountine for triangle No = ', &  !
                            I6,' with printing flag on.')              !
@@ -834,7 +827,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         case(2); blend = s(1)        ; dblend(1:2) = (/ 1.d0,  0.d0/)
         case(3); blend = s(2)        ; dblend(1:2) = (/ 0.d0,  1.d0/)
         case(4); blend = 1.d0 - s(1) ; dblend(1:2) = (/-1.d0,  0.d0/)
-        endselect
+        end select
 !
 !  .....compute curve bubble
         call curveB(nc,se,norientc, xc,dxcdse)
@@ -848,7 +841,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         enddo
 !
 !  .....printing
-        if (iprint .eq. 1) then
+        if (iprint.eq.1) then
           write(*,*)'rectaB: X,dxds AFTER EDGE = ',ie
           do ivar = 1, 3
             write(*,7011) X(ivar),dxds(ivar,1:2)
@@ -874,7 +867,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         Dxdt(1:3,is) = dxds(1:3,1)*dsdt(1,is,Norient) &
                      + dxds(1:3,2)*dsdt(2,is,Norient)
       enddo
-      if (iprint .eq. 1) then
+      if (iprint.eq.1) then
         write(*,*)'rectaB: FINAL  X,Dxdt = '
         do ivar = 1, 3
           write(*,7011) X(ivar),Dxdt(ivar,1:2)

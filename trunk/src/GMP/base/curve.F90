@@ -72,18 +72,24 @@ subroutine curve(No,Eta, X,Dxdeta)
       real(8),dimension(3),intent(out) :: X,Dxdeta
 !
       real(8), dimension(3,2) :: xv
-      integer                 :: iprint,i,np,j,ierror
+      integer                 :: i,np,j,ierror
       character(len=10)       :: type
-!----------------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------------
 !
 !  ...curve type
       type=CURVES(No)%Type
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) No, type, Eta
  7000   format(' curve: No,type,Eta = ',i4,2x,a10,2x,f8.3)
       endif
+#endif
 !
       select case(type)
 !

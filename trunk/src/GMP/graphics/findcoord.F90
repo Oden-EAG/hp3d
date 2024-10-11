@@ -46,9 +46,6 @@
       real(8) :: d
       integer :: iter
 !
-      integer :: iprint
-      iprint=0
-!
 !-----------------------------------------------------------------------
 !
       select case(Lab)

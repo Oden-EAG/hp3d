@@ -24,15 +24,20 @@ subroutine recta_local(No,Norient,T, X,Dxdt)
       real(8),dimension(2  ) :: eta
       real(8),dimension(2,2) :: detadt
       real(8),dimension(3,2) :: dxdeta
-      integer :: i,iprint
+      integer :: i
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------
 !
-      iprint=0
-!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) No,T,Norient
  7000   format(' recta_local: No,T,Norient = ',i6,2x,2(e12.5,2x,i1))
       endif
+#endif
 !
 !  ...GIVEN -> GLOBAL REFERENCE
       call local2global(QUAD,T,Norient, eta,detadt)
@@ -46,12 +51,14 @@ subroutine recta_local(No,Norient,T, X,Dxdt)
                       dxdeta(1:3,2)*detadt(2,i)
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,3
           write(*,7001) i,X(i),Dxdt(i,1:2)
  7001     format(' i = ',i1,'; X(i),Dxdt(i,1:2) = ',3(e12.5,2x))
         enddo
       endif
+#endif
 !
 end subroutine recta_local
 !
@@ -83,10 +90,8 @@ subroutine recta(No,Eta, X,Dxdeta)
       real(8),dimension(3,3) :: aux
 !
       integer :: i,np,nc,j
-      integer :: iprint
-!--------------------------------------------------------------------------
 !
-      iprint=0
+!--------------------------------------------------------------------------
 !
       select case(RECTANGLES(No)%Type)
 !
@@ -150,7 +155,7 @@ subroutine recta(No,Eta, X,Dxdeta)
    7003 format(' recta: unknown Type = ',a10)
       stop
 !
-      endselect
+      end select
 !
 !
 end subroutine recta

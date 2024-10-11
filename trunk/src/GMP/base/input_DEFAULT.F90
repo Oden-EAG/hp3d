@@ -108,10 +108,12 @@ subroutine input_DEFAULT(Fp)
       character(len=10) :: type
       integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr,isurf_flag
       integer :: istat
-      integer :: iprint
-!-----------------------------------------------------------------------
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!-----------------------------------------------------------------------
 !
       open(unit=nin,file=Fp, &
          form='formatted',access='sequential',status='old',action='read')
@@ -140,10 +142,13 @@ subroutine input_DEFAULT(Fp)
 !  ...loop over surfaces
       do ns=1,NRSURFS
         read(nin,*) SURFACES(ns)%Type
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ns,SURFACES(ns)%Type
  7003     format('   ns = ',i4,'; type = ',a10)
         endif
+#endif
 !
         select case(SURFACES(ns)%Type)
 !
@@ -217,7 +222,7 @@ subroutine input_DEFAULT(Fp)
           write(*,7004) SURFACES(ns)%Type
  7004     format(' input_DEFAULT: unknown surface! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -255,10 +260,13 @@ subroutine input_DEFAULT(Fp)
 !  ...loop over points
       do np=1,NRPOINT
         read(nin,*) POINTS(np)%Type
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,1010) np,POINTS(np)%Type
  1010     format('   np = ',i4,'; type = ',a10)
         endif
+#endif
 !
         select case(POINTS(np)%Type)
 !
@@ -291,7 +299,7 @@ subroutine input_DEFAULT(Fp)
         case default
           write(*,1002) POINTS(np)%Type
  1002     format(' input_DEFAULT: unknown point type! Type = ',a10)
-        endselect
+        end select
 !
       enddo
 !
@@ -378,7 +386,7 @@ subroutine input_DEFAULT(Fp)
 !        case('CylCur')
         case('CylCoord')
 !
-        endselect
+        end select
 !
       enddo
 !
@@ -443,7 +451,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1003)type
  1003     format(' input_DEFAULT: unknown triangle type! Type = ',a10)
           stop
-        endselect
+        end select
 !
       enddo
 !
@@ -496,7 +504,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1004) RECTANGLES(nr)%Type
  1004     format(' input_DEFAULT: unknown rectangle type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -523,7 +531,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1005) PRISMS(npri)%Type
  1005     format(' input_DEFAULT: unknown prism type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -549,7 +557,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1006) HEXAS(nh)%Type
  1006     format(' input_DEFAULT: unknown hexa type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -564,11 +572,13 @@ subroutine input_DEFAULT(Fp)
         write(*,*) 'input_DEFAULT: increase MAXTE!'
         stop
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'input_DEFAULT: READING TETRAS...'
         write(*,*) '           NRTETRA = ',NRTETRA
       endif
-!
+#endif
 !
       do ntet=1,NRTETRA
         read(nin,*) TETRAS(ntet)%Type
@@ -581,7 +591,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1007) type
  1007     format(' input_DEFAULT: unknown tet type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
 !---------------------------------------------------------------------
@@ -596,11 +606,13 @@ subroutine input_DEFAULT(Fp)
         write(*,*) 'input_DEFAULT: increase MAXPY!'
         stop
       endif
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'input_DEFAULT: READING PYRAMIDS...'
         write(*,*) '           NRPYRAM = ',NRPYRAM
       endif
-!
+#endif
 !
       do npyr=1,NRPYRAM
         read(nin,*) PYRAMIDS(npyr)%Type
@@ -613,7 +625,7 @@ subroutine input_DEFAULT(Fp)
           write(*,1008) PYRAMIDS(npyr)%Type
  1008     format(' input_DEFAULT: unknown pyramid type! Type = ',a10)
           stop
-        endselect
+        end select
       enddo
 !
       if (.not. QUIET_MODE) write(*,*)''

@@ -26,12 +26,17 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       real(8), dimension(3)   :: xvec,xvecp
 !  ...gradient of xvecp
       real(8), dimension(3,3) :: dxvecpdx
-      integer                 :: iprint,i
-      real(8)                 :: s,s1
+      integer                 :: i
+      real(8)                 :: s
+!
+#if HP3D_DEBUG
+      real(8) :: s1
+      integer :: iprint
+      iprint=0
+#endif
 !------------------------------------------------------------------------------------
 !
-      iprint=0
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) Point(1:3),Cvect(1:3),Rad,X(1:3)
  7000   format(' cylinder: Point = ',3e12.5,/, &
@@ -39,6 +44,7 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
                '           Rad   = ', e12.5,/, &
                '           X     = ',3e12.5    )
       endif
+#endif
 !
 !  ...evaluate cylinder unit vector
       call norm(Cvect, s)
@@ -47,22 +53,24 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !  ...evaluate the relative position vector of X
       xvec(1:3) = X(1:3) - Point(1:3)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) unit(1:3),xvec(1:3)
  7001   format(' cylinder: unit = ',3e12.5,' xvec = ',3e12.5)
       endif
+#endif
 !
 !  ...project the relative position vector onto the plane normal to the
 !     cylinder axis
       call scalar_product(xvec,unit, s)
       xvecp(1:3) = xvec(1:3) - s*unit(1:3)
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) xvecp(1:3)
  7002   format('cylinder: xvecp = ',3e12.5)
       endif
+#endif
 !
 !  ...compute the gradient of the projection vector
       do i=1,3
@@ -71,21 +79,28 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       enddo
 !
       call scalar_product(xvecp,xvecp, s)
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         call norm(xvecp, s1)
         write(*,7003) s1
  7003   format(' cylinder: |xvecp| = ',e12.5)
       endif
+#endif
+!
       Fval = s - Rad**2
       do i=1,3
         call scalar_product(xvecp,dxvecpdx(1:3,i), s)
         Dfdx(i) = 2.d0*s
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7004) Fval,Dfdx(1:3)
  7004   format(' cylinder: Fval,Dfdx = ',e12.5,2x,3e12.5)
         call pause
       endif
+#endif
 !
 !
 end subroutine cylinder
