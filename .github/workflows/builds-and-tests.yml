@@ -13,22 +13,13 @@ on:
 jobs:
   builds-and-tests:
     strategy:
-      # matrix:
-      #   os: [ubuntu-latest, macos-13, macos-14]
-      #   mode: [real, complex]
-      #   target: [dbg, opt]
-      #   include:
-      #     - os: ubuntu-latest
-      #       deployment: ''
-      #     - os: macos-13
-      #       deployment: '13.7'
-      #     - os: macos-14
-      #       deployment: '14.7'
       matrix:
-        os: [macos-13, macos-14]
-        mode: [real]
-        target: [dbg]
+        os: [ubuntu-latest, macos-13, macos-14]
+        mode: [real, complex]
+        target: [dbg, opt]
         include:
+          - os: ubuntu-latest
+            deployment: ''
           - os: macos-13
             deployment: '13.7'
           - os: macos-14
@@ -85,7 +76,9 @@ jobs:
           sudo ln -s $(brew --prefix)/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s $(brew --prefix)/opt/flex/bin/flex /usr/local/bin/flex
           which bison
+          bison --version
           which flex
+          flex --version
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
