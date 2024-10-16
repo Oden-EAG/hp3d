@@ -13,15 +13,22 @@ on:
 jobs:
   builds-and-tests:
     strategy:
+      # matrix:
+      #   os: [ubuntu-latest, macos-13, macos-14]
+      #   mode: [real, complex]
+      #   target: [dbg, opt]
+      #   include:
+      #     - os: ubuntu-latest
+      #       deployment: ''
+      #     - os: macos-13
+      #       deployment: '13.7'
+      #     - os: macos-14
+      #       deployment: '14.7'
       matrix:
-        os: [ubuntu-latest, macos-13, macos-14]
-        mode: [real, complex]
-        target: [dbg, opt]
+        os: [macos-14]
+        mode: [real]
+        target: [dbg]
         include:
-          - os: ubuntu-latest
-            deployment: ''
-          - os: macos-13
-            deployment: '13.7'
           - os: macos-14
             deployment: '14.7'
 
@@ -62,7 +69,13 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
-          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+          which gfortran-12
+          gfortran-12 --version
+          which gfortran-13
+          gfortran-13 --version
+          which gfortran-14
+          gfortran-14 --version
+          sudo ln -s /usr/local/bin/gfortran-14 /usr/local/bin/gfortran
           gfortran --version
 
       # Get Bison and Flex (MacOS)
