@@ -77,8 +77,6 @@ jobs:
           gfortran --version
 
       # Get Bison and Flex (MacOS)
-      # sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
-      # sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
       - name: Get Bison and Flex (MacOS)
         if: runner.os == 'macOS'
         run: |
@@ -86,6 +84,8 @@ jobs:
           brew install bison flex
           sudo ln -s $(brew --prefix)/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s $(brew --prefix)/opt/flex/bin/flex /usr/local/bin/flex
+          which bison
+          which flex
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
