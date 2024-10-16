@@ -66,28 +66,23 @@ jobs:
         run: ls ${{ github.workspace }}
 
       # Symlink gfortran (MacOS)
-      # sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
-      # sudo ln -s /opt/homebrew/bin/gfortran-14 /usr/local/bin/gfortran
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
-          which gfortran-12
-          gfortran-12 --version
-          which gfortran-13
-          gfortran-13 --version
-          which gfortran-14
-          gfortran-14 --version
           sudo ln -s $(which gfortran-14) /usr/local/bin/gfortran
           which gfortran
           gfortran --version
 
       # Get Bison and Flex (MacOS)
+      # sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
+      # sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
       - name: Get Bison and Flex (MacOS)
         if: runner.os == 'macOS'
         run: |
+          brew --prefix
           brew install bison flex
-          sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
-          sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+          export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+          export PATH="/opt/homebrew/opt/flex/bin:$PATH"
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
