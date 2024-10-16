@@ -66,6 +66,8 @@ jobs:
         run: ls ${{ github.workspace }}
 
       # Symlink gfortran (MacOS)
+      # sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+      # sudo ln -s /opt/homebrew/bin/gfortran-14 /usr/local/bin/gfortran
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
@@ -75,7 +77,8 @@ jobs:
           gfortran-13 --version
           which gfortran-14
           gfortran-14 --version
-          sudo ln -s /usr/local/bin/gfortran-14 /usr/local/bin/gfortran
+          sudo ln -s $(which gfortran-14) /usr/local/bin/gfortran
+          which gfortran
           gfortran --version
 
       # Get Bison and Flex (MacOS)
