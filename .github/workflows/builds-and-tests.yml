@@ -25,10 +25,12 @@ jobs:
       #     - os: macos-14
       #       deployment: '14.7'
       matrix:
-        os: [macos-14]
+        os: [macos-13, macos-14]
         mode: [real]
         target: [dbg]
         include:
+          - os: macos-13
+            deployment: '13.7'
           - os: macos-14
             deployment: '14.7'
 
@@ -69,6 +71,7 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
+          which gfortran-14
           sudo ln -s $(which gfortran-14) /usr/local/bin/gfortran
           which gfortran
           gfortran --version
@@ -81,8 +84,8 @@ jobs:
         run: |
           brew --prefix
           brew install bison flex
-          export PATH="/opt/homebrew/opt/bison/bin:$PATH"
-          export PATH="/opt/homebrew/opt/flex/bin:$PATH"
+          sudo ln -s $(brew --prefix)/opt/bison/bin/bison /usr/local/bin/bison
+          sudo ln -s $(brew --prefix)/opt/flex/bin/flex /usr/local/bin/flex
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
