@@ -91,7 +91,14 @@ jobs:
       - name: Check x11 (MacOS)
         if: runner.os == 'macOS'
         run: |
-          brew install libx11
+          echo "ls /usr"
+          ls /usr
+          echo "ls /usr/X11/"
+          ls /usr/X11/
+          echo "find /opt -name 'Xos.h'"
+          sudo find /opt -name 'Xos.h'
+          echo "find /usr -name 'Xos.h'"
+          sudo find /usr -name 'Xos.h'
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
