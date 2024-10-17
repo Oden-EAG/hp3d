@@ -93,10 +93,10 @@ jobs:
         run: |
           echo "ls /usr"
           ls /usr
-          echo "ls /usr/X11"
+          echo "ls /usr/X11/"
           ls /usr/X11
           echo "find /usr -name 'Xos.h'"
-          find /usr -name 'Xos.h'
+          sudo find /usr -name 'Xos.h'
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
