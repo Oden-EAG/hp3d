@@ -26,7 +26,7 @@ jobs:
       #       deployment: '14.7'
       matrix:
         os: [macos-14]
-        mode: [real]
+        mode: [complex]
         target: [dbg]
         include:
           - os: macos-14
@@ -91,11 +91,12 @@ jobs:
       - name: Check x11 (MacOS)
         if: runner.os == 'macOS'
         run: |
+          echo "ls /usr"
           ls /usr
+          echo "ls /usr/X11"
           ls /usr/X11
-          ls /usr/X11/lib
-          ls /usr/X11/include
-          ls /usr/X11/include/X11
+          echo "find /usr -name 'Xos.h'"
+          find /usr -name 'Xos.h'
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
