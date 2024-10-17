@@ -105,8 +105,8 @@ VIS_INCS   = -I$(PETSC_INC)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EXTRA LIBS LINKING
-EXTRA_LINK_LIBS    = -L/usr/X11/lib -lX11
-EXTRA_LINK_INCS    = -I/usr/X11/include
+EXTRA_LINK_LIBS    = -L/opt/homebrew/lib -lX11
+EXTRA_LINK_INCS    = -I/opt/homebrew/include
 
 #------------------------------------------------------------------
 # HP3D PATHS
