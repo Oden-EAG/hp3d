@@ -13,9 +13,9 @@ HP3D_BASE_PATH = /Users/runner/work/hp3d/hp3d/trunk
 
 PETSC_DIR ?= /Users/runner/work/hp3d/hp3d/petsc
 ifeq ($(HP3D_COMPLEX),1)
-  PETSC_ARCH ?= arch-macos-12-complex-dbg
+  PETSC_ARCH ?= arch-macos-14-complex-dbg
 else
-  PETSC_ARCH ?= arch-macos-12-real-dbg
+  PETSC_ARCH ?= arch-macos-14-real-dbg
 endif
 
 

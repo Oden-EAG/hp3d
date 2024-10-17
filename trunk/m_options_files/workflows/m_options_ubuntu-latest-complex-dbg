@@ -112,7 +112,7 @@ VIS_LIBS   = -Wl,--start-group \
              $(PETSC_LIB)/libhdf5hl_fortran.a \
              -Wl,--end-group
 # -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
-VIS_INCS   = -I${PETSC_INC}
+VIS_INCS   = -I$(PETSC_INC)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EXTRA LIBS LINKING
