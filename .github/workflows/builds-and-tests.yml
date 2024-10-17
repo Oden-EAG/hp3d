@@ -91,10 +91,10 @@ jobs:
       - name: Check x11 (MacOS)
         if: runner.os == 'macOS'
         run: |
-          echo "find /opt -name 'Xos.h'"
-          sudo find /opt -name 'Xos.h'
-          echo "find /usr -name 'Xos.h'"
-          sudo find /usr -name 'Xos.h'
+          echo "find /opt/homebrew -name 'Xos.h'"
+          sudo find /opt/homebrew -name 'Xos.h'
+          echo "find /opt/homebrew -name 'libX11.*'"
+          sudo find /opt/homebrew -name 'libX11.*'
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
