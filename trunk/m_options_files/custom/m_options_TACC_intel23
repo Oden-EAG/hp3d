@@ -1,0 +1,240 @@
+#------------------------------------------------------------------
+# SET HP3D AND LIBRARY PATH
+#------------------------------------------------------------------
+COMPILER        = INTEL
+HP3D_BASE_PATH  = ${WORK2}/hp3d/trunk
+
+#------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+HP3D_COMPLEX ?= 1
+HP3D_DEBUG   ?= 0
+
+HP3D_USE_INTEL_MKL ?= 1
+HP3D_USE_MPI_F08   ?= 1
+HP3D_USE_OPENMP    ?= 1
+HP3D_USE_X11       ?= 0
+
+#------------------------------------------------------------------
+# COMPILER SETTINGS (a 64bit processor architecture is assumed)
+#------------------------------------------------------------------
+
+# Enable performance profiling with TAU
+TAU_PERF ?= NO
+
+# Compiler
+# Tau performance tool
+ifeq ($(TAU_PERF),YES)
+  FF = tau_f90.sh
+  CC = tau_cc.sh
+else
+  FF = mpif90
+  CC = mpicc
+endif
+FC     =  $(FF)
+FFLAGS = -fPIC
+
+# Additional Intel compiler flags
+#FFLAGS += -stand
+
+# OpenMP
+ifeq ($(HP3D_USE_OPENMP),1)
+  FFLAGS += -qopenmp
+endif
+
+# Optimization flags
+ifeq ($(HP3D_DEBUG),0)
+  FFLAGS += -O3 -xCORE-AVX512
+endif
+
+# Debug flags
+ifeq ($(HP3D_DEBUG),1)
+  FFLAGS += -O0 -g -traceback -check all -debug all
+  FFLAGS += -check noarg_temp_created
+  #FFLAGS += -assume noprotect_constants # compiler error in debug mode
+  FFLAGS += -warn all -warn noexternals
+endif
+
+CFLAGS  =
+
+# Preprocessor defs to call Fortran from C 
+# (-DAdd_ or -DAdd__ or -DUPPER)
+CDEFS   = -DAdd_
+
+# Utility used to launch MPI jobs
+HP3D_MPIEXEC    = ibrun
+HP3D_MPIEXEC_NP = -n
+HP3D_MPI_NP     = 2
+
+#------------------------------------------------------------------
+# INTEL MKL LIBRARY
+#------------------------------------------------------------------
+#
+# See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
+#
+# loads: BLAS, LAPACK, ScaLAPACK, BLACS, SPBLAS
+#
+MKL_LIBS = ${MKLROOT}/lib/intel64/libmkl_blas95_lp64.a \
+           ${MKLROOT}/lib/intel64/libmkl_lapack95_lp64.a \
+           ${MKLROOT}/lib/intel64/libmkl_scalapack_lp64.a \
+         -Wl,--start-group \
+           ${MKLROOT}/lib/intel64/libmkl_cdft_core.a \
+           ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
+           ${MKLROOT}/lib/intel64/libmkl_intel_thread.a \
+           ${MKLROOT}/lib/intel64/libmkl_core.a \
+           ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_lp64.a \
+         -Wl,--end-group \
+           -liomp5 -lpthread -lm -ldl
+MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
+# -i8 (default 64-bit integer)
+
+#------------------------------------------------------------------
+# MUMPS LIBRARY
+#------------------------------------------------------------------
+#
+# TACC MUMPS
+# needs PT-SCOTCH and parMETIS (64bit versions for large problems)
+# (module petsc/3.15-i64)
+# also adding Zoltan library dependence
+# also adding PETSC library dependence (petsc needs phdf5)
+
+
+PETSC_DIR = /home1/apps/intel23/impi21_9/petsc/3.20.5
+
+ifeq ($(HP3D_COMPLEX),1)
+  TACC_PETSC32_LIB = $(PETSC_DIR)/3.20.5-complex/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/3.20.5-complex/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/3.20.5-complexi64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/3.20.5-complexi64/include
+else
+  TACC_PETSC32_LIB = $(PETSC_DIR)/3.20.5/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/3.20.5/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/3.20.5-i64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/3.20.5-i64/include
+endif
+
+MUMPS_LIBS  = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
+                                    -lmumps_common -lpord
+
+MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps \
+                                    -lmetis -lparmetis \
+                                    -lscotch -lscotcherr \
+                                    -lptscotch -lptscotcherr
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC)
+
+ifeq ($(HP3D_COMPLEX),1)
+  MUMPS_LIBS += -L/home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/lib -lzoltan
+  MUMPS_INCS += -I/home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/include
+else
+  MUMPS_LIBS += -L/home1/apps/intel19/impi19_0/petsc/3.15/clx/lib -lzoltan
+  MUMPS_INCS += -I/home1/apps/intel19/impi19_0/petsc/3.15/clx/include
+endif
+
+#MUMPS_LIBS += -L/opt/apps/intel19/impi19_0/fftw3/3.3.8/lib -lfftw3 -lm
+#MUMPS_INCS += -I/opt/apps/intel19/impi19_0/fftw3/3.3.8/include
+
+#------------------------------------------------------------------
+# VIS LIBRARY
+#------------------------------------------------------------------
+#
+# TACC HDF5
+#
+
+# module load phdf5/1.14.3
+VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5_hl_fortran
+VIS_INCS   = -I${TACC_HDF5_INC}
+
+#------------------------------------------------------------------
+# HP3D PATHS
+#------------------------------------------------------------------
+#
+# Mainly for library makefile
+
+HP3D_PATH_COMPLEX = $(HP3D_BASE_PATH)/complex
+HP3D_PATH_REAL    = $(HP3D_BASE_PATH)/real
+
+SRC_PATH         = src
+MODULE_PATH      = module
+LIB_PATH         = lib
+
+OBJ_PATH_COMPLEX =  _obj_complex_
+OBJ_PATH_REAL    =  _obj_real_
+
+ifeq ($(HP3D_COMPLEX),1)
+  HP3D_PATH       = $(HP3D_PATH_COMPLEX)
+  OBJ_PATH        = $(OBJ_PATH_COMPLEX)
+else
+  HP3D_PATH       = $(HP3D_PATH_REAL)
+  OBJ_PATH        = $(OBJ_PATH_REAL)
+endif
+
+HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS)
+
+#not used
+HP3D_MOD_OPTION_INC = -module ./$(MODULE_PATH)
+
+# For problem makefiles
+HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a 
+HP3D_FRONTAL    = $(HP3D_PATH)/lib/libfrontal.a
+HP3D_COMMON     = $(HP3D_PATH)/lib/libhp3d_common.a
+HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
+
+#------------------------------------------------------------------
+# FOR PROBLEM LINKING
+#------------------------------------------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# HP3D LINKING (includes frontal solver)
+
+# Cyclic dependencies force to compile as a group.
+HP3D_LINK_LIBS    = -Wl,--start-group \
+                    $(HP3D_LIB) $(HP3D_FRONTAL)
+#HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
+HP3D_LINK_LIBS   += -Wl,--end-group
+HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
+                    -I$(HP3D_PATH)/module
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# BASIC LINEAR ALGEBRA LIBRARIES LINKING
+LIN_ALG_LINK_LIBS = $(MKL_LIBS)
+LIN_ALG_LINK_INCS = $(MKL_INCS)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PETSC LINKING
+#PETSC_LINK_LIBS  = -L$(TACC_PETSC32_LIB) -lpetsc
+#PETSC_LINK_INCS  = #-I/home1/apps/intel18/impi18_0/petsc/3.11/include
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# MUMPS LINKING
+MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS) -L$(TACC_PETSC64_LIB) -lpetsc
+MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# EXTRA LIBS LINKING
+X_LIB = -lX11
+EXTRA_LINK_LIBS    = $(X_LIB)
+EXTRA_LINK_INCS    =
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# PROBLEM LINKING
+
+PROB_LIBS    = $(HP3D_LINK_LIBS)   \
+               $(MUMPS_LINK_LIBS)  \
+               $(VIS_LIBS)         \
+               $(EXTRA_LINK_LIBS)
+
+PROB_INCS     = -module ./$(MODULE_PATH)
+PROB_INCS    += $(HP3D_LINK_INCS)   \
+                $(MUMPS_LINK_INCS)  \
+                $(VIS_INCS)         \
+                $(EXTRA_LINK_INCS)
+
+# Files with ending in .F and .F90 (not .f and .f90)
+# are preprocessed according to certain directives
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+                -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
+                -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
+                -D"HP3D_USE_X11=$(HP3D_USE_X11)"
+

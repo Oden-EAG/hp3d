@@ -4,9 +4,9 @@
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - May 2023
+!> @date  Apr 2024
 !
-!> @brief         - driver for the element routine
+!> @brief Driver for the element routine
 !
 !     arguments:
 !        in:
@@ -20,6 +20,7 @@
 subroutine elem(Mdle, Itest,Itrial)
 !
    use data_structure3D
+   use mpi_wrapper
    use parametersDPG
    use physics  , only: NR_PHYSA
    use assembly , only: ALOC,BLOC
@@ -35,17 +36,24 @@ subroutine elem(Mdle, Itest,Itrial)
 !..number of test and trial degrees of freedom
    integer :: nrdofH ,nrdofE ,nrdofV ,nrdofQ
    integer :: nrdofHH,nrdofEE,nrdofVV,nrdofQQ
-   integer :: nrdofVi_a,nrdofVi_b,nrTest,nrTrial
+   integer :: nrdofHi,nrdofVi,nrTest,nrTrial
    integer :: ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl
    integer :: nrv,nre,nrf
 !
 !..element type
    integer :: etype
 !
+!..TIMER
+   real(8) :: start_time, end_time
+   logical, parameter :: timer = .false.
+!
+!..use blas3 optimized assembly
+   logical, parameter :: opt_blas = .true.
+!
 !-------------------------------------------------------------------------
 !
-!..activate four physics variables (H1 trace + H(div) trace +L2 (field variable) 
-!   + L2 (approximate gradient) ) for assembly
+!..activate four physics variables for assembly
+!  (H1 trace, H(div) trace, L2 scalar field, L2 vector field)
    Itest(1:NR_PHYSA) = 1; Itrial(1:NR_PHYSA) = 1
 !
    norder (1:19) = 0
@@ -69,7 +77,7 @@ subroutine elem(Mdle, Itest,Itrial)
       stop
    end select
 !
-!..note: compute_enriched_order is only provided for hexa
+!..note: compute_enriched_order is only provided for hexa currently
    call compute_enriched_order(etype,nordP, norderP)
 !..compute nrdof for trial
    call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
@@ -78,22 +86,45 @@ subroutine elem(Mdle, Itest,Itrial)
 !..compute number of bubble DOFs
    call ndof_nod(etype,norder(nre+nrf+1), ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl)
 !..compute number of H1 interface dofs
-   nrdofVi_a = nrdofH - ndofHmdl
+   nrdofHi = nrdofH - ndofHmdl
 !..calculate number of H(div) interface DOFs
-   nrdofVi_b = nrdofV - ndofVmdl
+   nrdofVi = nrdofV - ndofVmdl
 !..calculate total number of trial and test DOFs
-   nrTest  = nrdofHH +  nrdofVV
-   nrTrial = nrdofQ + 3 * nrdofQ + nrdofVi_a + nrdofVi_b
+   nrTest  = nrdofHH + nrdofVV
+   nrTrial = nrdofQ + 3 * nrdofQ + nrdofHi + nrdofVi
+!
+!..TIMER
+   if (timer) start_time = MPI_Wtime()
 !
 !..call element integration routine
-   call elem_poisson_UW(Mdle,nrTest,nrTrial,                                                 &
-            nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofVi_a,nrdofVi_b,               &
-            BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                             &
-            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,ALOC(1,3)%array,ALOC(1,4)%array,   &
-            BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array,ALOC(2,3)%array,ALOC(2,4)%array,   &
-            BLOC(3)%array,ALOC(3,1)%array,ALOC(3,2)%array,ALOC(3,3)%array,ALOC(3,4)%array,   &
-            BLOC(4)%array,ALOC(4,1)%array,ALOC(4,2)%array,ALOC(4,3)%array,ALOC(4,4)%array)
-!     
+   if (opt_blas) then
+      call elem_opt_UW(Mdle,nrTest,nrTrial,                                               &
+         nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofHi,nrdofVi,                   &
+         BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                             &
+         BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,ALOC(1,3)%array,ALOC(1,4)%array,   &
+         BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array,ALOC(2,3)%array,ALOC(2,4)%array,   &
+         BLOC(3)%array,ALOC(3,1)%array,ALOC(3,2)%array,ALOC(3,3)%array,ALOC(3,4)%array,   &
+         BLOC(4)%array,ALOC(4,1)%array,ALOC(4,2)%array,ALOC(4,3)%array,ALOC(4,4)%array)
+   else
+      call elem_poisson_UW(Mdle,nrTest,nrTrial,                                           &
+         nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofHi,nrdofVi,                   &
+         BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                             &
+         BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,ALOC(1,3)%array,ALOC(1,4)%array,   &
+         BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array,ALOC(2,3)%array,ALOC(2,4)%array,   &
+         BLOC(3)%array,ALOC(3,1)%array,ALOC(3,2)%array,ALOC(3,3)%array,ALOC(3,4)%array,   &
+         BLOC(4)%array,ALOC(4,1)%array,ALOC(4,2)%array,ALOC(4,3)%array,ALOC(4,4)%array)
+   endif
+!
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      if (      opt_blas) write(*,11) 'elem_opt: '    , end_time-start_time
+      if (.not. opt_blas) write(*,11) 'elem_poisson: ', end_time-start_time
+      !$OMP END CRITICAL
+   11 format(A,f12.5,' s')
+   endif
+!
 end subroutine elem
 !
 !-------------------------------------------------------------------------
@@ -102,9 +133,9 @@ end subroutine elem
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - May 2023
+!> @date  May 2023
 !
-!> @brief         - compute element stiffness and load
+!> @brief Compute element stiffness and load
 !
 !     arguments:
 !        in:
@@ -117,8 +148,8 @@ end subroutine elem
 !              NrdofQ   - number of L2 dofs which will be used for u and sigma_1,2,3 
 !              NrdofU   - number of L2 trial dof for u
 !              NrdofS   - number of L2 trial dof for sigma  = grad u (Dimension X NrdofQ)
-!              NrdofVi_a- number of H1 trial interface dof
-!              NrdofVi_b- number of H(div) trial interface dof
+!              NrdofHi  - number of H1 trial interface dof
+!              NrdofVi  - number of H(div) trial interface dof
 !              MdQ1     - num rows of AlocQ1Q1,AlocQ1Q2,AlocQ1H,AlocQ1V
 !              MdQ2     - num rows of AlocQ2Q1,AlocQ2Q2,AlocQ2H,AlocQ2V
 !              MdH      - num rows of AlocHQ1,AlocHQ2,AlocHH,AlocHV
@@ -153,7 +184,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
                            NrTest,NrTrial,                              &
                            NrdofHH,NrdofVV,NrdofH,NrdofQ,               &
                            NrdofU,NrdofS,                               &
-                           NrdofVi_a,NrdofVi_b,                         &
+                           NrdofHi,NrdofVi,                             &
                            MdH,MdV,MdQ1,MdQ2,                           &
                            BlocH,AlocHH,AlocHV,AlocHQ1,AlocHQ2,         &
                            BlocV,AlocVH,AlocVV,AlocVQ1,AlocVQ2,         &
@@ -162,11 +193,12 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
+   use common_prob_data
    use control
    use data_structure3D
    use element_data
    use parametersDPG
-   use mpi_param, only: RANK
+   use mpi_wrapper
 !
    implicit none
 !
@@ -180,8 +212,8 @@ subroutine elem_poisson_UW(Mdle,                                        &
    integer, intent(in) :: NrdofQ
    integer, intent(in) :: NrdofU
    integer, intent(in) :: NrdofS
-   integer, intent(in) :: NrdofVi_a
-   integer, intent(in) :: NrdofVi_b
+   integer, intent(in) :: NrdofHi
+   integer, intent(in) :: NrdofVi
    integer, intent(in) :: MdQ1
    integer, intent(in) :: MdQ2
    integer, intent(in) :: MdH
@@ -272,6 +304,11 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !..workspace for trial and test variables
    real(8) :: u, v, q, divtau_a, divtau_b, tn, sn, u_hat, aux
    real(8) :: sig(3), dv(3), dq(3), tau_a(3), tau_b(3), s(3)
+   real(8) :: vfac, tfac
+!
+!..TIMER
+   real(8) :: start_time, end_time
+   logical, parameter :: timer = .false.
 !
    integer, external :: ij_upper_to_packed
 !
@@ -279,17 +316,31 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
+!..TIMER
+   if (timer) start_time = MPI_Wtime()
+!
+   select case(TEST_NORM)
+      case(GRAPH_NORM)
+         vfac = ALPHA_NORM
+         tfac = ALPHA_NORM + 1.0d0
+      case( MATH_NORM)
+         vfac = 1.0d0
+         tfac = 1.0d0
+      case default
+         write(*,*) 'elem_poisson: invalid test norm!'
+         stop
+   end select
 !
 !..allocate auxiliary matrices
    allocate(gramP((NrTest)*(NrTest+1)/2))
    allocate(stiff_HQ1(NrdofHH,NrdofU))
    allocate(stiff_HQ2(NrdofHH,NrdofS))
-   allocate(stiff_HH(NrdofHH,NrdofVi_a))
-   allocate(stiff_HV(NrdofHH,NrdofVi_b))
+   allocate(stiff_HH(NrdofHH,NrdofHi))
+   allocate(stiff_HV(NrdofHH,NrdofVi))
    allocate(stiff_VQ1(NrdofVV,NrdofU))
    allocate(stiff_VQ2(NrdofVV,NrdofS))
-   allocate(stiff_VH(NrdofVV,NrdofVi_a))
-   allocate(stiff_VV(NrdofVV,NrdofVi_b))
+   allocate(stiff_VH(NrdofVV,NrdofHi))
+   allocate(stiff_VV(NrdofVV,NrdofVi))
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -348,6 +399,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
+   INTEGRATION = 0
 !
 !..loop over integration points
    do l=1,nint
@@ -358,15 +410,16 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !
 !..H1 shape functions (for geometry)
       call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdof,shapH,gradH)
-
+!
 !..L2 shape functions
       call shape3DQ(etype,xi,norder, nrdof,shapQ)
 !
 !..discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
+!
 !..discontinuous H(div) shape functions
       call shape3VV(etype,xi,nordP, nrdof,shapVV,divVV)
-
+!
 !..geometry map
       call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
@@ -413,14 +466,15 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !
 !..determine index in triangular packed format            
             k = ij_upper_to_packed(k1,k2)
-!..accumlate Gram components of Gram matrix correspoding to v
-            aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
+!..accumulate components of Gram matrix corresponding to v
+            aux = vfac*q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
             gramP(k) = gramP(k) + aux*weight
-!           
+!
 !..end of 2nd loop through enriched H1 test functions
          enddo
 !
-!..cross terms for  graph norm
+!..cross terms for graph norm
+         if (TEST_NORM .eq. MATH_NORM) cycle
          do k2 = 1,NrdofVV
             tau_a(1:3) = dxdxi(1:3,1) * shapVV(1,k2) &
                        + dxdxi(1:3,2) * shapVV(2,k2) &
@@ -473,7 +527,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
             tau_b(1:3) = tau_b(1:3)/rjac
 !
             k = ij_upper_to_packed(k1 + NrdofHH,k2 + NrdofHH)
-            aux = divtau_a * divtau_b + 2.d0 * &
+            aux = divtau_a * divtau_b + tfac * &
                   (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
             gramP(k) = gramP(k) +  weight * aux
 !
@@ -483,6 +537,15 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !..end of loop through integration points
    enddo
 !
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem INTEGR Vol: ', end_time-start_time
+      !$OMP END CRITICAL
+      11 format(A,f12.5,' s')
+      start_time = MPI_Wtime()
+   endif
 !
 !---------------------------------------------------------------------
 !    B O U N D A R Y    I N T E G R A L S                            |
@@ -539,7 +602,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
             v = shapHH(k1)
 !
 !..loop through H(div) trial functions
-            do k2=1,NrdofVi_b
+            do k2=1,NrdofVi
 !..Piola transformation
                s(1:3) = dxdxi(1:3,1)*shapV(1,k2) &
                       + dxdxi(1:3,2)*shapV(2,k2) &
@@ -564,7 +627,8 @@ subroutine elem_poisson_UW(Mdle,                                        &
             tau_a(1:3) = tau_a(1:3)/rjac
             tn = tau_a(1)*rn(1) + tau_a(2)*rn(2) + tau_a(3)*rn(3)
 !
-            do k2=1,NrdofVi_a
+!..loop through H1 trial functions
+            do k2=1,NrdofHi
                u_hat = shapH(k2)
                stiff_VH(k1,k2) = stiff_VH(k1,k2) - weight * tn * u_hat
             enddo
@@ -576,6 +640,15 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !..end loop through element faces
    enddo
 !
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem INTEGR Bdr: ', end_time-start_time
+      !$OMP END CRITICAL
+      start_time = MPI_Wtime()
+   endif
+!
 !---------------------------------------------------------------------
 !  Construction of DPG system
 !---------------------------------------------------------------------
@@ -584,7 +657,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
    stiff_ALL = ZERO
 !
 !  Total test/trial DOFs of the element
-   i1 = NrdofHH; i2 = NrdofVV; j1 = NrdofVi_a; j2 = NrdofVi_b; j3 = NrdofU; j4 = NrdofS
+   i1 = NrdofHH; i2 = NrdofVV; j1 = NrdofHi; j2 = NrdofVi; j3 = NrdofU; j4 = NrdofS
    stiff_ALL(1:i1,1:j1) = stiff_HH
    stiff_ALL(1:i1,j1+1:j1+j2) = stiff_HV
    stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = stiff_HQ1
@@ -603,17 +676,18 @@ subroutine elem_poisson_UW(Mdle,                                        &
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
    call DPPTRF('U',NrTest,gramP,info)
    if (info.ne.0) then
-      write(*,*) 'elem_heat: DPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_poisson_UW: DPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^T X = [B|l]
    call DTPTRS('U','T','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
    if (info.ne.0) then
-      write(*,*) 'elem_heat: DTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_poisson_UW: DTPTRS: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
+   deallocate(gramP)
    allocate(raloc(NrTrial+1,NrTrial+1)); raloc = ZERO
 
 !..C. Matrix multiply: B^T G^-1 B (=B~^T B~)
@@ -653,6 +727,14 @@ subroutine elem_poisson_UW(Mdle,                                        &
    AlocQ2Q2(1:j4,1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+1:j1+j2+j3+j4)
 !
    deallocate(raloc)
+!
+!..TIMER
+   if (timer) then
+      end_time = MPI_Wtime()
+      !$OMP CRITICAL
+      write(*,11) 'elem DPG LinAlg: ', end_time-start_time
+      !$OMP END CRITICAL
+   endif
 !
 end subroutine elem_poisson_UW
 

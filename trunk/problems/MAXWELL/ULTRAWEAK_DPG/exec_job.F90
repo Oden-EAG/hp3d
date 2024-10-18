@@ -54,7 +54,7 @@
 !
 !     ...solve problem with par_mumps (MPI MUMPS)
          if (NUM_PROCS .eq. 1) then
-            call par_mumps_sc('H')
+            call mumps_sc('H')
          else
             call par_mumps_sc('H')
          endif

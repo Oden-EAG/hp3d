@@ -19,7 +19,6 @@
 !              Ddvshap - second derivatives
 !
 !----------------------------------------------------------------------
-!
    subroutine Gshape1(Nord,Xi, Vshap,Dvshap,Ddvshap)
 !
       use parameters
@@ -43,10 +42,11 @@
 !
       integer :: j,k
 !
-!----------------------------------------------------------------------
-!
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
 !  ...check data
       if ((Nord.lt.5).or.(Nord.gt.5)) then
@@ -77,6 +77,8 @@
           b(j) = 1.d0
           call rhsub(a,ashap(1:6,j),b,6,6)
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           do j=1,6
             write(*,7003) j
@@ -86,6 +88,8 @@
           enddo
           call pause
         endif
+#endif
+!
       endif
 !
 !  ...compute shape functions and their derivatives
@@ -129,7 +133,6 @@
 !              D3vshap - third derivatives
 !
 !----------------------------------------------------------------------
-!
    subroutine Gshap1(Nord,Xi, Vshap,Dvshap,Ddvshap,D3vshap)
 !
       use parameters
@@ -155,10 +158,11 @@
 !
       integer :: j,k
 !
-!----------------------------------------------------------------------
-!
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
+!----------------------------------------------------------------------
 !
 !  ...check data
       if ((Nord.lt.5).or.(Nord.gt.5)) then
@@ -188,6 +192,8 @@
           b(j) = 1.d0
           call rhsub(a,ashap(1:6,j),b,6,6)
         enddo
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           do j=1,6
             write(*,7003) j
@@ -197,6 +203,8 @@
           enddo
           call pause
         endif
+#endif
+!
       endif
 !
 !  ...compute shape functions and their derivatives

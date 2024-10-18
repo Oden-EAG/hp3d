@@ -19,7 +19,6 @@
 !                        reference coordinate
 !
 !----------------------------------------------------------------------
-!
    subroutine curve_QuaCir(No,Eta, X,Dxdeta)
 !
       use GMP
@@ -44,8 +43,10 @@
       integer :: i,j,np
       real(8) :: alpha,pihalf,rad,s,s1
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
       if (CURVES(No)%Type.ne.'QuaCir') then
         write(*,7001)
@@ -53,12 +54,14 @@
         stop
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'No,Eta = ',No,Eta
 !!!        write(*,7002) No, Eta
 !!! 7002   format(' curve_QuaCir: No,Eta = ',i4,2x,f8.3)
         call pause
       endif
+#endif
 !
 !  ...get the endpoints coordinates
       do i=1,2
@@ -83,13 +86,14 @@
       enddo
       call cross_product(aij(1:3,1),aij(1:3,2), aij(1:3,3))
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,aij(i,1:3)
  7005     format(' i,a(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !  ...evaluate coordinates and their derivatives in the auxiliary
 !     system of coordinates (see manual for explanation)
@@ -102,13 +106,14 @@
       dxprdeta(2) =  xprim(1)*pihalf
       dxprdeta(3) =  0.d0
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) xprim(1:3)
  7006   format(' xprim    = ',3(e12.5,2x))
         write(*,7007) dxprdeta(1:3)
  7007   format(' dxprdeta = ',3(e12.5,2x))
       endif
+#endif
 !
 !  ...evaluate physical coordinates and their derivatives wrt the
 !     reference coordinate
@@ -123,13 +128,14 @@
         Dxdeta(i) = s1
       enddo
 !
-!  ...printing
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003) X(1:3)
         write(*,7004) Dxdeta(1:3)
  7003   format(' X      = ',3(e12.5,2x))
  7004   format(' Dxdeta = ',3(e12.5,2x))
       endif
+#endif
 !
 !
    end subroutine curve_QuaCir

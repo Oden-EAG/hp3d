@@ -25,17 +25,20 @@ subroutine prism(No,Eta, X,Dxdeta)
       real(8),dimension(  8) :: vshape
       real(8),dimension(3,8) :: dvshape
       integer :: iv,np,k,i
+!
+#if HP3D_DEBUG
       integer :: iprint
+      iprint=0
+#endif
 !------------------------------------------------------------------------------------
 !
-      iprint=0
-!
-! ....printing statement
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No,PRISMS(No)%Type
  7001   format('prism: No,PRISMS(No)%Type = ',i8,2x,a10)
         call pause
       endif
+#endif
 !
 ! ....select prism type
       select case(PRISMS(No)%Type)
@@ -69,7 +72,7 @@ subroutine prism(No,Eta, X,Dxdeta)
         write(*,7002) PRISMS(No)%Type
  7002   format('prism: unknown prism type = ',a10)
         stop
-      endselect
+      end select
 !
 !
    end subroutine prism
@@ -123,16 +126,21 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       integer :: nc,norient,np,nr,nt
       real(8) :: te
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
+#endif
 !
 !------------------------------------------------------------------------
 !
  10   continue
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:3)
  7001   format(' prism_TI: No,Eta = ',i5,2x,3e12.5)
       endif
+#endif
 !
 !  ...affine coordinates for the triangular faces
       vshapt(1) = 1.d0 - Eta(1) - Eta(2)
@@ -169,6 +177,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                              POINTS(np)%Rdata(ivar)*dshapH(1:3,iv)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'prism_TI: VERTEX INTERPOLANT = '
         do ivar=1,3
@@ -176,6 +186,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
  7011     format(e12.5,3x,3e12.5)
         enddo
       endif
+#endif
 !
 !------------------------------------------------------------------------
 !     H O R I Z O N T A L    E D G E    B U B B L E S
@@ -202,17 +213,22 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !
           if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
 !
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7012) ie,nc,CURVES(nc)%Type
  7012       format('prism_TI: ie,nc,Type = ',i2,i8,2x,a5)
           endif
+#endif
 !
 !  .......evaluate edge kernel function
           call curveK(nc,te,norient, xe,dxedt)
+!
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,*) 'xe = ',xe
             write(*,*) 'dxedt = ',dxedt
           endif
+#endif
 !
 !  .......blending function
           blend       =  vshapt(    iv1)* vshapt(    iv2)* vshap(j)
@@ -227,6 +243,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                              + dxedt(1:3)*dtedeta(ivar)*blend    &
                              + xe(1:3)*dblend(ivar)
           enddo
+!
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,*) 'prism_TI: AFTER EDGE ie = ',ie
             do ivar=1,3
@@ -234,6 +252,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
             enddo
             call pause
           endif
+#endif
+!
         enddo
 !
 !  ...loop over horizontal edges
@@ -260,15 +280,22 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !  .....if at endpoint cycle
         if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
 !
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7012) ie,nc,CURVES(nc)%Type
         endif
+#endif
+!
 !  .....evaluate edge bubble function
         call curveB(nc,te,norient, xe,dxedt)
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'xe = ',xe
           write(*,*) 'dxedt = ',dxedt
         endif
+#endif
+!
 !  .....blending function
         blend=vshapt(i) ; dblend(1:2)=dvshapt(1:2,i) ; dblend(3)=0.d0
 !  .....add edge contribution
@@ -278,7 +305,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                            + dxedt(1:3)*dtedeta(ivar)*blend    &
                            + xe(1:3)*dblend(ivar)
         enddo
-!  .....printing
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'prism_TI: AFTER EDGE ie = ',ie
           do ivar=1,3
@@ -286,6 +314,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
           enddo
           call pause
         endif
+#endif
 !
 !  ...loop over vertical edges
       enddo
@@ -303,11 +332,13 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         if ((TRIANGLES(nt)%Type.eq.'TransTri') .or.              &
             (TRIANGLES(nt)%Type.eq.'PlaneTri')      ) cycle
 !
-!  .....printing
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7013) ifig,nt,TRIANGLES(nt)%Type
  7013     format(' prism_TI: ifig,nt,Type = ',i2,i8,2x,a10)
         endif
+#endif
+!
 !  .....project Eta onto the face
         tf(1:2)=Eta(1:2)
         dtfdeta(1:2,1)= (/1.d0,0.d0/)
@@ -329,7 +360,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                              +dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend   &
                            + xf(1:3)*dblend(ivar)
         enddo
-!  .....printing
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*)'prism_TI: AFTER FACE ifig = ',ifig
           do ivar=1,3
@@ -337,6 +369,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
           enddo
           call pause
         endif
+#endif
 !
 !  ...loop over horizontal faces
       enddo
@@ -353,11 +386,13 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         if ((RECTANGLES(nr)%Type.eq.'TraQua') .or.              &
             (RECTANGLES(nr)%Type.eq.'BilQua')      ) cycle
 !
-!  .....printing
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7014) ifig,nr,RECTANGLES(nr)%Type
  7014     format(' prism_TI: ifig,nr,Type = ',i2,i8,2x,a10)
         endif
+#endif
+!
 !  .....get the edge vertices specifying the local horizontal edge orientation
         iv1=TRIAN_EDGE_TO_VERT(1,i) ; iv2=TRIAN_EDGE_TO_VERT(2,i)
 !  .....project Eta onto face
@@ -399,7 +434,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                              +dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend   &
                            + xf(1:3)*dblend(ivar)
         enddo
-!  .....printing
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*)'prism_TI: AFTER FACE ifig = ',ifig
           do ivar=1,3
@@ -407,6 +443,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
           enddo
           call pause
         endif
+#endif
 !
 !  ...loop over vertical faces
       enddo

@@ -19,7 +19,7 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
       real(8), dimension(3), intent(out)   :: Dfdx
 !------------------------------------------------------------------------------------
       integer :: i
-      real(8)  :: dRn,dRh,d
+      real(8) :: dRn,dRh,d
 !------------------------------------------------------------------------------------
 !
       dRn=0.d0
@@ -67,15 +67,20 @@ subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
 !  ...vectors X1X2, X1X3, and the normal versor
       real(8), dimension(3) :: ver1,ver2,rn
       real(8)               :: s,d
-      integer              :: iprint
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !------------------------------------------------------------------------------------
 !
-      iprint=0
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) X,X1,X2,X3
  7001   format(' plane2: X,X1,X2,X3 = ',4(3f8.3,2x))
         call pause
       endif
+#endif
 !
 !  ...caculate the versor orthogonal to the plane
       ver1(1:3) = X2(1:3) - X1(1:3)
@@ -120,10 +125,13 @@ subroutine determine_plane1(X,Y, Rn)
       real(8),dimension(102) :: work
 !
       real(8) :: s,rlambda
-      integer :: i,j,k,iprint,info
-!------------------------------------------------------------------------------------
+      integer :: i,j,k,info
 !
+#if HP3D_DEBUG
+      integer :: iprint
       iprint=0
+#endif
+!------------------------------------------------------------------------------------
 !
 !  ...determine the auxiliary matrices
       do i=1,3
@@ -141,6 +149,7 @@ subroutine determine_plane1(X,Y, Rn)
         enddo
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001)
  7001   format('determine_plane1: b = ')
@@ -150,6 +159,7 @@ subroutine determine_plane1(X,Y, Rn)
         enddo
         call pause
       endif
+#endif
 !
 !  ...solve the eigenvalue problem and determine the eigenvector
 !     corresponding to the smallest eigenvalue
@@ -157,11 +167,13 @@ subroutine determine_plane1(X,Y, Rn)
       rlambda = w(1)
       Rn(1:3) = b(1:3,1)
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003) rlambda,RN(1:3)
  7003   format('determine_plane1: rlambda, Rn = ',e12.5,3x,3e12.5)
         call pause
       endif
+#endif
 !
 !
 end subroutine determine_plane1
@@ -196,16 +208,22 @@ subroutine determine_plane2(X,Y, Rn)
       real(8),dimension(68) :: work
 !
       real(8) :: s,rlambda
-      integer :: i,j,k,iprint,info,l
+      integer :: i,j,k,info,l
+!
+#if HP3D_DEBUG
+      integer :: iprint
+      iprint=0
+#endif
 !------------------------------------------------------------------------------------
 !
-      iprint=0
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7007) (X(1:3,i),i=1,2),(Y(1:3,i),i=1,2)
  7007   format('determine_plane2: ',/,'POINTS X = ',2(3e12.5,2x), &
                /,'POINTS Y = ',2(3e12.5,2x))
         call pause
       endif
+#endif
 !
 !  ...midpoint of line X_1,X_2
       x12(1:3) = (X(1:3,1) + X(1:3,2))/2.d0
@@ -239,10 +257,12 @@ subroutine determine_plane2(X,Y, Rn)
         rna(1:3,j) = rna(1:3,j)/s
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7005) rna(1:3,1),rna(1:3,2)
  7005   format('determine_plane2: UNIT VECTORS = ',2(3e12.5,2x))
       endif
+#endif
 !
 !  ...determine the auxiliary matrices
       do i=1,2
@@ -255,6 +275,7 @@ subroutine determine_plane2(X,Y, Rn)
         enddo
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006)
  7006   format('determine_plane2: a = ')
@@ -262,6 +283,7 @@ subroutine determine_plane2(X,Y, Rn)
           write(*,7002) (a(i,j),j=1,2)
         enddo
       endif
+#endif
 !
       do i=1,2
         do j=1,2
@@ -273,6 +295,7 @@ subroutine determine_plane2(X,Y, Rn)
         enddo
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001)
  7001   format('determine_plane2: b = ')
@@ -281,6 +304,7 @@ subroutine determine_plane2(X,Y, Rn)
  7002     format(2e12.5)
         enddo
       endif
+#endif
 !
 !  ...solve the eigenvalue problem and determine the eigenvector
 !     corresponding to the smallest eigenvalue
@@ -294,20 +318,24 @@ subroutine determine_plane2(X,Y, Rn)
 !!!!! x1(1:3) = b(1:3,1)
       x1(1:2) = b(1:2,1)
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003) rlambda,x1(1:2)
  7003   format('determine_plane2: rlambda, x1 = ',e12.5,3x,2e12.5)
       endif
+#endif
 !
       do i=1,3
         Rn(i) = x1(1)*rna(i,1) + x1(2)*rna(i,2)
       enddo
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7004) Rn(1:3)
  7004   format('determine_plane2: Rn = ',3e12.5)
         call pause
       endif
+#endif
 !
 !
 end subroutine determine_plane2

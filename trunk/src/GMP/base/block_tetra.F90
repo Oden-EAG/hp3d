@@ -39,21 +39,24 @@
 !  ...linear shape functions for a tetrahedron
       real(8) :: vshap(8),dvshap(3,8)
 !
-      integer :: i,ie,ifc,ivar,k,lab,np,nc,nt
+      integer :: i,ie,ifc,k,lab,np,nc,nt
 !
-      integer :: iprint
+#if HP3D_DEBUG
+      integer :: ivar,iprint
       iprint=0
-!
+#endif
 !-----------------------------------------------------------------------
 !  ...initialize
       X = 0; Dxdeta = 0
 !
-      if (No.eq.7) iprint = 0
+#if HP3D_DEBUG
+      if (No.eq.7) iprint=0
 !
       if (iprint.eq.1) then
         write(*,7001) No,Eta,TETRAS(No)%Type
  7001   format('tetra: No,Eta,Type = ',i8,2x,3f8.3,2x,a10)
       endif
+#endif
 !
 !  ...get the vertex coordinates
       do i=1,4
@@ -112,6 +115,8 @@
         stop
 !
       end select
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         do ivar=1,3
           write(*,7004) ivar,X(ivar),Dxdeta(ivar,1:3)
@@ -119,7 +124,7 @@
         enddo
         call pause
       endif
-!
+#endif
 !
    end subroutine tetra
 !
@@ -183,19 +188,22 @@
       real(8) :: blend,te
       integer :: ie,ifc,iv,iv1,iv2,iv3,ivar,nc,nt,norient,np
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
-!
+#endif
 !------------------------------------------------------------------------
 !  ...initialize
       X = 0; Dxdeta = 0
 !
  10   continue
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) '************************************************'
         write(*,7001) No,Eta(1:3)
- 7001   format('tetra_TraTet: No,Eta = ',i5,2x,3e12.5)
       endif
+#endif
 !
 !  ...check Eta
       if ( (Eta(1)              .lt.-GEOM_TOL).or. &
@@ -203,6 +211,7 @@
            (Eta(3)              .lt.-GEOM_TOL).or. &
            (Eta(1)+Eta(2)+Eta(3).gt.1.d0+GEOM_TOL)    ) then
         write(*,7001) No,Eta(1:3)
+ 7001   format('tetra_TraTet: No,Eta = ',i5,2x,3e12.5)
         call pause
       endif
 !
@@ -230,6 +239,8 @@
                            + POINTS(np)%Rdata(ivar)*dshapH(1:3,iv)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'tetra_TraTet: VERTEX INTERPOLANT = '
         do ivar=1,3
@@ -237,6 +248,7 @@
  7011     format(e12.5,3x,3e12.5)
         enddo
       endif
+#endif
 !
 !------------------------------------------------------------------------
 !  ...add edge bubbles
@@ -256,17 +268,22 @@
         call proj_n2e(iv1,iv2,shapH,dshapH, te,dtedeta)
         if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
 !
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7012) ie,nc,CURVES(nc)%Type
  7012     format('tetra_TraTet: ie,nc,Type = ',i2,i8,2x,a5)
         endif
+#endif
 !
 !  .....evaluate edge kernel function
         call curveK(nc,te,norient, xe,dxedt)
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'xe = ',xe
           write(*,*) 'dxedt = ',dxedt
         endif
+#endif
 !
 !  .....blending function
         blend = shapH(iv1)*shapH(iv2)
@@ -280,13 +297,17 @@
                            + dxedt(1:3)*dtedeta(ivar)*blend &
                            + xe(1:3)*dblend(ivar)
         enddo
-      if (iprint.eq.1) then
-        write(*,*) 'tetra_TraTet: AFTER EDGE ie = ',ie
-        do ivar=1,3
-          write(*,7011) X(ivar),Dxdeta(ivar,1:3)
-        enddo
-        call pause
-      endif
+!
+#if HP3D_DEBUG
+        if (iprint.eq.1) then
+          write(*,*) 'tetra_TraTet: AFTER EDGE ie = ',ie
+          do ivar=1,3
+            write(*,7011) X(ivar),Dxdeta(ivar,1:3)
+          enddo
+          call pause
+        endif
+#endif
+!
       enddo
 !
 !------------------------------------------------------------------------
@@ -308,10 +329,13 @@
 !  .....if point is on the edge, then the bubble contribution is zero
         if ((abs(tf(2)).lt.GEOM_TOL).or.(abs(tf(1)).lt.GEOM_TOL).or. &
             (abs(1.d0-tf(1)-tf(2)).lt.GEOM_TOL)) cycle
+!
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7013) ifc,nt,TRIANGLES(nt)%Type
  7013     format('tetra_TraTet: ifc,nt,Type = ',i2,i8,2x,a5)
         endif
+#endif
 !
 !  .....compute the face kernel
         call trianK(nt,tf,norient, xf,dxfdtf)
@@ -331,6 +355,8 @@
                            + xf(1:3)*dblend(ivar)
         enddo
       enddo
+!
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'tetra_TraTet: AFTER FACES = '
         do ivar=1,3
@@ -338,6 +364,7 @@
         enddo
         call pause
       endif
+#endif
 !
 !!!      call tetra_TraTet_OLD(No,Eta, xold,dxolddeta)
 !!!      if (iprint.eq.1) then
@@ -414,9 +441,10 @@
       real(8) :: dthet_deta1,dthet_deta2,dthet_deta3
       integer :: np,iv
 !
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
-!
+#endif
 !-----------------------------------------------------------------------
 !  ...initialize
       X = 0; Dxdeta = 0
@@ -427,10 +455,12 @@
         stop 1
       endif
 !
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) No,Eta
  7002   format('trian_CylTet: No,Eta = ',i4,2x,3f8.3)
       endif
+#endif
 !
       pi = acos(-1.d0)
       twopi = pi*2.d0

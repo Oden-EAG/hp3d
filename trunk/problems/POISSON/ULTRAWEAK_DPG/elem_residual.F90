@@ -73,7 +73,7 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    call celndof(etype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
 !
    nrTest = nrdofHH + nrdofVV
-   call elem_residual_poisson_UW(        &
+   call elem_residual_poisson_UW(                       &
       Mdle,nrTest,nrdofHH,nrdofVV,nrdofQ,nrdofH,nrdofV, &
       Resid,Nref_flag)
 !
@@ -107,11 +107,12 @@ end subroutine elem_residual
 !
 #include "typedefs.h"
 !
-subroutine elem_residual_poisson_UW(Mdle,                                     &
-                                    NrTest,NrdofHH,NrdofVV,                   &
-                                    NrdofQ,NrdofH,NrdofV,                     &
+subroutine elem_residual_poisson_UW(Mdle,                      &
+                                    NrTest,NrdofHH,NrdofVV,    &
+                                    NrdofQ,NrdofH,NrdofV,      &
                                     Resid,Nref_flag)
 !
+   use common_prob_data
    use control
    use parametersDPG
    use element_data
@@ -189,9 +190,8 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
    real(8) :: solLmb
 !
 !..various variables for the problem
-   real(8) :: rjac, bjac, fval, wa, weight
-   integer :: iflag, nrf, nint
-   integer :: k1, k2, k, l
+   real(8) :: rjac, bjac, fval, wa, weight, vfac, tfac
+   integer :: iflag, nrf, nint, k1, k2, k, l
    integer :: nordP, nrdof, nsign, ifc, info
 !
    integer, external :: ij_upper_to_packed
@@ -202,6 +202,18 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 #endif
 !
 !-----------------------------------------------------------------------
+!
+   select case(TEST_NORM)
+      case(GRAPH_NORM)
+         vfac = ALPHA_NORM
+         tfac = ALPHA_NORM + 1.0d0
+      case( MATH_NORM)
+         vfac = 1.0d0
+         tfac = 1.0d0
+      case default
+         write(*,*) 'elem_residual_poisson: invalid test norm!'
+         stop
+   end select
 !
    dofQ = ZERO; dofV = ZERO; dofE = ZERO; dofH = ZERO
 !
@@ -314,16 +326,17 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
             k = ij_upper_to_packed(k1,k2)
 !
 !..H1 test inner product: (q,v) + (grad_h q, grad_h v)
-            aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
+            aux = vfac*q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
             gramP(k) = gramP(k) + aux*weight
 !
 !     ...end 1st loop through enriched H1 test functions
          enddo
 !..cross terms for  graph norm
+         if (TEST_NORM .eq. MATH_NORM) cycle
          do k2 = 1,NrdofVV
             divtau_a = divVV(k2)/rjac
-            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
-                           + dxdxi(1:3,2) * shapVV(2,k2)       &
+            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)    &
+                           + dxdxi(1:3,2) * shapVV(2,k2)    &
                            + dxdxi(1:3,3) * shapVV(3,k2)
 !            
             tau_a(1:3) = tau_a(1:3)/rjac
@@ -338,7 +351,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
       do k1=1,NrdofVV
 !..Piola Transform of the divergence
          divtau_a = divVV(k1)/rjac
-         tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k1)      &
+         tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k1)       &
                         + dxdxi(1:3,2) * shapVV(2,k1)       &
                         + dxdxi(1:3,3) * shapVV(3,k1)
 !         
@@ -350,13 +363,14 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !
          do k2 = k1,NrdofVV
             divtau_b = divVV(k2)/rjac
-            tau_b(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)       &
-                           + dxdxi(1:3,2) * shapVV(2,k2)       &
+            tau_b(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)    &
+                           + dxdxi(1:3,2) * shapVV(2,k2)    &
                            + dxdxi(1:3,3) * shapVV(3,k2)
 !   
             tau_b(1:3) = tau_b(1:3)/rjac
 !            
-            aux = divtau_a * divtau_b + 2.d0* (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
+            aux = divtau_a * divtau_b + tfac * &
+                  (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
 !
             k = ij_upper_to_packed(k1 + NrdofHH,k2 + NrdofHH)
             gramP(k) = gramP(k) +  weight * aux

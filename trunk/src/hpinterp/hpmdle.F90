@@ -26,6 +26,7 @@
   use parameters
   use physics
   use element_data
+  use mpi_wrapper
   implicit none
 !
 ! ** Arguments
@@ -73,6 +74,8 @@
 ! misc work space
   integer :: nrv,nre,nrf,i,j,k,kj,ki,&
              ndofH_mdle,ndofE_mdle,ndofV_mdle,ndofQ_Mdle,iflag1
+!..TIMER
+!   real(8) :: start_time,end_time
 !
 #if HP3D_DEBUG
   integer :: iprint
@@ -80,6 +83,8 @@
 #endif
 !
 !-----------------------------------------------------------------------
+!..TIMER
+!   start_time = MPI_Wtime()
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
@@ -110,7 +115,7 @@
   call set_3Dint(Ntype,Norder, nint,xi_list,wa_list)
 !
 ! initiate stiffness matrix and load vector
-  bb = ZERO; aaH = 0.d0
+  bb = 0.d0; aaH = 0.d0
 !
 ! loop through integration points
   do l=1,nint
@@ -243,5 +248,11 @@
     Xdof(i,1:ndofH_mdle) = uu(1:ndofH_mdle,i)
   enddo
 !
+!..TIMER
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'hpmdle: ', end_time-start_time
+!11 format(A,f12.5,' s')
+!   !$OMP END CRITICAL
+!
   end subroutine hpmdle
-

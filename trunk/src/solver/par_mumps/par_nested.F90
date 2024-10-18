@@ -116,6 +116,7 @@ subroutine par_nested(mtype)
 !
 !..timer
    real(8) :: start_time,end_time,time_stamp
+   real(8) :: loc_time,min_time,max_time,avg_time
 !
 !..info (verbose output if true)
    logical :: info = .false.
@@ -361,7 +362,7 @@ subroutine par_nested(mtype)
 ! ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_comm, ierr)
-   if (RANK .eq. ROOT) then
+   if (RANK .eq. ROOT .and. (.not. QUIET_MODE)) then
       write(*,2010) '       Number of dof   : nrdof_con      = ', NRDOF_CON,  &
                     '                         nrdof_bub      = ', nrdof_bub,  &
                     '                         nrdof_mdl      = ', nrdof_mdl,  &
@@ -369,7 +370,7 @@ subroutine par_nested(mtype)
                     '       Total interf nnz: nnz            = ', nnz
    endif
    call MPI_BARRIER(mumps_comm, ierr)
-   if (info) then
+   if (info .and. (.not. QUIET_MODE)) then
    write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
                        '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
                        '       Local interf nnz: nnz_loc        = ', nnz_loc,        &
@@ -726,11 +727,24 @@ subroutine par_nested(mtype)
    endif
 !
    if (IPRINT_TIME .eq. 1) then
+      loc_time = MPI_Wtime()-start_time
       !write(*,3104) RANK,MPI_Wtime()-start_time
  3104 format('[',I4,'] - Local Solve: ',f12.5,'  seconds')
+ 3105 format('   - Local Solve (min): ',f12.5,'  seconds')
+ 3106 format('   - Local Solve (max): ',f12.5,'  seconds')
+ 3107 format('   - Local Solve (avg): ',f12.5,'  seconds')
       call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(3) = end_time-start_time
+      call MPI_REDUCE(loc_time,min_time,1,MPI_REAL8,MPI_MIN,ROOT,mumps_comm,ierr)
+      call MPI_REDUCE(loc_time,max_time,1,MPI_REAL8,MPI_MAX,ROOT,mumps_comm,ierr)
+      loc_time = loc_time / NUM_PROCS
+      call MPI_REDUCE(loc_time,avg_time,1,MPI_REAL8,MPI_SUM,ROOT,mumps_comm,ierr)
+      if (RANK .eq. ROOT) then
+         write(*,3105) min_time
+         write(*,3106) max_time
+         write(*,3107) avg_time
+      endif
       if (RANK .eq. ROOT) write(*,1006) Mtime(3)
  1006 format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif
@@ -750,7 +764,7 @@ subroutine par_nested(mtype)
 !
    ni = nrdof_subd_con; nb = mumps_bub%N
 !
-   call MPI_BARRIER(mumps_comm, ierr); time_stamp = MPI_Wtime()
+   if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if HP3D_COMPLEX
@@ -789,10 +803,12 @@ subroutine par_nested(mtype)
                               ni, nb, ZONE, Aii, ni)
 #endif
 !
-   call MPI_BARRIER(mumps_comm, ierr)
-   if (RANK.eq.ROOT) then
-      write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
-7891  format(A,F12.5)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_comm, ierr)
+      if (RANK.eq.ROOT) then
+         write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
+   7891  format(A,F12.5)
+      endif
    endif
 !
    mkl_stat = MKL_SPARSE_DESTROY(Aib_sparse)

@@ -14,16 +14,16 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-12, macos-13]
+        os: [ubuntu-latest, macos-13, macos-14]
         mode: [real, complex]
         target: [dbg, opt]
         include:
           - os: ubuntu-latest
             deployment: ''
-          - os: macos-12
-            deployment: '12.7'
           - os: macos-13
-            deployment: '13.6'
+            deployment: '13.7'
+          - os: macos-14
+            deployment: '14.7'
 
     name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
@@ -62,16 +62,33 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
-          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+          which gfortran-14
+          sudo ln -s $(which gfortran-14) /usr/local/bin/gfortran
+          which gfortran
           gfortran --version
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
         if: runner.os == 'macOS'
         run: |
+          brew --prefix
           brew install bison flex
-          sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
-          sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+          sudo ln -s $(brew --prefix)/opt/bison/bin/bison /usr/local/bin/bison
+          sudo ln -s $(brew --prefix)/opt/flex/bin/flex /usr/local/bin/flex
+          which bison
+          bison --version
+          which flex
+          flex --version
+
+      # Check x11 (MacOS)
+      - name: Check x11 (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew --prefix
+          echo "find $(brew --prefix) -name 'Xos.h'"
+          sudo find $(brew --prefix) -name 'Xos.h'
+          echo "find $(brew --prefix) -name 'libX11.a'"
+          sudo find $(brew --prefix) -name 'libX11.a'
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
@@ -111,6 +128,7 @@ jobs:
           --download-parmetis=yes \
           --download-ptscotch=yes \
           --download-zoltan=yes \
+          --with-zoltan-fortran-bindings=1 \
           --download-hdf5=yes \
           --with-hdf5-fortran-bindings=1 \
           --with-shared-libraries=0 \

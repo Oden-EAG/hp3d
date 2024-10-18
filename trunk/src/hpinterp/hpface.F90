@@ -26,6 +26,7 @@
                     Xnod, Xdof)
   use parameters
   use element_data
+  use mpi_wrapper
   implicit none
 !
 ! ** Arguments
@@ -84,12 +85,17 @@
   integer :: nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
+!..TIMER
+!   real(8) :: start_time,end_time
+!
 #if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
+!..TIMER
+!   start_time = MPI_Wtime()
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
@@ -136,7 +142,7 @@
                  nint,xi_list,wa_list)
 !
 ! initiate stiffness matrix and load vector
-  bb = ZERO; aaH = 0.d0
+  bb = 0.d0; aaH = 0.d0
 !
 ! loop through integration points
   do l=1,nint
@@ -280,5 +286,12 @@
   do i=1,3
     Xdof(i,1:ndofH_face) = uu(1:ndofH_face,i)
   enddo
+!
+!..TIMER
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!   write(*,11) 'hpface: ', end_time-start_time
+!11 format(A,f12.5,' s')
+!   !$OMP END CRITICAL
 !
   end subroutine hpface

@@ -36,10 +36,7 @@
 !
       integer :: i,j,np
 !
-      integer :: iprint
 !------------------------------------------------------------------------
-!
-      iprint=0
 !
 !  ...evaluate vertex coordinates
       do i=1,4

@@ -69,18 +69,18 @@ subroutine set_environment_maxwell
    call get_option_int('-imax', 'IMAX', 3, IMAX)
    call get_option_int('-job' , 'JOB' , 0, JOB )
 !
-   call get_option_int('-maxnods','MAXNODS_USER',0 ,MAXNODS_USER)
+   call get_option_int('-maxnods','MAXNODS_USER', 0, MAXNODS_USER)
 !
 !..ALPHA (scaling coefficient in UW test norm)
    call get_option_real('-alpha'  , 'ALPHA_NORM', 1.d0, ALPHA_NORM)
 !
-!..MU, EPSILON, SIGMA
+!..MU, EPSILON
    call get_option_real('-mu'     , 'MU'     , 1.d0, MU     )
    call get_option_real('-epsilon', 'EPSILON', 1.d0, EPSILON)
 !
 !..Set frequency OMEGA and impedance constant GAMMA
    call get_option_real('-omega' , 'OMEGA', 2.d0*PI, OMEGA)
-   call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
+   call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)

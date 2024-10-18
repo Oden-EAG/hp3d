@@ -10,28 +10,28 @@ HP3D_BASE_PATH  = ${WORK2}/hp3d/trunk
 HP3D_COMPLEX ?= 0
 HP3D_DEBUG   ?= 0
 
+HP3D_USE_INTEL_MKL ?= 1
+HP3D_USE_MPI_F08   ?= 1
+HP3D_USE_OPENMP    ?= 1
+HP3D_USE_X11       ?= 1
+
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-# Enable OpenMP threading
-HP3D_USE_OPENMP ?= 1
-
 # Enable performance profiling with TAU
-TAU_PERF ?= 0
-
-# Use parallel threads to compile libraries and problems
-J ?= 28
+TAU_PERF ?= NO
 
 # Compiler
 # Tau performance tool
 ifeq ($(TAU_PERF),YES)
-  FC = tau_f90.sh
+  FF = tau_f90.sh
   CC = tau_cc.sh
 else
-  FC = mpif90
+  FF = mpif90
   CC = mpicc
 endif
+FC     =  $(FF)
 FFLAGS = -fPIC
 
 # Additional Intel compiler flags
@@ -50,15 +50,21 @@ endif
 # Debug flags
 ifeq ($(HP3D_DEBUG),1)
   FFLAGS += -O0 -g -traceback -check all -debug all
-  FFLAGS += -check noarg_temp_created -assume noprotect_constants
+  FFLAGS += -check noarg_temp_created
+  #FFLAGS += -assume noprotect_constants # compiler error in debug mode
+  FFLAGS += -warn all -warn noexternals
 endif
-
 
 CFLAGS  =
 
 # Preprocessor defs to call Fortran from C 
 # (-DAdd_ or -DAdd__ or -DUPPER)
 CDEFS   = -DAdd_
+
+# Utility used to launch MPI jobs
+HP3D_MPIEXEC    = ibrun
+HP3D_MPIEXEC_NP = -n
+HP3D_MPI_NP     = 2
 
 #------------------------------------------------------------------
 # INTEL MKL LIBRARY
@@ -72,12 +78,13 @@ MKL_LIBS = ${MKLROOT}/lib/intel64/libmkl_blas95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_lapack95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_scalapack_lp64.a \
          -Wl,--start-group \
+           ${MKLROOT}/lib/intel64/libmkl_cdft_core.a \
            ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_intel_thread.a \
            ${MKLROOT}/lib/intel64/libmkl_core.a \
            ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_lp64.a \
          -Wl,--end-group \
-           -liomp5 -lpthread -lm -ldl 
+           -liomp5 -lpthread -lm -ldl
 MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # -i8 (default 64-bit integer)
 
@@ -91,20 +98,23 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
+PETSC_DIR = /home1/apps/intel19/impi19_0/petsc/3.15
+#PETSC_DIR ?= /home1/apps/intel23/impi21_9/petsc/3.19
+
 ifeq ($(HP3D_COMPLEX),1)
-  TACC_PETSC32_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/lib
-  TACC_PETSC32_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/include
-  TACC_PETSC64_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complexi64/lib
-  TACC_PETSC64_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complexi64/include
+  TACC_PETSC32_LIB = $(PETSC_DIR)/clx-complex/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/clx-complex/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/clx-complexi64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/clx-complexi64/include
 else
-  TACC_PETSC32_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx/lib
-  TACC_PETSC32_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx/include
-  TACC_PETSC64_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-i64/lib
-  TACC_PETSC64_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-i64/include
+  TACC_PETSC32_LIB = $(PETSC_DIR)/clx/lib
+  TACC_PETSC32_INC = $(PETSC_DIR)/clx/include
+  TACC_PETSC64_LIB = $(PETSC_DIR)/clx-i64/lib
+  TACC_PETSC64_INC = $(PETSC_DIR)/clx-i64/include
 endif
 
-MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
-                                   -lmumps_common -lpord
+MUMPS_LIBS  = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
+                                    -lmumps_common -lpord
 
 MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lmetis -lparmetis \
@@ -112,7 +122,10 @@ MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lptscotch -lptscotcherr
 
 MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
-             -I/home1/apps/intel19/impi19_0/petsc/3.15/include
+             -I$(PETSC_DIR)/include
+
+#MUMPS_LIBS += -L/opt/apps/intel19/impi19_0/fftw3/3.3.8/lib -lfftw3 -lm
+#MUMPS_INCS += -I/opt/apps/intel19/impi19_0/fftw3/3.3.8/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -121,8 +134,7 @@ MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
 # TACC HDF5
 #
 
-# module load hdf5/1.10.4
-# module load phdf5/1.10.4
+# module load phdf5/1.12.2
 VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
 VIS_INCS   = -I${TACC_HDF5_INC}
 
@@ -135,12 +147,12 @@ VIS_INCS   = -I${TACC_HDF5_INC}
 HP3D_PATH_COMPLEX = $(HP3D_BASE_PATH)/complex
 HP3D_PATH_REAL    = $(HP3D_BASE_PATH)/real
 
-OBJ_PATH_COMPLEX  =  _obj_complex_
-OBJ_PATH_REAL     =  _obj_real_
+SRC_PATH         = src
+MODULE_PATH      = module
+LIB_PATH         = lib
 
-SRC_PATH          = src
-MODULE_PATH       = module
-LIB_PATH          = lib
+OBJ_PATH_COMPLEX =  _obj_complex_
+OBJ_PATH_REAL    =  _obj_real_
 
 ifeq ($(HP3D_COMPLEX),1)
   HP3D_PATH       = $(HP3D_PATH_COMPLEX)
@@ -213,9 +225,9 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
-
-HP3D_USE_INTEL_MKL = 1
 PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
                 -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
+                -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
-                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
+                -D"HP3D_USE_X11=$(HP3D_USE_X11)"

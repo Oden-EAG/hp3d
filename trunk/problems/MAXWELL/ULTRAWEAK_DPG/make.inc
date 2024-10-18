@@ -13,6 +13,7 @@ SRC_UW      = \
         dirichlet.F90 \
         elem/elem.F90 \
         elem/elem_maxwell.F90 \
+        elem/elem_opt.F90 \
         elem/elem_residual.F90 \
         elem/elem_residual_maxwell.F90 \
         exact.F90 \

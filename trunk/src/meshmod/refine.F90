@@ -12,8 +12,8 @@ subroutine refine(Mdle_in,Kref_in)
    use data_structure3D
    use constrained_nodes
    use refinements
-   use mpi_param, only: RANK,ROOT
    use adaptivity , only: ANISO_ADAP
+   use mpi_wrapper
    implicit none
 !
    integer, intent(in) :: Mdle_in, Kref_in

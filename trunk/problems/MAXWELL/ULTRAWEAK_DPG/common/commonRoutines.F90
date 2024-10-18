@@ -126,7 +126,8 @@
    subroutine get_permittivity(mdle,x, eps)
 !
       use data_structure3D
-      use parameters,          only: ZERO, ZONE
+      use commonParam
+      use parameters, only: ZERO, ZONE
 !
       implicit none
 !

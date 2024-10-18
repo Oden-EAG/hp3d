@@ -43,8 +43,9 @@
 !
       implicit none
 !
-      VTYPE   :: Za(3), Zcross(3)
-      real(8) :: Rn(3)
+      real(8), intent(in)  :: Rn(3)
+      VTYPE  , intent(in)  :: Za(3)
+      VTYPE  , intent(out) :: Zcross(3)
 !
       Zcross(1) =   Rn(2)*Za(3) - Rn(3)*Za(2)
       Zcross(2) = - Rn(1)*Za(3) + Rn(3)*Za(1)

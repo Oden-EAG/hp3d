@@ -1,5 +1,17 @@
 
 ====================================
+Updates since last version release
+====================================
+
+- Added support for macOS 14; deprecated support for macOS 12.
+
+- BLAS3-optimized projection-based interpolation routines
+  used for updating geometry and Dirichlet DOFs.
+
+- BLAS3-optimized integration routines for various Poisson 
+  and Maxwell model problems.
+
+====================================
 Version 1.0, released on Mar 2, 2024
 ====================================
 
