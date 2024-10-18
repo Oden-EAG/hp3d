@@ -48,6 +48,7 @@ subroutine update_Ddof
    integer :: iel,iv,ie,ifc,ind,iflag
    integer :: mdle,no,nod
    integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem
+   integer :: nr_skipped
 !
 !..additional variables for distributed case
    integer :: src,rcv,tag,count,ierr,j_loc,j_glb,j_off,loc_max
@@ -56,6 +57,7 @@ subroutine update_Ddof
    integer :: nod_cnt(NUM_PROCS)
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    VTYPE  , dimension(:,:), pointer :: buf
+   integer :: visit_flag_comm(MAXNODS)
 !
 !..WARNING: "dirichlet" and other user-supplied routines must be thread-
 !           safe to use this routine; not recommended without proper
@@ -89,9 +91,12 @@ subroutine update_Ddof
 !
 !  ...initiate number of updated elements
       nr_up_elem=0
+!  ...initiate number of skipped elements in this pass
+      nr_skipped=0
 !
 !  ...set flag that indicates if an element was skipped
       nod_flg = .false.
+      visit_flag_comm = ZERO
 !
 !  ...loop through active elements
       do iel=1,NRELES_SUBD
@@ -113,21 +118,39 @@ subroutine update_Ddof
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
          nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+!
+         nod_flg = .false.
          do i=1,nrnodm
             nod = nodm(i)
             call locate(nod,nodesl,nr_elem_nodes, loc)
 !
 !        ...if not a regular node of the element
             if (loc.eq.0) then
-!
-!           ...check if the node has been updated
-               if (NODES(nod)%visit.eq.0 .and. is_Dirichlet(nod)) then
-                  nod_flg = .true.
-                  goto 100
-               endif
+               nod_flg = .true.
             endif
          enddo
 !
+         if (nod_flg) then
+            call update_deg(NODES(mdle)%father,visit_flag_comm)
+          endif
+!
+!     ...double check if all parent nodes have been updated
+         nod_flg = .false.
+         do i=1,nrnodm
+            nod = nodm(i)
+            call locate(nod,nodesl,nr_elem_nodes, loc)
+!        ...if not a regular node check if it has been updated
+            if (loc.eq.0) then
+!
+!        ...skip the element if the node has not been updated
+            if (NODES(nod)%visit.ne.1) nod_flg = .true.
+            endif
+         enddo
+!
+         if (nod_flg) then
+            nr_skipped = nr_skipped+1
+            go to 100
+          endif
 !     ...update the number of processed elements
          nr_up_elem = nr_up_elem+1
 !
@@ -136,7 +159,10 @@ subroutine update_Ddof
          do iv=1,nvert(ntype)
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof))       cycle
-            if (.not.associated(NODES(nod)%dof%zdofH)) cycle
+            if (.not.associated(NODES(nod)%dof%zdofH)) then
+               NODES(nod)%visit=1
+               cycle
+            endif
             if (NODES(nod)%visit.eq.1)                 cycle
             if (is_Dirichlet_attr(nod,CONTIN)) then
 #if HP3D_DEBUG
@@ -145,8 +171,9 @@ subroutine update_Ddof
 #endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond, NODES(nod)%dof%zdofH(:,:,N_COMS))
-               NODES(nod)%visit=1
             endif
+            NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
          enddo
 !
 !-----------------------------------------------------------------------
@@ -175,7 +202,6 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
                endif
-               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
@@ -189,8 +215,9 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ie,    &
                                 NODES(nod)%dof%zdofE(:,:,N_COMS))
                endif
-               NODES(nod)%visit=1
             endif
+            NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
          enddo
 !
 !-----------------------------------------------------------------------
@@ -226,7 +253,6 @@ subroutine update_Ddof
                                    zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
                   endif
                endif
-               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
@@ -247,7 +273,6 @@ subroutine update_Ddof
                                    zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
                   endif
                endif
-               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,NORMAL)) then
 !           ...update H(div) Dirichlet dofs
@@ -268,12 +293,14 @@ subroutine update_Ddof
                                    NODES(nod)%dof%zdofV(:,:,N_COMS))
                   endif
                endif
-               NODES(nod)%visit=1
             endif
+            NODES(nod)%visit=1
+            visit_flag_comm(nod) = 1
 !     ...end of loop over faces
          enddo
 !
          NODES(mdle)%visit=1
+         visit_flag_comm(mdle) = 1
 !
 !  ...end of loop through elements
  100  enddo
@@ -335,8 +362,7 @@ subroutine update_Ddof
          nod = nodm(i)
          call locate(nod,nodesl,nr_elem_nodes, loc)
 !     ...check if the node has been updated
-         if (loc.eq.0 .and. NODES(nod)%visit.eq.0  &
-                      .and. is_Dirichlet(nod) ) then
+         if (loc.eq.0 .and. NODES(nod)%visit.eq.0 ) then
             NODES(nod)%visit = -1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2
