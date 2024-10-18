@@ -64,7 +64,7 @@ subroutine set_environment_maxwell
 !
 !  ...... ICOMP, ISOL
    call get_option_int('-comp', 'ICOMP_EXACT', 1, ICOMP_EXACT  )
-   call get_option_int('-isol', 'ISOL'       , 1, ISOL         )
+   call get_option_int('-isol', 'ISOL'       ,10, ISOL         )
 !
    call get_option_int('-imax', 'IMAX', 3, IMAX)
    call get_option_int('-job' , 'JOB' , 0, JOB )
@@ -82,6 +82,12 @@ subroutine set_environment_maxwell
    call get_option_real('-omega' , 'OMEGA', 2.d0*PI, OMEGA)
    call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
 !
+!..Set envelope wavenumber WAVENUM_K
+   call get_option_real('-k' , 'WAVENUM_K', 16.d0, WAVENUM_K)
+!
+!..Set bending radius RBEND
+   call get_option_real('-rbend' , 'RBEND', 10.d0, RBEND)
+!
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)
 !           3 (impedance via elimination)
@@ -94,7 +100,7 @@ subroutine set_environment_maxwell
 !     -- Paraview Interface --
 ! Variables relevant to src/modules/paraview
 ! option label // explanation // default value // parameter
-   call get_option_string('-prefix'          ,'Prefix paraview file'               ,'maxw'              , PREFIX  )
+   call get_option_string('-prefix'          ,'Prefix paraview file'               ,'bend'              , PREFIX  )
    call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
    call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 , VLEVEL  )
 !

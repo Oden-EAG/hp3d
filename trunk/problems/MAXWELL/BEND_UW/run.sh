@@ -1,7 +1,7 @@
 #
-# Script to run the Maxwell problem
+# Script to run the Maxwell problem with bending and envelope ansatz
 #
-# last modified: July 2023
+# last modified: October 2024
 #
 # =======================
 # I N S T R U C T I O N S
@@ -39,7 +39,7 @@ job=0
 imax=3
 
 # max NODES
-maxnods=100000
+maxnods=123456
 
 export KMP_STACKSIZE=24M   # p=3
 #export KMP_STACKSIZE=32M   # p=4
@@ -59,13 +59,18 @@ ibc=0
 alpha=1.d0
 
 # solution number
-isol=4
+isol=10
 
 # component number for manufactured solution
 comp=1
 
 # angular frequency
-omega=10.d0
+omega=6.283185307179586d0
+
+# envelope wavenumber
+k=4.d0
+# bending radius
+rbend=10.d0
 
 #
 # ==================
@@ -74,17 +79,17 @@ omega=10.d0
 #
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
-file_geometry='./geometries/bent_square_waveguide_cart'
+file_geometry='./geometries/bent_square_waveguide_new'
 ctrl='control/control'
 #
-args=" -isol ${isol} -omega ${omega} -gamma 1.0d0 -comp ${comp}"
-args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
-args+=" -ibc ${ibc}"
-args+=" -p ${p} -dp ${dp}"
-args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
+args=" -file_control ${ctrl}"
 args+=" -file_geometry ${file_geometry}"
-args+=" -file_control ${ctrl}"
-args+=" -maxnods ${maxnods}"
-args+=" -nthreads ${nthreads} -alpha ${alpha}"
+args+=" -p ${p} -dp ${dp}"
+args+=" -comp ${comp} -isol ${isol} -imax ${imax} -job ${job}"
+args+=" -maxnods ${maxnods} -alpha ${alpha} -omega ${omega} -gamma 1.0d0"
+args+=" -k ${k} -rbend ${rbend}"
+args+=" -ibc ${ibc}"
+args+=" -vis_level ${vis_level} -dir_output ${dir_output}"
+args+=" -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./bending ${args}

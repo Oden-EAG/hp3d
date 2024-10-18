@@ -1,5 +1,6 @@
 !------------------------------------------------------------------------------
-!> @brief      Evaluates unconstrained stiffness matrix and load vector
+!> @brief      Evaluates unconstrained stiffness matrix and load vector for the
+!!             envelope Maxwell UW formulation with a bending-related ansatz
 !!
 !> @param[in]  Mdle     - element middle node number
 !> @param[in]  NrTest   - total number of test dof
@@ -19,16 +20,16 @@
 !> @param[out] ZalocQE
 !> @param[out] ZalocQQ
 !!
-!> @date       Apr 2024
+!> @date       Oct 2024
 !------------------------------------------------------------------------------
-subroutine elem_maxwell(Mdle,                         &
-                        NrTest,NrTrial,               &
-                        NrdofEE,                      &
-                        NrdofH,NrdofE,NrdofQ,         &
-                        NrdofEi,                      &
-                        MdE,MdQ,                      &
-                        ZblocE,ZalocEE,ZalocEQ,       &
-                        ZblocQ,ZalocQE,ZalocQQ)
+subroutine elem_bend_env_maxwell(Mdle,                      &
+                                 NrTest,NrTrial,            &
+                                 NrdofEE,                   &
+                                 NrdofH,NrdofE,NrdofQ,      &
+                                 NrdofEi,                   &
+                                 MdE,MdQ,                   &
+                                 ZblocE,ZalocEE,ZalocEQ,    &
+                                 ZblocQ,ZalocQE,ZalocQQ)
 !
    use control
    use parametersDPG
@@ -73,6 +74,7 @@ subroutine elem_maxwell(Mdle,                         &
    real(8) :: dxidt(3,2), dxdt(3,2)
    real(8) :: dxdxi(3,3), dxidx(3,3)
    real(8) :: t(2), rjac, bjac
+   real(8) :: rK(3,3), rKKT(3,3)
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH),  gradH(3,MAXbrickH)
@@ -83,9 +85,7 @@ subroutine elem_maxwell(Mdle,                         &
    real(8) :: shapFi(3,MAXbrickE)
 !  ... enriched
    real(8) :: shapEE(3,MAXbrickEE), curlEE(3,MAXbrickEE)
-!  ... complex
-   complex(8) :: zshapF(3,MAXbrickE), zcurlF(3,MAXbrickE)
-   complex(8) :: epsTshapF(3,NrdofEE), epscurlF(3,NrdofEE)
+   real(8) :: rKTshapF(3,NrdofEE)
 !
 !..L2 shape functions
    real(8) :: shapQ(MAXbrickQ)
@@ -98,10 +98,12 @@ subroutine elem_maxwell(Mdle,                         &
 !
 !..Field and material values
    real(8) :: FF, CC, afac
-   real(8) :: fldE(3), fldH(3), crlE(3)
+   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rKTF(3), rKTG(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
-   complex(8) :: epsTfldE(3), epsTfldF(3), epscrlE(3)
-   complex(8) :: eps(3,3)
+   complex(8) :: AstarF1(3),AstarF2(3)
+   complex(8) :: AstarG1(3),AstarG2(3)
+   complex(8) :: AstarE1(3),AstarE2(3)
+   complex(8) :: AstarH1(3),AstarH2(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -120,7 +122,7 @@ subroutine elem_maxwell(Mdle,                         &
    complex(8) :: zaux,zcux
 !
 !..Maxwell load and auxiliary variables
-   complex(8) :: zJ(3), zImp(3)
+   complex(8) :: zJ(3), zImp(3), zL(3)
    real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
 !
 !..number of edge,faces per element type
@@ -130,8 +132,7 @@ subroutine elem_maxwell(Mdle,                         &
    integer :: i1, j1, j2, k1, k2, i, k, l, nint, n, m
    integer :: iflag, ifc, info, nrdof, nordP, nsign
 !
-   complex(8) :: zc1
-   complex(8) :: za(3,3), zc(3,3)
+   complex(8) :: za1,zc1
 !
 !..TIMER
    real(8) :: start_time, end_time
@@ -216,6 +217,14 @@ subroutine elem_maxwell(Mdle,                         &
    stiff_EE_T(:,:) = ZERO
    stiff_EQ_T(:,:) = ZERO
 !
+!
+!
+!..constant material properties
+! .scalar permittivity and permeability (will occasionally be more convenient)
+   za1 = ZI*OMEGA*EPSILON
+   zc1 = ZI*OMEGA*MU
+
+!
 !-----------------------------------------------------------------------
 !              E L E M E N T   I N T E G R A L S
 !-----------------------------------------------------------------------
@@ -242,8 +251,6 @@ subroutine elem_maxwell(Mdle,                         &
 !  ...geometry map
       call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
-!  ...get permittivity at x
-      call get_permittivity(Mdle,x, eps)
 !
 #if HP3D_DEBUG
       if (iflag .ne. 0) then
@@ -257,43 +264,50 @@ subroutine elem_maxwell(Mdle,                         &
       weight = rjac*wa
 !
 !  ...get the RHS
-      call getf(Mdle,x, zJ)
-!
-      za = (ZI*OMEGA*EPSILON) * eps(:,:)
-      zc = (ZI*OMEGA*MU) * IDENTITY(:,:)
-!
-!  ...scalar permeability (will occasionally be more convenient)
-      zc1 = ZI*OMEGA*MU
+      call getf(Mdle,x, zJ, zL)
 !
 !  ...apply pullbacks
       call DGEMM('T','N',3,NrdofEE,3,1.d0     ,dxidx,3,shapEE,3,0.d0,shapF,3)
       call DGEMM('N','N',3,NrdofEE,3,1.d0/rjac,dxdxi,3,curlEE,3,0.d0,curlF,3)
 !
-!  ...apply permittivity
-      zshapF = cmplx(shapF,0.d0,8)
-      zcurlF = cmplx(curlF,0.d0,8)
-      call ZGEMM('C','N',3,NrdofEE,3,ZONE,za,3,zshapF,3,ZERO,epsTshapF,3)
-      call ZGEMM('N','N',3,NrdofEE,3,ZONE,za,3,zcurlF,3,ZERO,epscurlF ,3)
+!  ...for 2nd option to integrate
+!  ...get the transformation matrix K and K.K^T
+      call get_matrixK(Mdle,x,rK)
+      call get_matrixKKT(Mdle,x,rKKT)
+!  ...apply transformation K^T to test functions F (and G)
+      call DGEMM('T','N',3,NrdofEE,3,1.d0,rK,3,shapEE,3,0.d0,rKTshapF,3)
 !
 !  ...loop through enriched H(curl) test functions
       do k1=1,NrdofEE
 !
 !     ...pickup pulled back test functions
-         fldF(:) = shapF(:,k1);  crlF(:) = curlF(:,k1)
-         fldG(:) = fldF(:);      crlG(:) = crlF(:)
-         epsTfldF(:) = epsTshapF(:,k1)
+         fldF(:) = shapF(:,k1);    crlF(:) = curlF(:,k1)
+         fldG(:) = fldF(:);        crlG(:) = crlF(:)
+!     ...for 2nd option to integrate
+         rKTF(:) = rKTshapF(:,k1); rKTG(:) = rKTshapF(:,k1)
 !
 !  --- load ---
 !
 !        RHS:
 !        (J^imp,F) first  equation RHS (with first H(curl) test function F)
-!        (0    ,G) second equation RHS is zero
+!        (L^fdy,G) second equation RHS (Faraday's eqn artificial load)
          n = 2*k1-1
          bload_E(n) = bload_E(n)                                   &
                     + (fldF(1)*zJ(1)+fldF(2)*zJ(2)+fldF(3)*zJ(3))  &
                     * weight
 !
+         n = 2*k1
+         bload_E(n) = bload_E(n)                                   &
+                    + (fldG(1)*zL(1)+fldG(2)*zL(2)+fldG(3)*zL(3))  &
+                    * weight
 !
+!     ...For 1st option to integrate
+!     ...Evaluate A^* on (F ; 0)
+         call get_Astar(Mdle,x,cmplx(fldF,0.d0,8),(/ZERO,ZERO,ZERO/),                &
+                               cmplx(crlF,0.d0,8),(/ZERO,ZERO,ZERO/),AstarF1,AstarF2)
+!     ...Evaluate A^* on (0 ; G)
+         call get_Astar(Mdle,x,(/ZERO,ZERO,ZERO/),cmplx(fldG,0.d0,8),                &
+                               (/ZERO,ZERO,ZERO/),cmplx(crlG,0.d0,8),AstarG1,AstarG2)
 !  --- stiffness matrix ---
 !
 !     ...loop through L2 trial shape functions
@@ -305,100 +319,130 @@ subroutine elem_maxwell(Mdle,                         &
 !        ...Piola transformation
             fldE(1:3) = shapQ(k2)/rjac; fldH = fldE
 !
-!        ...-iωε(E,F)
-!        ...(H,curl(F))
+!   1ST OPTION TO INTEGRATE: evaluate adjoint operator
+!        ...First equation. Test function F
             n = 2*k1-1
-            stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n) - fldE(:)*conjg(epsTfldF(:))*weight
-            stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n) + fldH(:)*          crlF(:) *weight
+!        ...Accumulate ( E , AstarF1 )
+            stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n)                             &
+                                  + fldE(:)*conjg(AstarF1(:))*weight
+!        ...Accumulate ( H , AstarF2 )
+            stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n)                             &
+                                  + fldH(:)*conjg(AstarF2(:))*weight
 !
-!        ...(E,curl(G))
-!        ...iωμ(H,G)
+!        ...Second equation. Test function G
             n = 2*k1
-            stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n) +     fldE(:)*crlG(:)*weight
-            stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n) + zc1*fldH(:)*fldG(:)*weight
+!        ...Accumulate ( E , AstarG1 )
+            stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n)                               &
+                                  + fldE(:)*conjg(AstarG1(:))*weight
+!        ...Accumulate ( H , AstarG2 )
+            stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n)                               &
+                                  + fldH(:)*conjg(AstarG2(:))*weight
+!
+! !   2ND OPTION TO INTEGRATE: break bilinear functional into terms
+! !        ...First equation. Test function F
+!             n = 2*k1-1
+! !        ...-iωε(E,F)
+!             stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n) - za1*fldE(:)*fldF(:)*weight
+! !        ...(H,curl(F))
+!             stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n) +     fldH(:)*crlF(:)*weight
+! !        ...-i(H, K^T F)
+!             stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n) -  ZI*fldH(:)*rKTF(:)*weight
+! !
+! !        ...Second equation. Test function G
+!             n = 2*k1
+! !        ...iωμ(H,G)
+!             stiff_EQ_T(m+4:m+6,n) = stiff_EQ_T(m+4:m+6,n) + zc1*fldH(:)*fldG(:)*weight
+! !        ...(E,curl(G))
+!             stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n) +     fldE(:)*crlG(:)*weight
+! !        ...-i(E, K^T G)
+!             stiff_EQ_T(m+1:m+3,n) = stiff_EQ_T(m+1:m+3,n) -  ZI*fldE(:)*fldG(:)*weight
 !
 !     ...end of loop through L2 trial functions
          enddo
 !
 !  --- Gram matrix ---
 !
-!     ...loop through enriched H(curl) test functions
+!     ...loop through enriched H(curl) test functions --- Gram matrix's columns
          do k2=k1,NrdofEE
-            fldE(:) = shapF(:,k2)
-            crlE(:) = curlF(:,k2)
-            epsTfldE(:) = epsTshapF(:,k2)
-            epscrlE(:) = epscurlF(:,k2)
-!
-            call dot_product(fldF,fldE, FF)
-            call dot_product(crlF,crlE, CC)
+!        ...THESE ARE NOT the same E and H from the trial space. 
+!           Those were L^2 while these are H(curl)            
+            fldE(:) = shapF(:,k2); fldH = fldE
+            crlE(:) = curlF(:,k2); crlH = crlE
 !
 !        ...accumulate for the Hermitian Gram matrix
 !           (compute upper triangular only)
 !        ...testNorm = Scaled Adjoint Graph norm
 !             ||v|| = alpha*(v,v) + (A^* v, A^* v)
-!             (first eqn multiplied by F, second eqn by G)
-!             G_ij=(phi_j,phi_i)_testNorm is 2x2 matrix
-!             where (phi_j,phi_i)_l2Norm = Int[phi_i^* phi_j]
-!             and phi_i = (F_i,G_i), phi_j = (F_j,G_j).
+!                with v = (F;G)^T
+!             Gram_ij=(phi_j,phi_i)_testNorm is 2x2 matrix
 !             -------------------------
-!             | (F_i,F_j)   (F_i,G_j) |
-!             | (G_i,F_j)   (G_i,G_j) |
+!             | (F_i,E_j)   (F_i,H_j) |
+!             | (G_i,E_j)   (G_i,H_j) |
 !             -------------------------
-!             F_i/G_i are outer loop shape functions (fldF)
-!             F_j/G_j are inner loop shape functions (fldE)
+!             F_i/G_i are outer loop shape functions (fldF,fldG)
+!             E_j/H_j are inner loop shape functions (fldE,fldH)
 !
-!           (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
+!           (E_j,F_i) terms = Int[F_^*i E_j] terms (Gram_11)
             n = 2*k1-1; m = 2*k2-1
             k = ij_upper_to_packed(n,m)
-            if (TEST_NORM .eq. MATH_NORM) then
-               zaux = ZERO
-            else
-               zaux = conjg(epsTfldF(1))*epsTfldE(1) + &
-                      conjg(epsTfldF(2))*epsTfldE(2) + &
-                      conjg(epsTfldF(3))*epsTfldE(3)
-            endif
-            gramP(k) = gramP(k) &
-                     + (zaux + afac*FF + CC)*weight
 !
-!           (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
+            select case(TEST_NORM)
+               case(MATH_NORM)
+!              ...compute (E,F)_L2 and (curlE,curlF)_L2
+                  call dot_product(fldF,fldE, FF)
+                  call dot_product(crlF,crlE, CC)
+                  gramP(k) = gramP(k) + cmplx((CC+FF)*weight,0.d0,8)
+               case(GRAPH_NORM)
+!
+!              ...For 1st option to integrate
+!              ...Evaluate A^* on (E ; 0)
+                  call get_Astar(Mdle,x,cmplx(fldE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
+                                        cmplx(crlE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
+                                        AstarE1,AstarE2)
+                  gramP(k) = gramP(k)  &
+                           + SUM(AstarE1*conjg(AstarF1) + AstarE2*conjg(AstarF2))*weight
+            end select
+!
+!           (H_j,G_i) terms = Int[G_^*i H_j] terms (G_22)
             n = 2*k1; m = 2*k2
             k = ij_upper_to_packed(n,m)
-            if (TEST_NORM .eq. MATH_NORM) then
-               zcux = ZERO
-            else
-               zcux = abs(zc1)**2*(fldF(1)*fldE(1) + &
-                                   fldF(2)*fldE(2) + &
-                                   fldF(3)*fldE(3) )
-            endif
-            gramP(k) = gramP(k) &
-                     + (zcux + afac*FF + CC)*weight
+!
+            select case(TEST_NORM)
+               case(MATH_NORM)
+!              ...compute (H,G)_L2 and (curlH,curlG)_L2 .
+!              ...they're equal to FF and CC, resp.
+                  ! call dot_product(fldF,fldE, FF)
+                  ! call dot_product(crlF,crlE, CC)
+                  gramP(k) = gramP(k) + cmplx((CC+FF)*weight,0.d0,8)
+               case(GRAPH_NORM)
+!
+!              ...For 1st option to integrate
+!              ...Evaluate A^* on (0 ; H)
+                  call get_Astar(Mdle,x,(/ZERO,ZERO,ZERO/),cmplx(fldH,0.d0,8),   &
+                                        (/ZERO,ZERO,ZERO/),cmplx(crlH,0.d0,8),   &
+                                        AstarH1,AstarH2)
+                  gramP(k) = gramP(k)  &
+                           + SUM(AstarH1*conjg(AstarG1) + AstarH2*conjg(AstarG2))*weight
+            end select
 !
             if (TEST_NORM .ne. GRAPH_NORM) cycle
 !
-!           (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
+!           (H_j,F_i) terms = Int[F_^*i H_j] terms (G_12)
             n = 2*k1-1; m = 2*k2
             k = ij_upper_to_packed(n,m)
-            zaux = - (fldF(1)*epscrlE(1) + &
-                      fldF(2)*epscrlE(2) + &
-                      fldF(3)*epscrlE(3) )
-            zcux = conjg(zc1)*(crlF(1)*fldE(1) + &
-                               crlF(2)*fldE(2) + &
-                               crlF(3)*fldE(3) )
-            gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+            gramP(k) = gramP(k)    &
+                     + SUM(AstarH1*conjg(AstarF1) + AstarH2*conjg(AstarF2))*weight
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
 !           only if it is not a diagonal element, G_ii
             if (k1 .ne. k2) then
-!           (F_j,G_i) terms = Int[G_^*i F_j] terms (G_21)
+!           (E_j,G_i) terms = Int[G_^*i E_j] terms (G_21)
                n = 2*k1; m = 2*k2-1
                k = ij_upper_to_packed(n,m)
-               zaux = - (crlF(1)*epsTfldE(1) + &
-                         crlF(2)*epsTfldE(2) + &
-                         crlF(3)*epsTfldE(3) )
-               zcux = zc1*(fldF(1)*crlE(1) + &
-                           fldF(2)*crlE(2) + &
-                           fldF(3)*crlE(3) )
-               gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+               gramP(k) = gramP(k)    &
+                        + SUM(AstarE1*conjg(AstarG1) + AstarE2*conjg(AstarG2))*weight
             endif
 !
 !     ...end of loop through enriched H(curl) test functions
@@ -656,7 +700,7 @@ subroutine elem_maxwell(Mdle,                         &
    if (IBCFLAG.eq.2) call imp_penalty(Mdle,NrdofH,NrdofEi,MdE,          &
                                       norder,norderi, ZblocE,ZalocEE)
 !
-end subroutine elem_maxwell
+end subroutine elem_bend_env_maxwell
 
 
 !------------------------------------------------------------------------------

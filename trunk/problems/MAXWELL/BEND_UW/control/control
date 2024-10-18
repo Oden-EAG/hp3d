@@ -5,6 +5,6 @@
            0     INT_NEUMANN: ADAPTIVE QUAD. FOR BDRY. LOAD
            0     NFLAG2GRID:  NO 2-GRID SOLVER
            2     INPUT_FILE:  0) dumpin, 2) standard
-      1.0d-6     GEOM_TOL:     GEOMETRY TOLERANCE
+      1.d-10     GEOM_TOL:     GEOMETRY TOLERANCE
            0     INTEGRATION:  OVERINTEGRATION QUADRATURE INCREASE
-           0     EXGEOM:       EXACT GEOMETRY FLAG
+           1     EXGEOM:       EXACT GEOMETRY FLAG

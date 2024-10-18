@@ -60,7 +60,7 @@
       real(8) :: dzdxs, dzdys, dzdzs
 !
       real(8) :: x1, x2, x3, xshift, yshift, zshift
-      real(8) :: r, alpha
+      real(8) :: r, alpha, a, b
 !
 !---------------------------------------------------------------------------------------
 !
@@ -97,6 +97,35 @@
          Grad2p(3,1) =  pi_mod**2*dcos(x1*pi_mod)*dcos(x3*pi_mod)*dsin(x2*pi_mod)*(1.0D0,1.0D0)
          Grad2p(3,2) =  pi_mod**2*dcos(x2*pi_mod)*dcos(x3*pi_mod)*dsin(x1*pi_mod)*(1.0D0,1.0D0)
          Grad2p(3,3) = -pi_mod**2*dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
+!
+!  ...affine function depending on x
+      case(10)
+         cn = 1.d0*ZONE
+         a = 0.d0;    b =1.d0
+         p = cn*(a*x1+b)
+!     ...1st order derivatives
+         Gradp(1) = cn*a
+!     ...second order derivatives are all zero
+!
+!  ...quadratic bubble depending on x
+      case(11)
+         cn = 1.d0*ZONE
+         p = cn*(x1-x1**2)
+!     ...1st order derivatives
+         Gradp(1) = cn*(1.d0-2.d0*x1)
+!     ...second order derivatives
+         Grad2p(1,1) = cn*(-2.d0)
+!
+!  ...polynomial depending on r^2 = y^2+z^2
+      case(12)
+         cn = 1.d0*ZONE
+         p = cn*(x2**2 + x3**2 - RBEND**2)
+!     ...1st order derivatives
+         Gradp(2) = cn*2.d0*x2
+         Gradp(3) = cn*2.d0*x3
+!     ...second order derivatives
+         Grad2p(2,2) = cn*2.d0
+         Grad2p(3,3) = cn*2.d0
 !
 !  ...polynomial solution vanishing on the boundary
       case(2)

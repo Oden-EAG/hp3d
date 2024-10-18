@@ -1,0 +1,87 @@
+3    3    NDIM,MANDIM
+
+0         NRSURFS
+
+1         NRDOMAIN
+
+0         BDOM_FLAG
+
+8         NRPOINT
+
+Regular
+0.d0   10.d0   0.d0
+
+Regular
+1.d0   10.d0   0.d0
+
+Regular
+1.d0   11.d0   0.d0
+
+Regular
+0.d0   11.d0   0.d0
+
+Regular
+0.d0   0.d0   10.d0
+
+Regular
+1.d0   0.d0   10.d0
+
+Regular
+1.d0   0.d0   11.d0
+
+Regular
+0.d0   0.d0   11.d0
+
+12  NRCURVE
+
+Seglin
+1 2
+Seglin
+2 3
+Seglin
+4 3
+Seglin
+1 4
+Seglin
+5 6
+Seglin
+6 7
+Seglin
+8 7
+Seglin
+5 8
+CylCoord
+1 5
+CylCoord
+2 6
+CylCoord
+3 7
+CylCoord
+4 8
+
+0 NRTRIAN
+
+6 NRRECTA
+
+BilQua
+1 2 3 4
+BilQua
+5 6 7 8
+CylRec
+1 2 6 5
+CylRec
+2 3 7 6
+CylRec
+4 3 7 8
+CylRec
+1 4 8 5
+
+0 NRPRISM
+
+1 NRHEXAS
+CylHex
+1  1 2 3 4 5 6 7 8
+
+0 NRTETRA
+
+0 NRPYRAM

@@ -4,14 +4,14 @@
 !------------------------------------------------------------------------------
 !> @brief      Evaluate source terms at a point
 !!
-!> @param[in]  Mdle  - element (middle node) number
-!> @param[in]  X     - physical coordinates
-!> @param[out] Zfval - rhs f
-!> @param[out] ZJval - rhs J
+!> @param[in]  Mdle - element (middle node) number
+!> @param[in]  X    - physical coordinates
+!> @param[out] ZJ   - rhs J^imp
+!> @param[out] ZL   - rhs L^fdy
 !!
-!> @date       July 2023
+!> @date       October 2024
 !------------------------------------------------------------------------------
-subroutine getf(Mdle,X, ZJval)
+subroutine getf(Mdle,Xp, ZJ,ZL)
 !
    use control     , only: NEXACT
    use parameters  , only: MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
@@ -20,8 +20,8 @@ subroutine getf(Mdle,X, ZJval)
    implicit none
 !
    integer, intent(in)  :: Mdle
-   real(8), intent(in)  :: X(3)
-   VTYPE  , intent(out) :: ZJval(3)
+   real(8), intent(in)  :: Xp(3)
+   VTYPE  , intent(out) :: ZJ(3),ZL(3)
 !
 !..exact solution
    VTYPE :: valH  (  MAXEQNH    )
@@ -37,7 +37,7 @@ subroutine getf(Mdle,X, ZJval)
    VTYPE :: dvalQ (  MAXEQNQ,3  )
    VTYPE :: d2valQ(  MAXEQNQ,3,3)
 !
-   VTYPE   :: zaux
+   VTYPE :: zaux,zKH(3),zKE(3)
 !
 #if HP3D_DEBUG
    integer :: iprint
@@ -48,33 +48,48 @@ subroutine getf(Mdle,X, ZJval)
 !
 #if HP3D_DEBUG
    if (iprint.eq.1) then
-      write(*,7001) Mdle,X
- 7001 format(' getf: Mdle,X = ',i8,2x,3(f8.3,2x))
+      write(*,7001) Mdle,Xp
+ 7001 format(' getf: Mdle,Xp = ',i8,2x,3(f8.3,2x))
    endif
 #endif
 !
 !..initialize source terms
-   ZJval = ZERO
+   ZJ = ZERO; ZL = ZERO
 !
    select case(NEXACT)
 !  ............................
 !  ...UNKNOWN EXACT SOLUTION...
       case(0)
-!
-         ZJval(1:3) = ZERO
+!  ...They remain as ZERO
 !
 !  ........................................
 !  ...KNOWN EXACT SOLUTION, NON-ZERO RHS...
       case(1)
 !     ...compute exact solution
-         call exact(X,Mdle, valH,dvalH,d2valH,valE,dvalE,d2valE,  &
+         call exact(Xp,Mdle,valH,dvalH,d2valH,valE,dvalE,d2valE,  &
                             valV,dvalV,d2valV,valQ,dvalQ,d2valQ)
 !
-!        ...RHS = curl H - iωεE
+!        ...ZJ = curl H - i K.H -iωεE
+!        ...first term
+            ZJ(1) = dvalE(3,2,2) - dvalE(2,2,3)
+            ZJ(2) = dvalE(1,2,3) - dvalE(3,2,1)
+            ZJ(3) = dvalE(2,2,1) - dvalE(1,2,2)
+!        ...apply the transformation matrix K to H
+            call apply_matrixK(Mdle,Xp,valE(1:3,2),zKH)
             zaux = ZI*OMEGA*EPSILON
-            ZJval(1) = dvalE(3,2,2) - dvalE(2,2,3) - zaux*valE(1,1)
-            ZJval(2) = dvalE(1,2,3) - dvalE(3,2,1) - zaux*valE(2,1)
-            ZJval(3) = dvalE(2,2,1) - dvalE(1,2,2) - zaux*valE(3,1)
+!        ...add 2nd and 3rd terms            
+            ZJ(1:3) = ZJ(1:3) - ZI*zKH - zaux*valE(1:3,1)
+!
+!        ...ZL = curl E - i K.E +iωμH
+!        ...first term
+            ZL(1) = dvalE(3,1,2) - dvalE(2,1,3)
+            ZL(2) = dvalE(1,1,3) - dvalE(3,1,1)
+            ZL(3) = dvalE(2,1,1) - dvalE(1,1,2)
+!        ...apply the transformation matrix K to E
+            call apply_matrixK(Mdle,Xp,valE(1:3,1),zKE)
+            zaux = ZI*OMEGA*MU
+!        ...add 2nd and 3rd terms            
+            ZL(1:3) = ZL(1:3) - ZI*zKE + zaux*valE(1:3,2)
 !
 !  ...........................................
 !  ...KNOWN EXACT SOLUTION, HOMOGENEOUS RHS...

@@ -50,6 +50,7 @@
       VTYPE   :: E
       VTYPE   :: dE(3)
       VTYPE   :: d2E(3,3)
+      VTYPE   :: zKE(3),zDKE(3,3)
       integer :: icomp, idx
 !
 !------------------------------------------------------------------------------
@@ -69,7 +70,7 @@
 !  ...initialize variables
       E = ZERO; dE = ZERO; d2E = ZERO
 !
-!  ...get Electric field
+!  ...get Electric field component
       call mfd_solutions(Xp, E,dE,d2E)
 !
 !  ...E-field value
@@ -81,12 +82,27 @@
 !  ...E-field 2nd order derivatives
       D2valE(icomp,idx,1:3,1:3) = d2E(1:3,1:3)
 !
-!  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
+!
+! !  ...H-field value
+!       ValE(icomp+1,idx+1) = E ! E-field trace; (icomp,idx+1) is H-field trace
+! !
+! !  ...E-field 1st order derivatives
+!       DvalE(icomp+1,idx+1,1:3) = dE(1:3)
+! !
+! !  ...E-field 2nd order derivatives
+!       D2valE(icomp+1,idx+1,1:3,1:3) = d2E(1:3,1:3)
+!
+!  ...2nd H(curl) ATTRIBUTE H = [curl of attribute E - iK*E ] / (-i omega mu)
 !     H-field value (H-field trace)
       ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
       ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
       ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
 !
+!  ...apply the transformation matrix K to E
+      call apply_matrixK(Mdle,Xp,ValE(1:3,idx),zKE)
+!  ...subtract iKE from H-field
+      ValE(1:3,idx+1) = ValE(1:3,idx+1) - ZI*zKE(1:3)
+!  ...divide H by -i omega mu
       ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*MU)
 !
 !  ...H-field 1st order derivatives
@@ -102,8 +118,15 @@
       DvalE(3,idx+1,2) = D2valE(2,idx,1,2) - D2valE(1,idx,2,2)
       DvalE(3,idx+1,3) = D2valE(2,idx,1,3) - D2valE(1,idx,2,3)
 !
-      DvalE(1:3,idx+1,1:3) = DvalE(1:3,idx+1,1:3)/(-ZI*OMEGA*MU)
+!  ...get gradient of K.E
+      call get_gradKE(Mdle,Xp,ValE(1:3,idx),DvalE(1:3,idx,1:3),zDKE)
+!  ...subtract i.gradKE from H field
+      DvalE(1,idx+1,1:3) = DvalE(1,idx+1,1:3) - ZI*zDKE(1,1:3)
+      DvalE(2,idx+1,1:3) = DvalE(2,idx+1,1:3) - ZI*zDKE(2,1:3)
+      DvalE(3,idx+1,1:3) = DvalE(3,idx+1,1:3) - ZI*zDKE(3,1:3)
 !
+      DvalE(1:3,idx+1,1:3) = DvalE(1:3,idx+1,1:3)/(-ZI*OMEGA*MU)
+
 !  ...2nd order derivatives (not needed)
 !
 !  ...L2 components, derivatives not needed

@@ -10,7 +10,7 @@
 !> @param[out]  Itrial  - index for assembly
 !!                         (trivial since not multiphysics application)
 !!
-!> @date        Apr 2024
+!> @date        Oct 2024
 !----------------------------------------------------------------------
 subroutine elem(Mdle, Itest,Itrial)
 !
@@ -114,7 +114,7 @@ subroutine elem(Mdle, Itest,Itrial)
          BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,        &
          BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array)
    else
-      call elem_maxwell(Mdle,nrTest,nrTrial,                   &
+      call elem_bend_env_maxwell(Mdle,nrTest,nrTrial,                   &
          nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
          BLOC(1)%nrow,BLOC(2)%nrow,                            &
          BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,        &

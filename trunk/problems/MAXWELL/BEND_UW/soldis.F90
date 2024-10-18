@@ -72,24 +72,24 @@
 !
 !     ...exact E (tangential) trace
          case(1)
-            call cross_product(rn,ZvalE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(1))
          case(2)
-            call cross_product(rn,ZvalE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(2))
          case(3)
-            call cross_product(rn,ZvalE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact H (tangential) trace
          case(4)
-            call cross_product(rn,ZvalE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(1))
          case(5)
-            call cross_product(rn,ZvalE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(2))
          case(6)
-            call cross_product(rn,ZvalE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact E field
@@ -116,24 +116,24 @@
 !
 !     ...exact E (tangential) trace
          case(1)
-            call cross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
             Val = dreal(rntimesE(1))
          case(2)
-            call cross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
             Val = dreal(rntimesE(2))
          case(3)
-            call cross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact H (tangential) trace
          case(4)
-            call cross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
             Val = dreal(rntimesE(1))
          case(5)
-            call cross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
             Val = dreal(rntimesE(2))
          case(6)
-            call cross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact E field
@@ -200,7 +200,7 @@
 !
    20 write(*,*) 'SET VARIABLE: EEhat(1-3), HHhat(4-6), EHfld(7-12)'
       read(*,*) ICHOOSE_COMP
-      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.14)) goto 20
+      if ((ICHOOSE_COMP.lt.1).and.(ICHOOSE_COMP.gt.12)) goto 20
 !
       call disp_soldis(NSTD_OUT)
 !

@@ -102,7 +102,7 @@
       integer :: ibc(6,NRINDEX)
 !
 !  ...Maxwell load and auxiliary variables
-      complex(8) :: zJ(3), zImp(3)
+      complex(8) :: zJ(3), zImp(3) , zL(3)
       real(8)    :: E1(3), rntimesE(3), rn2timesE(3)
       real(8)    :: pen
 !
@@ -235,7 +235,7 @@
 !
 !     ...get the RHS
 !     ...zJ (maxwell rhs)
-         call getf(Mdle,x, zJ)
+         call getf(Mdle,x, zJ,zL)
 !
 !     ...set auxiliary constants
          za = (ZI*OMEGA*EPSILON)*eps(:,:)
@@ -266,7 +266,8 @@
 !        ...first eqn
 !           (J^imp,F)
             k = 2*k1-1
-            zaux = zJ(1)*fldF(1) + zJ(2)*fldF(2) + zJ(3)*fldF(3)
+            zaux = zJ(1)*fldF(1) + zJ(2)*fldF(2) + zJ(3)*fldF(3)    &
+                 + zL(1)*fldG(1) + zL(2)*fldG(2) + zL(3)*fldG(3)
             bload_E(k) = bload_E(k) + zaux*weight
 !
 !        ...first eqn

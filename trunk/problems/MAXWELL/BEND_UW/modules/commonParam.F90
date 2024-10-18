@@ -29,6 +29,10 @@ module commonParam
 !
 !..frequency
    real(8) :: OMEGA
+!..envelope wavenumber k
+   real(8) :: WAVENUM_K
+!..bending radius
+   real(8) :: RBEND
 !
 !..impedance BC:
 !  GAMMA  : impedance constant
