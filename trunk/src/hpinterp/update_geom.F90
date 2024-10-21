@@ -47,7 +47,7 @@ subroutine update_geom(Mdle, visit_flag_comm)
 !
 !..auxiliary variables
    integer :: iv,ie,ifc,ind,iflag,i,k
-   integer :: no,nod,nod1,noda(8),idec,iprint
+   integer :: no,nod,nod1,noda(8),idec
 !
 !..offsets for geometry dof of higher order nodes
    integer na(18),ndofH(18),ndofE,ndofV,ndofQ

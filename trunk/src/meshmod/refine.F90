@@ -12,8 +12,8 @@ subroutine refine(Mdle_in,Kref_in)
    use data_structure3D
    use constrained_nodes
    use refinements
-   use adaptivity , only: ANISO_ADAP
-   use mpi_wrapper
+   use mpi_param, only: RANK,ROOT
+   use adaptivity , only: CLOSURE_STRAT
    implicit none
 !
    integer, intent(in) :: Mdle_in, Kref_in
@@ -183,12 +183,12 @@ subroutine refine(Mdle_in,Kref_in)
 !
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               if(ANISO_ADAP .eq. 1) then 
+               if(CLOSURE_STRAT .eq. 1) then 
                   call find_element_ref(NODES(mdle_loc)%ntype,0,kreff, krefm)
                endif
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
-               if(ANISO_ADAP .eq. 0) then
+               if(CLOSURE_STRAT .eq. 0) then
                   call get_isoref(mdle_loc, kref_iso)
                   call find_element_ref(NODES(mdle_loc)%ntype,kref_iso,kreff, krefm)
                endif

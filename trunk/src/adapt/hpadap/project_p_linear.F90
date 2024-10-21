@@ -193,11 +193,14 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
                                                 shap3DQ_coarse_store,nint_pp_store,&
                                                 Error_org,Poly_flag,Rate_p)
 !
-!..deallocating the memory used for storing quadrature and 
-    deallocate(weights_fine_store)
-    deallocate(quad_point_store)
-    deallocate(nint_pp_store)
-    deallocate(shap3DQ_fine_store)
-    deallocate(shap3DQ_coarse_store)
+!..deallocating the allocatable arrays
+   deallocate(ap)
+   deallocate(zbload)
+   deallocate(mdle_sons)
+   deallocate(weights_fine_store)
+   deallocate(quad_point_store)
+   deallocate(nint_pp_store)
+   deallocate(shap3DQ_fine_store)
+   deallocate(shap3DQ_coarse_store)
 !
 end subroutine project_p_linear

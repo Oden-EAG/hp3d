@@ -160,5 +160,13 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
                Elem_grate = Rate_p
          endif
       endif
-endif
+!  ...deallocating allocatable arrays
+      deallocate(error_opt)
+      deallocate(g_rate_ref)
+      deallocate(kref_opts)
+      deallocate(nord_max_href)
+      deallocate(rate_hcomp)
+      deallocate(count_ref)
+      deallocate(loc_max_rate_ref)
+   endif
 end subroutine project_h

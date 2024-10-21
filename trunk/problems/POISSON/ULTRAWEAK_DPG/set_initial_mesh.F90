@@ -40,7 +40,7 @@
 !------------------------------------------------------------------------------------
 !
 !  setting the parameter for choosing BC associated with a given geometry
-   geomtype = 0
+   geomtype = 1
 !..check if have not exceeded the maximum order
    if (IP.gt.MAXP) then
       write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP

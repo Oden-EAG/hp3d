@@ -89,6 +89,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
 !
       allocate(nextract_save_lvl(NrdofgQ,3))
       allocate(nextract_prev_subson(NrdofgQ))
+      allocate(nextract_subson(NrdofgQ))
 !
       nextract_save_lvl    = ZERO
       nextract_prev_subson = ZERO
@@ -102,7 +103,6 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
          Nord_mod  = Nord_mod + order_add
          call ddecode(Nord_mod,pxm,pym,pzm)
          nrdofmQ = pxm * pym * pzm
-         allocate(nextract_subson(nrdofmQ))
          nextract_subson = ZERO
 !
          call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
@@ -127,7 +127,6 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
 !
          Nord_mod = Nord_old
          counter = counter + 1
-         deallocate(nextract_subson)
 !
       enddo
 !  ...selecting the first lvl candidate
@@ -149,7 +148,6 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
             Nord_mod  = Nord_mod + order_add
             call ddecode(Nord_mod,pxm,pym,pzm)
             nrdofmQ = pxm * pym * pzm
-            allocate(nextract_subson(nrdofmQ))
             nextract_subson = ZERO
 !
             call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
@@ -174,7 +172,6 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
             poly_flags_lvl(counter + 1) = Nord_mod
             Nord_mod = poly_flag_chosen
             counter = counter + 1
-            deallocate(nextract_subson)
 !
          endif
       enddo
@@ -191,8 +188,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
       nextract_prev_subson(1:nrdofmQ) = nextract_save_lvl(1:nrdofmQ,max_loc(1))
       Nord_mod = Nord_old + 111
       call ddecode(Nord_mod,pxm,pym,pzm)
-      nrdofmQ = pxm * pym * pzm
-      allocate(nextract_subson(nrdofmQ))
+      nrdofmQ = pxm * pym * pzm 
       nextract_subson = ZERO
 !
       call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
@@ -217,9 +213,16 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
       rate_p    = maxval(error_rates)
       max_loc   = maxloc(error_rates)
       Polyflag = poly_flags_lvl(max_loc (1))
+!
+      deallocate(nextract_save_lvl)
+      deallocate(nextract_prev_subson)
       deallocate(nextract_subson)
 !
       if(Nord_glob .lt. Polyflag) write(*,*) "Error = ",Polyflag, Nord_glob,max_loc(1)
     endif
+!..deallocating alloctable array
+    deallocate(ap_subson)
+    deallocate(zbload_subson)
+    deallocate(bwork_subson)
 !
 end subroutine opt_polynomial_search_subson_linear

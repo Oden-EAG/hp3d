@@ -9,7 +9,7 @@ subroutine close_mesh()
    use environment, only: QUIET_MODE
    use mpi_wrapper
    use bitvisit
-   use adaptivity , only: ANISO_ADAP
+   use adaptivity , only: CLOSURE_STRAT
 !
    implicit none
 !
@@ -149,12 +149,12 @@ subroutine close_mesh()
             else
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               if(ANISO_ADAP .eq. 1) then 
+               if(CLOSURE_STRAT .eq. 1) then 
                   call find_element_closing_ref(ntype,kreff,krefe, kref)
                endif
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
-               if(ANISO_ADAP .eq. 0) then 
+               if(CLOSURE_STRAT .eq. 0) then 
                   call get_isoref(mdle, kref)
                endif
 !           ...-------------------------------------------------------------------
@@ -239,7 +239,7 @@ subroutine close_mesh_par()
    use mpi_wrapper
    use bitvisit
    use environment, only: QUIET_MODE
-   use adaptivity , only: ANISO_ADAP
+   use adaptivity , only: CLOSURE_STRAT
 !
    implicit none
 !
@@ -373,12 +373,12 @@ subroutine close_mesh_par()
             else
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               if(ANISO_ADAP .eq. 1) then 
+               if(CLOSURE_STRAT .eq. 1) then 
                   call find_element_closing_ref(ntype,kreff,krefe, kref)
                endif
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
-               if(ANISO_ADAP .eq. 0) then 
+               if(CLOSURE_STRAT .eq. 0) then 
                   call get_isoref(mdle, kref)
                endif
 !           ...-------------------------------------------------------------------

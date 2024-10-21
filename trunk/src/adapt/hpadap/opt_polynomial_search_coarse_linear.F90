@@ -268,5 +268,10 @@ subroutine opt_polynomial_search_coarse_linear(Mdle,Nr_mdle_sons,Mdle_sons,Nrdof
          rate_p = 0.0
          Polyflag = nord_org
       endif
+!  ...deallocating  allocatable arrays
+      deallocate(nextract_prev)
+      deallocate(bwork)
+      deallocate(nextract_save_lvl)
     endif
+!
 end subroutine opt_polynomial_search_coarse_linear

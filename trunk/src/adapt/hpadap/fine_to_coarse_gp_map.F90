@@ -348,6 +348,8 @@ subroutine subson_one_irregularity_map(Etype,Kref_intent,Kref_appl,Nr_sons_inten
             enddo
       end select
 !
+!..deallocateallocatable array
+      deallocate(el_pmap)
    endif
 !
 end subroutine subson_one_irregularity_map

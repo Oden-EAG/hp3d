@@ -23,21 +23,18 @@ module adaptivity
    real(8) :: GREEDY
 !
    real(8) :: ERR_MAX =0.d0, ERR_MIN =0.d0
-!
-!..ANISO_ADAP controls closure type.
-!  ANISO_ADAP = 0 leads to isotropic closure
-!  ANISO_ADAP = 1 leads to anisotropic closure
-   integer :: ANISO_ADAP = 1
+!..ADAPT_STRAT = 0 is isotropic h-refinement
+!..ADAPT_STRAT = 1 is anisotropic hp-refinement
+   integer, parameter :: ADAPT_STRAT = 1
+!..CLOSURE_STRAT controls closure type.
+!  CLOSURE_STRAT = 0 leads to isotropic closure
+!  CLOSURE_STRAT = 1 leads to anisotropic closure
+   integer :: CLOSURE_STRAT = 1
 !..Parameters for anisotropic adaptation
 !..0 is for greedy strat and 1 is for Doerfler
-   integer, parameter :: ADAP_STRAT = 1
-!..maximum number of refinements
-   integer, parameter :: max_step = 200
+   integer, parameter :: MARKING_STRAT = 1
 !..ratio for the greedy or Doerfler strategy
-   real(8), parameter :: Factor = 0.75
-!..Factor (when multiplied with the guaranteed rate)) that decides the
-!  threshold for implementing anisotropic h or p or hp
-   real(8), parameter :: Factor_max_rate = 0.25
+   real(8), parameter :: ADAP_RATIO = 0.75
 !
    contains
 !

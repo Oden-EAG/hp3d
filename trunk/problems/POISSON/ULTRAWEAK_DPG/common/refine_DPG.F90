@@ -20,6 +20,7 @@ subroutine refine_DPG
 
    use common_prob_data
    use control
+   use adaptivity
    use data_structure3D
    use environment  , only: QUIET_MODE
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
@@ -28,14 +29,10 @@ subroutine refine_DPG
     
    implicit none
 !
-!..0 is for greedy strat and 1 is for Doerfler 
-   integer, parameter :: adap_strat = 1
 !..parameters below were input to the function before but currently used as finxed parameters for debug
 !..if exact then adapting to reduce in error L2 solution u
    integer, parameter :: physNick = 1 
    integer, parameter :: max_step = 40
-! factor used the selection parameter for greedy and doerfler strategy
-   real(8), parameter :: Factor = 0.75
 !..Ires :true means adaptation using residual.
    logical            :: Ires = .true.
 !..Irefine = 2 means adaptive strategy
@@ -238,18 +235,18 @@ subroutine refine_DPG
    if (Irefine .eq. IADAPTIVE) then
       nr_elem_ref = 0
 !..strategy 1 (greedy strategy)
-      if(adap_strat .eq. 0) then
+      if(MARKING_STRAT .eq. 0) then
          do iel = 1,NRELES
             mdle = ELEM_ORDER(iel)
             call find_domain(mdle,i)
-            if(elem_resid(iel) > Factor * elem_resid_max) then
+            if(elem_resid(iel) > ADAP_RATIO * elem_resid_max) then
                nr_elem_ref = nr_elem_ref + 1
                mdle_ref(nr_elem_ref) = mdle
                if (RANK.eq.ROOT) write(*,1020) 'ndom=',i,', mdle=',mdle,', r =',elem_resid(iel)
             endif
             1020    format(A,I2,A,I9,A,es12.5)
          enddo
-      elseif(adap_strat .eq. 1) then    ! strategy 2: Doerfler's Strategy
+      elseif(MARKING_STRAT .eq. 1) then    ! strategy 2: Doerfler's Strategy
 !
          mdle_ref(1:NRELES) = ELEM_ORDER(1:NRELES)
          call qsort_duplet(mdle_ref,elem_resid,NRELES,1,NRELES)
@@ -277,7 +274,7 @@ subroutine refine_DPG
 !
             nr_elem_ref = nr_elem_ref + 1
             res_sum = res_sum + elem_resid(iel)
-            if(res_sum > Factor*resid_tot) exit
+            if(res_sum > ADAP_RATIO*resid_tot) exit
 !
          enddo
          if (RANK.eq.ROOT) write(*,1023) 'nr_elem_ref = ', nr_elem_ref

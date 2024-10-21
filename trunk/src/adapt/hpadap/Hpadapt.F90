@@ -11,12 +11,17 @@ subroutine HpAdapt
    use parametersDPG
    use par_mesh        , only: DISTRIBUTED, HOST_MESH, distr_mesh
    use mpi_param       , only: ROOT, RANK,NUM_PROCS
-   use adaptivity      , only: ANISO_ADAP,ADAP_STRAT,max_step, &
-                               Factor,Factor_max_rate
+   use adaptivity      , only: CLOSURE_STRAT,MARKING_STRAT, &
+                               ADAP_RATIO,ADAPT_STRAT
 !
    implicit none
 !
+   integer, parameter :: max_step = 200
    integer, parameter :: IADAPTIVE = 2
+!..Factor (when multiplied with the guaranteed rate)) that decides the
+!  threshold for implementing anisotropic h or p or hp
+   real(8), parameter :: Factor_max_rate = 0.25
+!
    integer  :: Irefine = 2
    logical  :: ires = .true.
 !
@@ -229,18 +234,18 @@ subroutine HpAdapt
    if (Irefine .eq. IADAPTIVE) then
       nr_elem_ref = 0
 !  ...strategy 1 (greedy strategy)
-      if(adap_strat .eq. 0) then
+      if(MARKING_STRAT .eq. 0) then
          do iel = 1,NRELES
                mdle = ELEM_ORDER(iel)
                call find_domain(mdle,i)
-               if(elem_resid(iel) > Factor * elem_resid_max) then
+               if(elem_resid(iel) > ADAP_RATIO * elem_resid_max) then
                   nr_elem_ref = nr_elem_ref + 1
                   mdle_ref(nr_elem_ref) = mdle
                   if (RANK.eq.ROOT) write(*,1020) 'ndom=',i,', mdle=',mdle,', r =',elem_resid(iel)
                endif
                1020    format(A,I2,A,I9,A,es12.5)
          enddo
-      elseif(adap_strat .eq. 1) then    ! strategy 2: Doerfler's Strategy
+      elseif(MARKING_STRAT .eq. 1) then    ! strategy 2: Doerfler's Strategy
 !    
          mdle_ref(1:NRELES) = ELEM_ORDER(1:NRELES)
          call qsort_duplet(mdle_ref,elem_resid,NRELES,1,NRELES)
@@ -268,7 +273,7 @@ subroutine HpAdapt
 !    
                nr_elem_ref = nr_elem_ref + 1
                res_sum = res_sum + elem_resid(iel)
-               if(res_sum > Factor*resid_tot) exit
+               if(res_sum > ADAP_RATIO*resid_tot) exit
 !    
          enddo
       endif
@@ -293,7 +298,7 @@ subroutine HpAdapt
    flag_pref = ZERO
 !..hp refining the marked elements
 !..setting up the ANSIO_ADAP flag from adaptation module to allow isotropic adaptation
-   ANISO_ADAP = 0
+   CLOSURE_STRAT = 0
    call Finegrid_padap(nr_elem_ref,mdle_ref,flag_pref)
 !
 !..solving on the hp refined mesh to fine mesh solution
@@ -349,10 +354,12 @@ subroutine HpAdapt
       case(MDLB)
          call project_p_linear(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep)
 !
-         call project_h(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep, &
-                        nref_grate(iel),ref_indicator_flags((iel-1) * 10 + 1:iel*10), &
-                        mep_Nord_href(1:100,1:8,iel),error_reduction_rate(1:100,iel), &
-                        mep_count(iel),loc_max_rate(iel))    
+         if(ADAPT_STRAT .eq. 1) then
+            call project_h(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep, &
+                           nref_grate(iel),ref_indicator_flags((iel-1) * 10 + 1:iel*10), &
+                           mep_Nord_href(1:100,1:8,iel),error_reduction_rate(1:100,iel), &
+                           mep_count(iel),loc_max_rate(iel))
+         endif
 !
       case default
          write(*,*) "Element type not recognized"
@@ -424,7 +431,7 @@ subroutine HpAdapt
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !..setting up the ANSIO_ADAP flag from adaptation module to allow aniso adaptation
-   ANISO_ADAP = 1
+   CLOSURE_STRAT = 1
 !----------------------------------------------------------------------------------------------
 !..perfoming computed Hp refinements
 !--------------------------------------------------------------------------------
@@ -579,6 +586,16 @@ subroutine HpAdapt
          call update_gdof
          call update_Ddof
    end select  
+!..deallocating the allocatable arrays
+   deallocate(href_flags)
+   deallocate(ref_indicator_flags)
+   deallocate(mep_Nord_href)
+   deallocate(error_reduction_rate)
+   deallocate(loc_max_rate)
+   deallocate(mep_count)
+   deallocate(nref_grate)
+   deallocate(flag_pref)
+!
 end subroutine HpAdapt
 !----------------------------------------------------------------------
 !> @brief Driver routine to run Hp adaptation.

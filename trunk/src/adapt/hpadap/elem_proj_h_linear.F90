@@ -93,8 +93,7 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
    integer :: nint_pp,nrdof,nord_glob, nord_org, polyflag
    integer, allocatable    :: nord_mep(:,:),nord_old(:)
    real(8), allocatable    :: error_subsons(:)
-!  
-   integer, allocatable    :: subsons_nextract(:,:)
+!     
    integer, allocatable    :: nord_max(:)
 !..shape functions for the load vector computation in the projection problem
    real(8) :: q1,q2,q 
@@ -476,12 +475,27 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
                   endif
          endif
       enddo
-   endif
+!  ...deallocating allocatable arrays
+      deallocate(subsons_ap)
+      deallocate(subsons_zbload)
+      deallocate(subsons_overlap)
+      deallocate(mdle_sons)
+      deallocate(nord_org_subsons)
+      deallocate(ap)
+      deallocate(zbload)
+      deallocate(subsons_awork)
+      deallocate(subsons_bwork)
+      deallocate(nord_mep)
+      deallocate(nord_old)
+      deallocate(error_subsons)
+      deallocate(nord_max)
+      deallocate(weights_fine_store)
+      deallocate(quad_point_store)
+      deallocate(shap3DQ_fine_store)
+      deallocate(shap3DQ_coarse_store)
+      deallocate(nint_pp_store)
+      deallocate(subsons_nextract_prev)
 !
-   deallocate(weights_fine_store)
-   deallocate(quad_point_store)
-   deallocate(nint_pp_store)
-   deallocate(shap3DQ_coarse_store)
-   deallocate(shap3DQ_fine_store)
+   endif
 !
 end subroutine elem_proj_h_linear

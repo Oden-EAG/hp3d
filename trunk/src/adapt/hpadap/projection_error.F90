@@ -257,6 +257,7 @@ subroutine fine_to_subson_projection_error(Kref,Coeff,Nextract,Overlap,NrdofmQ,N
                Proj_error = Proj_error + weight * (zvalQ(Iattr) - zvalQpp(Iattr))**2
          enddo
       enddo
+      deallocate(Mdle_olp_fine)
    endif
 !
 end subroutine fine_to_subson_projection_error

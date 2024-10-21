@@ -29,7 +29,7 @@ module parameters
    integer, parameter :: MAXNODM = 50
 !
 !..maximum number of generation
-   integer, parameter :: MAXGEN = 20
+   integer, parameter :: MAXGEN = 50
    integer, parameter :: MAXQUEUE = 50
 !
 !..maximum number of quadrature points for 1D,2D,3D elements
