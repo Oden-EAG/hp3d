@@ -30,7 +30,7 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
 !..stores L2 dofs of the fine grid elements (sons of the marked element after the isotropic hp refinement).
    real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ)
 !..stores the values of the solution for the original and sons.
-   real(8) :: zvalQ(MAXEQNQ), zvalQpp(MAXEQNQ)
+   real(8) :: zvalQpp(MAXEQNQ)
 !
 !..variables required for coarse element
 !..number of shape functions in trial space for original element (in case of ultra weak formulation: only nrdofQ is useful)

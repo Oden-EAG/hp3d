@@ -63,7 +63,7 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
                zdofV_pp(MAXEQNV,MAXbrickVV)
 !
 !..to store the values of the solution for the original and sons respectively
-   real(8)  :: zvalQ(MAXEQNQ), zvalQpp(MAXEQNQ)
+   real(8)  :: zvalQpp(MAXEQNQ)
    integer  :: nr_subsons,hx,hy,hz
    integer  :: pxm,pym,pzm ! max poly order in each direction
 !..projection matrix for the child of the coarse elements 

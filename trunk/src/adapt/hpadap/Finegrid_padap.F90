@@ -19,8 +19,8 @@ subroutine Finegrid_padap(Nr_elem_ref,Mdle_ref,Flag_pref)
    integer, dimension(Nr_elem_ref),    intent(in)  :: Mdle_ref
    integer, dimension(Nr_elem_ref),    intent(out) :: Flag_pref
 !
-   integer :: nord_new,is,nord,nordx,nordy,nordz,naux,pord
-   integer :: i,mdle,iel,kref,ierr
+   integer :: nord_new,nord,nordx,nordy,nordz,naux,pord
+   integer :: mdle,iel,kref,ierr
    integer :: etype
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
