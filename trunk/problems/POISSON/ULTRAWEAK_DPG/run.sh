@@ -2,10 +2,10 @@
 
 #
 # MPI Procs
-nproc=1
+nproc=2
 #
 # OMP THREADS
-nthreads=1
+nthreads=4
 
 # Configure problem params
 # - initial polynomial order of approximation
@@ -20,23 +20,24 @@ dp=1
 #   3: arc tan solution
 #   4: x boundary layer
 #   5: x boundary layer
-isol=0
+isol=5
 # - user mode
 #   interactive run    (job=0)
 #   pre-configured run (job=1)
-job=0
+job=1
 # - number of refinements (if job=1)
-imax=10
+imax=25
 
 # Geometry file
-file_geometry='./geometries/hexa_orient0'
+file_geometry='./geometries/fichera_corner'
+# file_geometry='./geometries/hexa_orient0'
 # - MAXNODS
 maxnods=525000
 
 export KMP_STACKSIZE=64M
 
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
-# args+=" -file-geometry ${file_geometry}"
+args+=" -file-geometry ${file_geometry}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./pois ${args}

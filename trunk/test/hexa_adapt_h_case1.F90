@@ -12,6 +12,7 @@ program test_hexa_adapt_h_case1
    use mpi_wrapper
    use par_mesh
    use zoltan_wrapper
+   use adaptivity , only: CLOSURE_STRAT
 !
    implicit none
 !
@@ -60,6 +61,7 @@ program test_hexa_adapt_h_case1
    subroutine hexa_adapt_h_case1
 !
       integer :: idx,icnt,itr,kref,mdle,nref
+      integer :: tmp
 !
       integer :: mdle_ref(NREF_MAX)
       integer :: kref_ref(NREF_MAX)
@@ -73,6 +75,8 @@ program test_hexa_adapt_h_case1
       NPASS = 1
 !
       icnt = 0
+      tmp = CLOSURE_STRAT
+      CLOSURE_STRAT = 0
 !
       open(unit=nin,file='./hexa_adapt_h_case1.txt', &
            form='formatted',access='sequential',status='old',action='read')
@@ -134,6 +138,7 @@ program test_hexa_adapt_h_case1
 !  ...end loop over itr
       enddo
 !
+      CLOSURE_STRAT = tmp
    end subroutine hexa_adapt_h_case1
 !
 !

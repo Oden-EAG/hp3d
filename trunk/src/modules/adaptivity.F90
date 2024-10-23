@@ -12,7 +12,7 @@ module adaptivity
 !
    implicit none
 !
-   save
+   ! save
 !
    integer, parameter :: ADAPT_FILE_OUT = 35
 !
@@ -23,6 +23,18 @@ module adaptivity
    real(8) :: GREEDY
 !
    real(8) :: ERR_MAX =0.d0, ERR_MIN =0.d0
+!..ADAPT_STRAT = 0 is isotropic h-refinement
+!..ADAPT_STRAT = 1 is anisotropic hp-refinement
+   integer, parameter :: ADAPT_STRAT = 1
+!..CLOSURE_STRAT controls closure type.
+!  CLOSURE_STRAT = 0 leads to isotropic closure
+!  CLOSURE_STRAT = 1 leads to anisotropic closure
+   integer :: CLOSURE_STRAT = 1
+!..Parameters for anisotropic adaptation
+!..0 is for greedy strat and 1 is for Doerfler
+   integer, parameter :: MARKING_STRAT = 1
+!..ratio for the greedy or Doerfler strategy
+   real(8), parameter :: ADAP_RATIO = 0.75
 !
    contains
 !
