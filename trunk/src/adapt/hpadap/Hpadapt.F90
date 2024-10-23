@@ -61,13 +61,12 @@ subroutine HpAdapt
    real(8) :: grate_mesh
    integer :: poly_flag
    integer,   allocatable :: flag_pref(:)
-   integer :: nr_sons,first_son
+   integer :: first_son
    integer :: hx,hy,hz, nr_sons_intent,nr_sons_close,mdle_child
    integer, allocatable :: pref_intent(:), pref_close(:)
 !
    integer :: i,ic,mdle,iel,kref,subd,count,ierr
-   real(8) :: x(3), xnod(3,MAXbrickH)
-   integer :: nord_new,is,nord
+   integer :: nord_new,nord
    real(8) :: error_org,rate_p
 !
 !..element type
@@ -79,8 +78,6 @@ subroutine HpAdapt
    integer :: kref_close, kref_intent,href_count,counter
 !
    real(8) :: start_time,end_time
-!..printing flag
-   integer :: iprint = 2
 !..initialize
    elem_resid(1:NRELES)    = 0.d0
    elem_ref_flag(1:NRELES) = 0

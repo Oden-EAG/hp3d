@@ -55,14 +55,15 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
 !
    real(8),    allocatable :: ap_subson(:,:)
    real(8),    allocatable :: zbload_subson(:,:)
-   real(8),    allocatable :: bwork_subson(:,:), nextract_save_lvl(:,:)
+   real(8),    allocatable :: bwork_subson(:,:)
    integer,    allocatable :: nextract_prev_subson(:)
    integer,    allocatable :: nextract_subson(:)
+   integer,    allocatable :: nextract_save_lvl(:,:)
    integer  :: nrdofmQ,pxm,pym,pzm
    integer  :: max_loc(1)
    integer  :: etype
 !..aux variables
-   integer  ::  k,k1,k2,k3,j,l,iattr
+   integer  ::  k,l,iattr
    integer  ::  Nord_mod, order_add,Nord_prev, nrdof_old
    real(8)  ::  proj_error,rate_p,proj_error_net
    real(8)  ::  rate_max_lvl

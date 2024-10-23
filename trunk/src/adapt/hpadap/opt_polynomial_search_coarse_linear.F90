@@ -51,8 +51,9 @@ subroutine opt_polynomial_search_coarse_linear(Mdle,Nr_mdle_sons,Mdle_sons,Nrdof
 !..arrays containing the indices of the L2 shape functions generated using tensor product.
    integer, allocatable    :: nextract(:)
    integer, allocatable    :: nextract_prev(:)
+   integer, allocatable    :: nextract_save_lvl(:,:)
 !..variables for the function
-   real(8), allocatable :: bwork(:,:), nextract_save_lvl(:,:)
+   real(8), allocatable :: bwork(:,:)
    integer :: px,py,pz, nrdofgQ, nrdofmQ, nrdof_org
    integer :: nord_org, nord_mod, nord_prev
    integer :: order_add

@@ -46,11 +46,8 @@ subroutine fine_to_coarse_projection_error(Nr_mdle_sons,Coeff,Nextract,NrdofmQ,N
 !
    real(8),    intent(out) :: Proj_error
 !
-!..to store the Coefficients of the basis functions of interpolant on original element after projection from fine to coarse element.
-   real(8) :: zdofQ(MAXbrickQQ)
 !..to store extracted Coefficeints
-   real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ), zdofH_pp(MAXEQNH,MAXbrickHH),zdofE_pp(MAXEQNE,MAXbrickEE), &
-              zdofV_pp(MAXEQNV,MAXbrickVV)
+   real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ)
 !..to store the values of the solution for the original and sons respectively
    real(8) :: zvalQ(MAXEQNQ), zvalQpp(MAXEQNQ)
 !..variables required for coarse element
@@ -60,28 +57,17 @@ subroutine fine_to_coarse_projection_error(Nr_mdle_sons,Coeff,Nextract,NrdofmQ,N
    integer :: nrdofH_pp, nrdofE_pp, nrdofV_pp, nrdofQ_pp
 !.. L2 shape functions
    real(8) :: shapQ(MAXbrickQQ)
-!..H1 shape functions
-   real(8) :: shapH(MAXbrickHH), gradH(3,MAXbrickHH)
-!..3D quadrature data
-   real(8) :: xiloc(3,MAXNINT3ADD), waloc(MAXNINT3ADD)
 !..geometry
-   real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3), rn(3),xis(3)
-   real(8) :: dxidt(3,2), dxdt(3,2), t(2)
-!..geometry dof of original element
-   real(8) :: xnod(3,MAXbrickHH)
-!..geometry dof of sons
-   real(8) :: xnod_pp(3,MAXbrickHH)
+   real(8) :: xi(3)
    integer :: etype
 !..element order, orientation for edges and faces of the original element
-   integer :: norder(19), norient_edge(12), norient_face(6)
-   integer :: nint, nrdof
+   integer :: norder(19)
 !..element order, orientation for edges and faces for enriched sons
-   integer :: norder_pp(19), norient_edge_pp(12), norient_face_pp(6)
+   integer :: norder_pp(19)
    integer :: nint_pp
 !..auxiliary variables
-   real(8) :: wa,weight,rjac,bjac,fval
-   integer :: k1,k2,l,iflag,k,is,mdle_fine,j,order_add,Nord_mod    
-   integer :: idec
+   real(8) :: weight,rjac
+   integer :: l,k,is,mdle_fine
    real(8) :: q
 !
    etype = NODES(Mdle)%ntype
@@ -172,32 +158,24 @@ subroutine fine_to_subson_projection_error(Kref,Coeff,Nextract,Overlap,NrdofmQ,N
 !
    real(8),    intent(out) ::  Proj_error
 !
-   integer :: norder_pp(19), norient_edge_pp(12), norient_face_pp(6)
+   integer :: norder_pp(19)
    integer :: nrdofH_pp, nrdofE_pp, nrdofV_pp, nrdofQ_pp
 !..to store extracted Coefficeints
-   real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ), zdofH_pp(MAXEQNH,MAXbrickHH),zdofE_pp(MAXEQNE,MAXbrickEE), &
-   zdofV_pp(MAXEQNV,MAXbrickVV)
+   real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ)
 !
 !..to store the values of the solution for the original and sons respectively
    real(8) :: zvalQ(MAXEQNQ), zvalQpp(MAXEQNQ)
 !.. L2 shape functions
    real(8) :: shapQ(MAXbrickQQ)
-!..H1 shape functions
-   real(8) :: shapH(MAXbrickHH), gradH(3,MAXbrickHH)
-!..geometry dof of sons
-   real(8) :: xnod_pp(3,MAXbrickHH)
-!..3D quadrature data
-   real(8) :: xiloc(3,MAXNINT3ADD), waloc(MAXNINT3ADD)
 !..geometry
-   real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3), rn(3),xis(3)
-   real(8) :: dxidt(3,2), dxdt(3,2), t(2)
+   real(8) :: xi(3)
 !..refinement indicators in x,y,z directions
    integer :: hx,hy,hz
    integer :: etype
    integer :: etype_coarse
 !..auxiliary variables
-   real(8) :: rjac,wa,weight,q
-   integer :: first_son,nr_subsons,nr_mdle_sons,iss,iflag,nrdof
+   real(8) :: rjac,weight,q
+   integer :: first_son,nr_subsons,nr_mdle_sons
    integer :: is, mdle_fine,Overlap_count,nint_pp
    integer :: k,l
    integer,allocatable :: Mdle_olp_fine(:)

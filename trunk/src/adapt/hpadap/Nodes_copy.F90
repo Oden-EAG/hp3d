@@ -18,10 +18,7 @@ subroutine Nodes_copy(NODES_cp)
 !
    type(node), intent(out) :: NODES_cp(MAXNODS)
 !
-   integer :: iel,mdle,NRELES_SUBD_cp,nod
-   integer :: NdofH,NdofE,NdofV,NdofQ
-   integer :: nn1c,nn2c,nn3c,ic
-   integer :: nnc(2,5), alloc_ind(5)
+   integer :: nod,nn1c,nn2c,nn3c
 !
    do nod = 1,MAXNODS
       NODES_cp(nod)%ntype = NODES(NOD)%ntype
@@ -110,7 +107,6 @@ subroutine Nodes_dealloc(NODES_cp)
    implicit none
 !
    integer :: nod
-   integer :: nn1c,nn2c
    type(node), intent(out) :: NODES_cp(MAXNODS)
 !
    do nod=1,MAXNODS

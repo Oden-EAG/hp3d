@@ -68,7 +68,7 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
    integer, allocatable           ::  loc_max_rate_ref(:)
 !
    integer :: max_rate_element_loc(1)
-   integer :: nrdofgQ, nrdof_org, nrdof_polyref
+   integer :: nrdofgQ, nrdof_org
    integer :: nord_glob, nord_org ,px,py,pz
    integer :: norder(19)
 !

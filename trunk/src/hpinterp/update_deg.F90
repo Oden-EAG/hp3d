@@ -44,9 +44,6 @@ subroutine update_deg(Mdle, visit_flag_comm)
 !..reference coordinates for an element
    real(8), dimension(3,8) :: xsub
 !
-!..geometry dofs for an element
-   real(8), dimension(3,MAXbrickH) :: xnod
-
 !..solution dof for an element
    VTYPE, dimension(MAXEQNH,MAXbrickH,N_COMS) :: zdofH
    VTYPE, dimension(MAXEQNE,MAXbrickE,N_COMS) :: zdofE
@@ -58,7 +55,7 @@ subroutine update_deg(Mdle, visit_flag_comm)
    integer :: no,nod,nod1,noda(8),idec
 !
 !..offsets for geometry and solution dof of higher order nodes
-   integer na(18), nH(18),nE(18),nV(6),ndofH(18),ndofE(18),ndofV(18),ndofQ
+   integer :: nH(18),nE(18),nV(6),ndofH(18),ndofE(18),ndofV(18),ndofQ
 
 #if HP3D_DEBUG
 integer :: iprint
@@ -182,7 +179,7 @@ integer :: iprint
          if (is_Dirichlet_attr(nod,TANGEN)) then
 !
 !        ...update H(Curl) Dirichlet dof	
-            if (associated(NODES(nod)%dof%zdofE)) then	
+            if (associated(NODES(nod)%dof%zdofE)) then
                call dhpedgeE(mdle,iflag,no,xsub,                     &
                               ntype,NODES(nod)%case,NODES(nod)%bcond, &
                               nedge_orient,nface_orient,norder,ie,    &
@@ -192,7 +189,7 @@ integer :: iprint
                   zdofE(1:MAXEQNE,nE(ie)+k,1:N_COMS)= NODES(nod)%dof%zdofE(1:MAXEQNE,k,1:N_COMS)
                enddo
 !
-            endif		
+            endif
          endif
 !
          NODES(nod)%visit = 1
@@ -262,7 +259,7 @@ integer :: iprint
                            zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
 !
                do k = 1,ndofH(nedge(ntype)+ifc)
-                  zdofH(1:MAXEQNH,nH(nedge(ntype)+ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofH(1:MAXEQNH,k,1:N_COMS)		
+                  zdofH(1:MAXEQNH,nH(nedge(ntype)+ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofH(1:MAXEQNH,k,1:N_COMS)
                enddo
             endif
          endif
@@ -276,7 +273,7 @@ integer :: iprint
                               zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
 !
                   do k = 1,ndofE(nedge(ntype)+ifc)
-                     zdofE(1:MAXEQNE,nE(nedge(ntype)+ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofE(1:MAXEQNE,k,1:N_COMS)	
+                     zdofE(1:MAXEQNE,nE(nedge(ntype)+ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofE(1:MAXEQNE,k,1:N_COMS)
                   enddo
 !
                endif
@@ -292,7 +289,7 @@ integer :: iprint
                               NODES(nod)%dof%zdofV(:,:,N_COMS))
 !
                   do k = 1,ndofV(nedge(ntype)+ifc)
-                     zdofV(1:MAXEQNV,nV(ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofV(1:MAXEQNV,k,1:N_COMS)		
+                     zdofV(1:MAXEQNV,nV(ifc)+k,1:N_COMS) = NODES(nod)%dof%zdofV(1:MAXEQNV,k,1:N_COMS)
                   enddo
 !	
                endif
@@ -320,6 +317,6 @@ integer :: iprint
    endif
 #endif
 !
-end subroutine update_deg	
+end subroutine update_deg
 
     

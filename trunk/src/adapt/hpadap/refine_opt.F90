@@ -24,7 +24,7 @@ subroutine refine_opt(Mdle_in,Kref_in,List,Nrlist)
    integer, dimension(2)        :: neig,nsid_list,norient_list
    integer, dimension(27)       :: nodesl,norientl
    integer, dimension(6)        :: kreff
-   integer :: i, n, loc, loc2,loc3, iface, iface_loc, kref, krefm, kref_iso
+   integer :: i, n, loc, loc2,loc3, iface, iface_loc, kref, krefm
    integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase, ntype
    logical :: iflag
 !

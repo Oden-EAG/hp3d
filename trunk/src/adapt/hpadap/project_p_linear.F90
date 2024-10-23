@@ -27,8 +27,6 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
    real(8), allocatable    :: ap(:)
    real(8), allocatable    :: zbload(:,:)
    integer, allocatable    :: mdle_sons(:)
-!..stores the dofs corresponding to the interpolant on original element after projection from fine to coarse element.
-   real(8) :: zdofQ(MAXEQNQ,MAXbrickQQ)
 !..stores L2 dofs of the fine grid elements (sons of the marked element after the isotropic hp refinement).
    real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ)
 !..stores the values of the solution for the original and sons.
@@ -47,21 +45,19 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
 !..3D quadrature data
    real(8) :: xiloc(3,MAXNINT3ADD), waloc(MAXNINT3ADD)
 !..geometry
-   real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3), rn(3),xis(3)
-   real(8) :: dxidt(3,2), dxdt(3,2), t(2)
+   real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3),xis(3)
 !..geometry dof of sons
    real(8) :: xnod_pp(3,MAXbrickHH)
    integer :: etype
 !..element order, orientation for edges and faces of the original element
-   integer :: norder(19), norient_edge(12), norient_face(6)
-   integer :: nint
+   integer :: norder(19)
 !..element order, orientation for edges and faces for enriched sons
    integer :: norder_pp(19), norient_edge_pp(12), norient_face_pp(6)
    integer :: nint_pp, nrdof
    integer :: nord_glob
 !..auxiliary variables
    real(8) :: wa,weight,rjac
-   integer :: k1,k2,l,iflag,k,is,mdle_fine,j, first_son 
+   integer :: k1,l,iflag,k,is,mdle_fine,first_son 
    integer :: iattr,icomp,ibeg
 !..location of L2 variable in L2 solution array
    integer :: var_loc
@@ -71,8 +67,6 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
    real(8), allocatable :: weights_fine_store(:,:,:), quad_point_store(:,:,:)
    real(8), allocatable :: shap3DQ_fine_store(:,:,:),shap3DQ_coarse_store(:,:,:)
    integer, allocatable :: nint_pp_store(:)
-!..options for polynomial selection process
-   integer :: opt_poly_choice = 1
 !
 !..allocating memory to the p+1 order projection matrix
    etype = NODES(Mdle)%ntype
