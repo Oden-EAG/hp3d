@@ -61,7 +61,52 @@
       endif
 !
       select case (IEXACT_DISP)
-!  ...exact solution
+!
+!  ...approximate solution
+      case(0)
+!
+         select case (ICHOOSE_COMP)
+!
+!     ...exact E (tangential) trace
+         case(1)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            Val = dreal(rntimesE(1))
+         case(2)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            Val = dreal(rntimesE(2))
+         case(3)
+            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            Val = dreal(rntimesE(3))
+!
+!     ...exact H (tangential) trace
+         case(4)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            Val = dreal(rntimesE(1))
+         case(5)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            Val = dreal(rntimesE(2))
+         case(6)
+            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            Val = dreal(rntimesE(3))
+!
+!     ...exact E field
+         case(7)
+            Val = dreal(zsolQ(1))
+         case(8)
+            Val = dreal(zsolQ(2))
+         case(9)
+            Val = dreal(zsolQ(3))
+!
+!     ...exact H field
+         case(10)
+            Val = dreal(zsolQ(4))
+         case(11)
+            Val = dreal(zsolQ(5))
+         case(12)
+            Val = dreal(zsolQ(6))
+         end select
+!
+            !  ...exact solution
       case(1)
          call exact(X, icase, &
                     zvalH,zdvalH,zd2valH, &
@@ -108,50 +153,56 @@
          case(12)
             Val = dreal(zvalQ(6))
          end select
-!
-!  ...approximate solution
-      case(0)
-!
+!         
+!  ...Signed error (numerical - exact)
+      case(2)
+         call exact(X, icase, &
+                    zvalH,zdvalH,zd2valH, &
+                    zvalE,zdvalE,zd2valE, &
+                    zvalV,zdvalV,zd2valV, &
+                    zvalQ,zdvalQ,zd2valQ)
+!     ...subtract exact from numerical
+         ZvalE(1:3,1:2) = ZsolE(1:3,1:2) - ZvalE(1:3,1:2)
+         ZvalQ(1:6) = ZsolQ(1:6) - ZvalQ(1:6)
          select case (ICHOOSE_COMP)
 !
 !     ...exact E (tangential) trace
          case(1)
-            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(1))
          case(2)
-            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(2))
          case(3)
-            call zcross_product(rn,zsolE(1:3,1), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,1), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact H (tangential) trace
          case(4)
-            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(1))
          case(5)
-            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(2))
          case(6)
-            call zcross_product(rn,zsolE(1:3,2), rntimesE)
+            call zcross_product(rn,ZvalE(1:3,2), rntimesE)
             Val = dreal(rntimesE(3))
 !
 !     ...exact E field
          case(7)
-            Val = dreal(zsolQ(1))
+            Val = dreal(zvalQ(1))
          case(8)
-            Val = dreal(zsolQ(2))
+            Val = dreal(zvalQ(2))
          case(9)
-            Val = dreal(zsolQ(3))
+            Val = dreal(zvalQ(3))
 !
 !     ...exact H field
          case(10)
-            Val = dreal(zsolQ(4))
+            Val = dreal(zvalQ(4))
          case(11)
-            Val = dreal(zsolQ(5))
+            Val = dreal(zvalQ(5))
          case(12)
-            Val = dreal(zsolQ(6))
-!
+            Val = dreal(zvalQ(6))
          end select
       end select
       if (iprint.eq.1) then
@@ -193,9 +244,9 @@
 !
       IEXACT_DISP=0
       if ((NEXACT.eq.1).or.(NEXACT.eq.2)) then
-   10   write(*,*) 'DISPLAY APPROXIMATE OR EXACT SOLUTION (0/1) ?'
+   10   write(*,*) 'DISPLAY (0) NUMERICAL SOL. (1) EXACT SOLUTION, OR (2) SIGNED ERROR [NUMERICAL - EXACT] ?'
         read(*,*) IEXACT_DISP
-        if ((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)) goto 10
+        if (((IEXACT_DISP.ne.0).and.(IEXACT_DISP.ne.1)).and.(IEXACT_DISP.ne.2)) goto 10
       endif
 !
    20 write(*,*) 'SET VARIABLE: EEhat(1-3), HHhat(4-6), EHfld(7-12)'
@@ -220,15 +271,17 @@
       write(Nstream,1000)
       write(Nstream,3100)
       select case (IEXACT_DISP)
-      case(1); write(Nstream,1010)
-      case(0); write(Nstream,1020)
+      case(0); write(Nstream,1010)
+      case(1); write(Nstream,1020)
+      case(2); write(Nstream,1030)
       end select
 !
       write(Nstream,3100)
 !
  1000 format('DISPLAY SETUP')
- 1010 format('DISPLAYING EXACT SOLUTION')
- 1020 format('DISPLAYING APPROXIMATE SOLUTION')
+ 1010 format('DISPLAYING NUMERICAL SOLUTION')
+ 1020 format('DISPLAYING EXACT SOLUTION')
+ 1030 format('DISPLAYING NUMERICAL-EXACT SOLUTION')
  3100 format('-----------------------')
 !
    end subroutine disp_soldis

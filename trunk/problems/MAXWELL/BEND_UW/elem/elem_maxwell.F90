@@ -270,10 +270,10 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
       call DGEMM('T','N',3,NrdofEE,3,1.d0     ,dxidx,3,shapEE,3,0.d0,shapF,3)
       call DGEMM('N','N',3,NrdofEE,3,1.d0/rjac,dxdxi,3,curlEE,3,0.d0,curlF,3)
 !
-!  ...for 2nd option to integrate
-!  ...get the transformation matrix K and K.K^T
-      call get_matrixK(Mdle,x,rK)
-      call get_matrixKKT(Mdle,x,rKKT)
+! !  ...for 2nd option to integrate
+! !  ...get the transformation matrix K and K.K^T
+!       call get_matrixK(Mdle,x,rK)
+!       call get_matrixKKT(Mdle,x,rKKT)
 !  ...apply transformation K^T to test functions F (and G)
       call DGEMM('T','N',3,NrdofEE,3,1.d0,rK,3,shapEE,3,0.d0,rKTshapF,3)
 !
@@ -435,7 +435,7 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
                      + SUM(AstarH1*conjg(AstarF1) + AstarH2*conjg(AstarF2))*weight
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
-!           only if it is not a diagonal element, G_ii
+!           only if it is not a diagonal block, G_ii
             if (k1 .ne. k2) then
 !           (E_j,G_i) terms = Int[G_^*i E_j] terms (G_21)
                n = 2*k1; m = 2*k2-1

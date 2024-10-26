@@ -48,7 +48,7 @@ subroutine elem(Mdle, Itest,Itrial)
    logical, parameter :: timer = .false.
 !
 !..use blas3 optimized assembly
-   logical, parameter :: opt_blas = .true.
+   logical, parameter :: opt_blas = .false.
 !
 !----------------------------------------------------------------------
 !

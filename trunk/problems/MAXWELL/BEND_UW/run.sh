@@ -29,7 +29,7 @@ nproc=1
 nthreads=1
 
 # Set polynomial order p
-p=2
+p=1
 
 # Set enriched order (p+dp)
 dp=1
@@ -59,7 +59,7 @@ ibc=0
 alpha=1.d0
 
 # solution number
-isol=10
+isol=14
 
 # component number for manufactured solution
 comp=1
@@ -70,7 +70,7 @@ omega=6.283185307179586d0
 # envelope wavenumber
 k=4.d0
 # bending radius
-rbend=10.d0
+rbend=500.d0
 
 #
 # ==================
@@ -79,7 +79,7 @@ rbend=10.d0
 #
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
-file_geometry='./geometries/bent_square_waveguide_new'
+file_geometry='./geometries/bent_waveguide_sq1_R500_DEG1'
 ctrl='control/control'
 #
 args=" -file_control ${ctrl}"

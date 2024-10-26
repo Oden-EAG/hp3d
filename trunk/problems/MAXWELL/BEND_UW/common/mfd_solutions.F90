@@ -60,7 +60,7 @@
       real(8) :: dzdxs, dzdys, dzdzs
 !
       real(8) :: x1, x2, x3, xshift, yshift, zshift
-      real(8) :: r, alpha, a, b
+      real(8) :: r, alpha, a, b, dr_x2, dr_x3,d2r_x2,d2r_x3,d2r_x2x3, u, du_r,d2u_r
 !
 !---------------------------------------------------------------------------------------
 !
@@ -127,6 +127,48 @@
          Grad2p(2,2) = cn*2.d0
          Grad2p(3,3) = cn*2.d0
 !
+!  ...linear w.r.t   r = sqrt(y^2+z^2)
+      case(13)
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = 2.d0*x2/r
+            dr_x3 = 2.d0*x3/r
+            d2r_x2 = 2.d0/r-4.d0*x2**2/r**3
+            d2r_x3 = 2.d0/r-4.d0*x3**2/r**3
+            d2r_x2x3 = -4.d0*x2*x3/r**3
+!
+            cn = 1.d0*ZONE
+            p = cn*r
+!     ...1st order derivatives
+            Gradp(2) = cn*dr_x2
+            Gradp(3) = cn*dr_x3
+!     ...second order derivatives
+            Grad2p(2,2) = cn*d2r_x2
+            Grad2p(3,2) = cn*d2r_x2x3
+            Grad2p(2,3) = Grad2p(3,2)
+            Grad2p(3,3) = cn*d2r_x3
+!  ...rational function depending on r = sqrt(y^2+z^2)
+      case(14)
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = 2.d0*x2/r
+            dr_x3 = 2.d0*x3/r
+            d2r_x2 = 2.d0/r-4.d0*x2**2/r**3
+            d2r_x3 = 2.d0/r-4.d0*x3**2/r**3
+            d2r_x2x3 = -4.d0*x2*x3/r**3
+!
+            cn = RBEND*ZONE
+            u = r**(-1)
+            du_r = -r**(-2)
+            d2u_r = 2.d0*r**(-3)
+            p = cn*u
+!     ...1st order derivatives
+            Gradp(2) = cn*du_r*dr_x2
+            Gradp(3) = cn*du_r*dr_x3
+!     ...second order derivatives
+            Grad2p(2,2) = cn*(d2u_r*dr_x2**2+du_r*d2r_x2)
+            Grad2p(3,2) = cn*(d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3)
+            Grad2p(2,3) = Grad2p(3,2)
+            Grad2p(3,3) = cn*(d2u_r*dr_x3**2+du_r*d2r_x3)
+!            
 !  ...polynomial solution vanishing on the boundary
       case(2)
 !

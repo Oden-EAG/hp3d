@@ -37,7 +37,7 @@ subroutine set_environment_maxwell
 ! =============================
 ! ========= GEOMETRIES ========
 ! =============================
-   call get_option_string( '-file_geometry', 'Geometry file', './geometries/bent_square_waveguide_cart', FILE_GEOM )
+   call get_option_string( '-file_geometry', 'Geometry file', './geometries/bent_square_waveguide_new', FILE_GEOM )
 !
 ! =============================
 ! ========== PHYSICS ==========
@@ -83,7 +83,7 @@ subroutine set_environment_maxwell
    call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
 !
 !..Set envelope wavenumber WAVENUM_K
-   call get_option_real('-k' , 'WAVENUM_K', 16.d0, WAVENUM_K)
+   call get_option_real('-k' , 'WAVENUM_K', 4.d0, WAVENUM_K)
 !
 !..Set bending radius RBEND
    call get_option_real('-rbend' , 'RBEND', 10.d0, RBEND)
