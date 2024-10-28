@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 !> @brief Routine performs fine mesh to coarse mesh projections and
-!         p-refinement for an h-ref candidate
+!         p-refinement for a h-ref candidate
 !> @param[in] Kref_loc              - h-ref flag of the h-ref candidate
 !> @param[in] Mdle                  - Middle node number of the coarse element
 !> @param[in] NrdofgQ               - number of L2 dofs for the isotropic p+1 order
@@ -13,10 +13,10 @@
 !> @param[in] Zbload                - load vector for the projection.
 !> @param[in] Nextract_prev         - extraction vector correspoding to Nord_old
 !> @param[in] Weights_fine_store    - weights and inverse of jacobian at each quadrature point
-!!                                    for the sons
-!> @param[in]  Quad_point_store     - coordinates of each quadrature point for the sons
-!> @param[in]  Nint_pp_store        - number of quadrature points for the sons
-!> @param[in]  Shap3DQ_fine_store   - values of L2 shape functions for the sons
+!!                                    for the child elements
+!> @param[in]  Quad_point_store     - coordinates of each quadrature point for the child elements
+!> @param[in]  Nint_pp_store        - number of quadrature points for the child elements
+!> @param[in]  Shap3DQ_fine_store   - values of L2 shape functions for the child elements
 !> @param[in]  Shap3DQ_coarse_store - values of L2 shape functions for the coarse element
 !
 !> @param[out] Polyflag             - optimal polynomial order for the given step
@@ -83,7 +83,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
    etype = NODES(Mdle)%ntype
    if(etype .eq. MDLB) then
 !
-!  ...lvl 1: base order is already solved outside
+!..lvl 1: base order is already solved outside
       call ddecode(Nord_old,pxm,pym,pzm)
       nrdofmQ = pxm * pym * pzm
       nrdof_old = nrdofmQ
@@ -106,7 +106,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
          nrdofmQ = pxm * pym * pzm
          nextract_subson = ZERO
 !
-         call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
+         call extraction_vector(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
 !
          do iattr = 1,NRQVAR
             do l = 1,nrdofmQ
@@ -130,7 +130,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
          counter = counter + 1
 !
       enddo
-!  ...selecting the first lvl candidate
+!..selecting the first lvl candidate
       rate_max_lvl = maxval(error_rates(1:3))
       max_loc      = maxloc(error_rates(1:3))
       poly_flag_chosen = poly_flags_lvl(max_loc(1))
@@ -140,8 +140,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
       nextract_prev_subson = ZERO
       nextract_prev_subson(1:nrdofmQ) = nextract_save_lvl(1:nrdofmQ,max_loc(1))
       nextract_save_lvl = ZERO
-!  ...level 2
-!
+!..level 2
       do k = 1,3
          if(k .ne. max_loc(1)) then
             order_add = int(10**(3-k))
@@ -151,7 +150,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
             nrdofmQ = pxm * pym * pzm
             nextract_subson = ZERO
 !
-            call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
+            call extraction_vector(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
 !
             do iattr = 1,NRQVAR
                do l = 1,nrdofmQ
@@ -177,11 +176,11 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
          endif
       enddo
 !
-!  ...selecting the second level candidate
+!..selecting the second level candidate
       rate_max_lvl = maxval(error_rates(4:5))
       max_loc      = maxloc(error_rates(4:5))
       poly_flag_chosen = poly_flags_lvl(3 + max_loc(1))
-!  ...final stage
+!..final stage
       Nord_prev = poly_flag_chosen
       call ddecode(Nord_prev,pxm,pym,pzm)
       nrdofmQ = pxm * pym * pzm
@@ -192,8 +191,7 @@ subroutine opt_polynomial_search_subson_linear(Kref_loc,Mdle,NrdofgQ,Nord_old,No
       nrdofmQ = pxm * pym * pzm 
       nextract_subson = ZERO
 !
-      call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
-
+      call extraction_vector(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nextract_prev_subson,nextract_subson)
       do iattr = 1,NRQVAR
          do l = 1,nrdofmQ
             bwork_subson(l,iattr) = zbload_subson(nextract_subson(l),iattr)/ap_subson(nextract_subson(l),nextract_subson(l))

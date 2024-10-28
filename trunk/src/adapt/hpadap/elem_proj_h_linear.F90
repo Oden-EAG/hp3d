@@ -1,16 +1,19 @@
 !-----------------------------------------------------------------------
-!> @brief Routine performs fine mesh to a h-refinement candidate element and computes
-!!        optimal p-distribution for the h-ref candidate
+!> @brief Routine performs projection from fine mesh elements to a h-refinement candidate 
+!         element and computes optimal p-distribution for the h-ref candidate
 !> @param[in]   Mdle            - middle node number of the coarse element
-!> @param[in]   Flag_pref_loc   - flag stating that the element is p-refined or not during fine mesh formation
+!> @param[in]   Flag_pref_loc   - flag stating that the element is p-refined or not during 
+!                                 fine mesh formation
 !> @param[in]   Kref_loc        - refinement flag for the h-ref candidate
 !> @param[in]   Error_org       - projection error for the coarse element
 !> @param[out]  Error_opt       - error for polynomial order that provides maximum error reduction rate
 !> @param[out]  G_rate_max      - maximum error reduction rate
 !> @param[out]  Rate_hcomp      - maximum error reduction rate for the competitive h-refinements
 !> @param[out]  Nord_href       - polynomial order for guranteed rate
-!> @param[out]  Nord_threshold  - polynomial distribution during the traversal along maximum error reduction path
-!> @param[out]  Count_threshold - number of steps in maximum error reduction path, once the refinements becomes competitive
+!> @param[out]  Nord_threshold  - polynomial distribution during the traversal along maximum error 
+!                                 reduction path
+!> @param[out]  Count_threshold - number of steps in maximum error reduction path, once the refinements 
+!                                 becomes competitive
 !> @param[out]  error_rate      - error rates while traversing the maximum error reduction path
 !> @param[out]  Loc_max_rate    - index of the step which produced the best error reduction rate
 !> @date May 2024
@@ -210,29 +213,26 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
             INTEGRATION = 1
             call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
             nint_pp_store(is,iss) = nint_pp
-!        ...extract the coefficeints of the fine grid solution for the is^th son
+!..extract the coefficeints of the fine grid solution for the is^th son
             call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
 !
             do l = 1,nint_pp
-
                xi(1:3) = xiloc(1:3,l)
                quad_point_store(1:3,l,is,iss) = xi(1:3)
                wa = waloc(l)
-                           !  ...H1 shape functions (for geometry)
+!..H1 shape functions (for geometry)
                call shape3DH(etype,xi,norder_pp,norient_edge_pp,norient_face_pp, nrdof,shapH,gradH)
-               !  ...L2 shape function calls
+!..L2 shape function calls
                call shape3DQ(etype,xi,norder_pp, nrdof,shapQ)
                shap3DQ_fine_store(1:nrdofQ_pp,l,is,iss) = shapQ(1:nrdofQ_pp)
-               !  ...geometry map
+!..geometry map
                call geom3D(mdle_fine,xi,xnod_pp,shapH,gradH,nrdofH_pp, x,dxdxi,dxidx,rjac,iflag)
-
                weight = rjac*wa
                weights_fine_store(l,1,is,iss) = weight
                weights_fine_store(l,2,is,iss) = rjac
                zvalQpp = ZERO
 !
                do iattr = 1,NR_PHYSA
-
                   if(D_TYPE(iattr).eq. DISCON) then
                         ibeg = ADRES(iattr)
                         do icomp = 1, NR_COMP(iattr)
@@ -322,7 +322,6 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
          do iss = 1,nr_subsons
 !        ...only solve if the subson has order changed
             if(nord_old(iss) .ne. nord_mep(iss,Nref)) then
-
                allocate(awork(nrdofgQ,nrdofgQ))
                allocate(bwork(nrdofgQ,MAXEQNQ))
                awork = ZERO
@@ -341,7 +340,7 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
                ap(1:nrdofgQ,1:nrdofgQ) = subsons_ap(1:nrdofgQ,1:nrdofgQ,iss)
                zbload(1:nrdofgQ,1:MAXEQNQ) = subsons_zbload(1:nrdofgQ,1:MAXEQNQ,iss)
 !
-               call extraction_vector_new(nord_old(iss),nord_org_subsons(iss),nord_glob,nrdofmQ,subsons_nextract_prev(iss,:),nextract)
+               call extraction_vector(nord_old(iss),nord_org_subsons(iss),nord_glob,nrdofmQ,subsons_nextract_prev(iss,:),nextract)
                do iattr = 1,NRQVAR
                   do l = 1,nrdofmQ
                         bwork(l,iattr) = zbload(nextract(l),iattr)/ap(nextract(l),nextract(l))
@@ -357,7 +356,6 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
                                                       nrdofmQ,nrdofgQ,iattr,Mdle,&
                                                       weights_fine_store(:,:,:,iss),quad_point_store(:,:,:,iss),nint_pp_store(:,iss),&
                                                       shap3DQ_fine_store(:,:,:,iss),shap3DQ_coarse_store(:,:,:,iss),proj_error_subson)
-!
                   proj_error_net_subson = proj_error_net_subson + proj_error_subson
                enddo
 !
@@ -461,7 +459,6 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
 ! 
          Nref = Nref + 1
       enddo
-
       Nord_href(1:nr_subsons) = nord_max(1:nr_subsons)
       Err_reduction_rate(1:100) = error_rate(1:100)
       Nord_threshold(1:100,1:8) = poly_dist_array(1:100,1:8)
@@ -497,5 +494,4 @@ subroutine elem_proj_h_linear(Mdle,Flag_pref_loc,Kref_loc,Error_org, Error_opt,&
       deallocate(subsons_nextract_prev)
 !
    endif
-!
 end subroutine elem_proj_h_linear

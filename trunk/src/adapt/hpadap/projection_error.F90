@@ -83,7 +83,7 @@ subroutine fine_to_coarse_projection_error(Nr_mdle_sons,Coeff,Nextract,NrdofmQ,N
       call solelm_L2(mdle_fine,zdofQ_pp)
       nint_pp = Nint_pp_store(is)
       do l = 1,nint_pp
-!     ...coordinates and weight of this integration point
+!..coordinates and weight of this integration point
          xi(1:3) = Quad_point_store(1:3,l,is)
          shapQ(1:nrdofQ_pp) = Shap3DQ_fine_store(1:nrdofQ_pp,l,is)
          weight = Weights_fine_store(l,1,is)
@@ -96,9 +96,9 @@ subroutine fine_to_coarse_projection_error(Nr_mdle_sons,Coeff,Nextract,NrdofmQ,N
          enddo
 !
          shapQ(1:nrdofQ_pp) = Shap3DQ_coarse_store(1:nrdofQ_pp,l,is)
-!     ...scaling the jacobian for isotropic refinement of coarse element
+!..scaling the jacobian for isotropic refinement of coarse element
          rjac = rjac * real(nr_mdle_sons,8)
-!     ...recontructing the projection at the transformed gauss point for
+!..recontructing the projection at the transformed gauss point for
 !        the transformed coarse elements.
          zvalQ = ZERO
          do k = 1,NrdofmQ
@@ -221,11 +221,11 @@ subroutine fine_to_subson_projection_error(Kref,Coeff,Nextract,Overlap,NrdofmQ,N
                shapQ = ZERO
                shapQ(1:nrdofQ_pp) = Shap3DQ_coarse_store(1:nrdofQ_pp,l,is)
 !
-!           ...scaling the jacobian for isotropic refinement of coarse element
+!..scaling the jacobian for isotropic refinement of coarse element
                rjac = rjac * real(Overlap_count,8)
 !
-!           ...recontructing the projection at the transformed gauss point for
-!              the transformed coarse elements.
+!..recontructing the projection at the transformed gauss point for
+!  the transformed coarse elements.
                zvalQ = ZERO
                do k = 1,NrdofmQ
                   q = shapQ(Nextract(k))/rjac

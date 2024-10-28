@@ -116,22 +116,22 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
       call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
       nint_pp_store(is) = nint_pp
 !
-!  ...extract the L2 dofs of the fine grid solution for the is^th son
+!..extract the L2 dofs of the fine grid solution for the is^th son
       call solelm_L2(mdle_fine,zdofQ_pp)
       do l = 1,nint_pp
 !     ...coordinates and weight of this integration point
          xi(1:3)=xiloc(1:3,l)
          quad_point_store(1:3,l,is) = xi(1:3)
          wa=waloc(l)
-!     ...H1 shape functions (for geometry)
+!..H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder_pp,norient_edge_pp,norient_face_pp, nrdof,shapH,gradH)
-!     ...L2 shape function calls
+!..L2 shape function calls
          call shape3DQ(etype,xi,norder_pp, nrdof,shapQ)
          shap3DQ_fine_store(1:nrdofQ_pp,l,is) = shapQ(1:nrdofQ_pp)
-!     ...geometry map
+!..geometry map
          call geom3D(mdle_fine,xi,xnod_pp,shapH,gradH,nrdofH_pp, x,dxdxi,dxidx,rjac,iflag)
          weight = rjac*wa
-!     ...storing the weight and inverse of jacobian for sons
+!..storing the weight and inverse of jacobian for sons
          weights_fine_store(l,1,is) = weight
          weights_fine_store(l,2,is) = rjac
 !
@@ -148,23 +148,23 @@ subroutine project_p_linear(Mdle,Flag_pref_loc, Error_org,Rate_p,Poly_flag)
                   enddo
                endif
          enddo
-!     ...calling the map between son's master element and coarse element master element
+!..calling the map between son's master element and coarse element master element
          call fine_to_coarse_gp_map(is,xi,xis,etype)
          shapQ = ZERO
          call shape3DQ(etype,xis,norder_pp, nrdof,shapQ)
          shap3DQ_coarse_store(1:nrdofQ_pp,l,is) = shapQ(1:nrdofQ_pp)
-!     ...scaling the jacobian to account for the isotropic refinement of coarse element
+!..scaling the jacobian to account for the isotropic refinement of coarse element
          rjac = rjac * real(nr_mdle_sons,8)
 !
-!     ...contribution to p+1 coarse projection matrix using subelement integration
-!        for linear elements, the projection matrix is diagonal, hence,only storing
-!     ...diagonal values
+!..contribution to p+1 coarse projection matrix using subelement integration
+!  for linear elements, the projection matrix is diagonal, hence,only storing
+!  diagonal values
          do k1 = 1,nrdofQ_pp
                q1 = shapQ(k1)/rjac
                q2 = shapQ(k1)/rjac
                ap(k1) = ap(k1) + weight * q1 * q2
          enddo
-!     ...computing  contributions to the projection load vector from each son (only for L2 variables)
+!..computing  contributions to the projection load vector from each son (only for L2 variables)
          do iattr = 1,NR_PHYSA
                if(D_TYPE(iattr) .eq. DISCON) then
                   ibeg = ADRES(iattr)

@@ -1,11 +1,11 @@
 !-----------------------------------------------------------------------------
-!> @brief Routine performs maps master element of the child (obtained
-!         after isotropic refinement of the coarse element) elements to the
+!> @brief Routine maps the master element correspoding to child (obtained after 
+!         isotropic refinement of the coarse element) elements to the
 !         master element corresponding to the coarse element.
 !> @param[in] Iel    - Index of the child (e.g.: 1-8 for isotropic refinement of hex element)
 !> @param[in] Xi     - quadrature point correspoding to the child
 !> @param[in] Etype  - element type
-!> @param[out] Xis   -  quadrature point  corresponding to the coarse element
+!> @param[out] Xis   - quadrature point  corresponding to the coarse element
 !> @date June 2024
 !-----------------------------------------------------------------------------
 subroutine fine_to_coarse_gp_map(Iel,Xi,Xis,Etype)
@@ -62,7 +62,7 @@ subroutine fine_to_coarse_gp_map(Iel,Xi,Xis,Etype)
 end subroutine fine_to_coarse_gp_map
 !
 !-----------------------------------------------------------------------------
-!> @brief Routine performs maps master element of the child (obtained
+!> @brief Routine maps master element of the child (obtained
 !         after isotropic refinement of the coarse element) elements to the
 !         master element corresponding to the h-ref candidate.
 !> @param[in] Etype  - element type

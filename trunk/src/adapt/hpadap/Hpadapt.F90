@@ -19,7 +19,7 @@ subroutine HpAdapt
    integer, parameter :: max_step = 200
    integer, parameter :: IADAPTIVE = 2
 !..Factor (when multiplied with the guaranteed rate)) that decides the
-!  threshold for implementing anisotropic h or p or hp
+!  threshold for implementing anisotropic p or hp
    real(8), parameter :: Factor_max_rate = 0.25
 !
    integer  :: Irefine = 2
@@ -86,7 +86,7 @@ subroutine HpAdapt
 !
 !..increase step if necessary
 !..irefineold=0 means no refinement was made in the previous step
-!..if first call or if a refinement was made, increase step
+!..if first call or if a refinement was made, increase istep
    if ((istep.eq.0).or.(irefineold.ne.0)) istep=istep+1
    irefineold=Irefine
 !..get dof count from solver
@@ -352,7 +352,7 @@ subroutine HpAdapt
          call project_p_linear(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep)
 !
          if(ADAPT_STRAT .eq. 1) then
-            call project_h(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep, &
+            call project_h_linear(mdle,flag_pref(iel),error_org,rate_p,poly_flag,istep, &
                            nref_grate(iel),ref_indicator_flags((iel-1) * 10 + 1:iel*10), &
                            mep_Nord_href(1:100,1:8,iel),error_reduction_rate(1:100,iel), &
                            mep_count(iel),loc_max_rate(iel))
@@ -477,7 +477,6 @@ subroutine HpAdapt
             case(MDLB)
                if(nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                   if(ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then
-!
                      kref = ref_indicator_flags((iel-1)*10 + 2)
                      href_flags(counter,1) = mdle
                      href_flags(counter,2) = kref
@@ -498,11 +497,9 @@ subroutine HpAdapt
             etype = NODES(mdle)%ntype
             nord = NODES(mdle)%order
             select case(etype)
-!
             case(MDLB)
                if(nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
-                  if(ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
-!
+                  if(ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then
                      kref = ref_indicator_flags((iel-1)*10 + 2)
                      call refine_opt(mdle,kref,href_flags(1:counter,:),counter)
                      href_count = href_count + 1
@@ -557,8 +554,10 @@ subroutine HpAdapt
                         allocate(pref_close(nr_sons_close))
                         pref_intent = ZERO
                         pref_close  = ZERO
-                        pref_intent(1:nr_sons_intent) = ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent-1)
-                        call subson_one_irregularity_map(etype,kref_intent,kref_close,nr_sons_intent,pref_intent,nr_sons_close,pref_close)
+                        pref_intent(1:nr_sons_intent) = ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3 &
+                                                                            +nr_sons_intent-1)
+                        call subson_one_irregularity_map(etype,kref_intent,kref_close,nr_sons_intent, &
+                                                         pref_intent,nr_sons_close,pref_close)
                         do ic = 1,nr_sons_close
                            nord_new = pref_close(ic)
                            mdle_child = first_son + ic - 1
@@ -622,7 +621,6 @@ subroutine Hp_adapt_solve
 !
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-
 !..initial solve
    Print *, HOST_MESH, RANK
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then

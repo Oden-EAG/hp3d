@@ -1,4 +1,3 @@
-!
 !-----------------------------------------------------------------------
 !> @brief Routine copies the current Nodes array into NODES_cp
 !> @param[in]   NODES_cp - Secondary nodes data structure required to

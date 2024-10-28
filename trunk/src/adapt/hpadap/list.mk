@@ -7,7 +7,7 @@ Hpadapt.F90
 Nodes_copy.F90
 opt_polynomial_search_coarse_linear.F90
 opt_polynomial_search_subson_linear.F90
-project_h.F90
+project_h_linear.F90
 project_p_linear.F90
 projection_error.F90
 solelm_L2.F90

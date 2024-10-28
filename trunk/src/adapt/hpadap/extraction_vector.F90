@@ -1,8 +1,7 @@
 !
 !-----------------------------------------------------------------------
-!> @brief  Routine extracts vector for location of smaller symmetric submatrix in larger symmetric matrix
-!!         Here larger matrix corresponds to a L2 gram matrix of larger space and smaller submatrix
-!!         is the L2 gram matrix of the smaller space
+!> @brief  Routine extracts index of polynomial basis for a given order when order is increased
+!          incrementally.
 !> @param[in]   Nord_prev       - previous order
 !> @param[in]   Nord_current    - current order
 !> @param[in]   Nord_glob       - highest possible order
@@ -11,7 +10,7 @@
 !> @param[out]  Nextract        - current extraction vector
 !> @date May 2024
 !-----------------------------------------------------------------------
-subroutine extraction_vector_new(Nord_prev,Nord_current,Nord_glob,NrdofmQ,Nextract_prev, Nextract)
+subroutine extraction_vector(Nord_prev,Nord_current,Nord_glob,NrdofmQ,Nextract_prev, Nextract)
 !
    implicit none
 !
@@ -66,4 +65,4 @@ subroutine extraction_vector_new(Nord_prev,Nord_current,Nord_glob,NrdofmQ,Nextra
          enddo
       enddo
    enddo
-end subroutine extraction_vector_new
+end subroutine extraction_vector

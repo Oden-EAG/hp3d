@@ -1,5 +1,6 @@
 !-----------------------------------------------------------------------
-!> @brief Routine performs fine mesh element to candidate h-refined element projections
+!> @brief Routine performs fine mesh element to candidate h-refined element projections and
+!         computes optimal h-refinement with optimal polynomial order
 !> @param[in]   Mdle                -    element number
 !> @param[in]   Flag_pref_loc       - flag indicating whether the element is p-refined or not
 !> @param[in]   Error_org           - projection error at the original polynomial order on the coarse element
@@ -12,10 +13,10 @@
 !> @param[out]  Elem_err_red_rate   - contains the error reduction rate while following maximum error reduction path
 !!                                    for h-ref candidate who provides the maximum guranteed rate
 !> @param[out]  Mep_count           - total number of steps taken while following the maximum error reduction path
-!> @param[out]  Loc_max_rate        - maximum guranteed rate among all h-refinement candidates
+!> @param[out]  Loc_max_rate        - maximum guaranteed rate among all h-refinement candidates
 !> @date May 2024
 !-----------------------------------------------------------------------
-subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
+subroutine project_h_linear(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
                      Elem_grate,Ref_indicator_flag, &
                      Mep_Nord_href,Elem_err_red_rate, &
                      Mep_count,Loc_max_rate)    
@@ -109,7 +110,7 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
 !
       allocate(loc_max_rate_ref(ref_opts))
       loc_max_rate_ref = ZERO
-
+!
       m = 1
       do k = 0,1
          do j = 0,1
@@ -130,10 +131,10 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
       error_max_rate  = maxval(error_opt(2:m))
       max_rate_element_loc =  maxloc(g_rate_ref(2:m))
       max_rate_hcomp = maxval(rate_hcomp(2:m))
-!  ...selection between href or pref
+!..selection between href or pref
       if(Flag_pref_loc .eq. 0) then
          Ref_indicator_flag(1) = 1
-!  ...since 1 element of kref_opts means 000, hence we need to offset it by one. Thus,we have max_rate_element(1) + 1
+!..since 1 element of kref_opts means 000, hence we need to offset it by one. Thus,we have max_rate_element(1) + 1
          Ref_indicator_flag(2) = kref_opts(max_rate_element_loc(1)+1)
          Ref_indicator_flag(3:10) = nord_max_href(max_rate_element_loc(1) + 1,1:8)
 
@@ -145,7 +146,7 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
       else
          if(max_rate_hcomp .ge. Rate_p) then
                Ref_indicator_flag(1) = 1
-!           ...since 1 element of kref_opts means 000, hence we need to offset it by one. Thus,we have max_rate_element(1) + 1
+!..since 1 element of kref_opts means 000, hence we need to offset it by one. Thus,we have max_rate_element(1) + 1
                Ref_indicator_flag(2) = kref_opts(max_rate_element_loc(1)+1)
                Ref_indicator_flag(3:10) = nord_max_href(max_rate_element_loc(1) + 1,1:8)
                Mep_Nord_href(1:100,1:8) = nord_threshold(1:100,1:8,max_rate_element_loc(1) + 1)
@@ -160,7 +161,7 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
                Elem_grate = Rate_p
          endif
       endif
-!  ...deallocating allocatable arrays
+!..deallocating allocatable arrays
       deallocate(error_opt)
       deallocate(g_rate_ref)
       deallocate(kref_opts)
@@ -169,4 +170,4 @@ subroutine project_h(Mdle,Flag_pref_loc,Error_org,Rate_p,Poly_flag,Istep, &
       deallocate(count_ref)
       deallocate(loc_max_rate_ref)
    endif
-end subroutine project_h
+end subroutine project_h_linear
