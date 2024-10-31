@@ -70,8 +70,9 @@ omega=6.283185307179586d0
 # envelope wavenumber
 k=4.d0
 # bending radius
-rbend=500.d0
-
+rbend=10.d0
+# prefix for paraview
+pref='torus0'
 #
 # ==================
 # RUN CONFIGURATIONS
@@ -79,7 +80,7 @@ rbend=500.d0
 #
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
-file_geometry='./geometries/bent_waveguide_sq1_R500_DEG1'
+file_geometry='./geometries/torus_part'
 ctrl='control/control'
 #
 args=" -file_control ${ctrl}"
@@ -89,7 +90,7 @@ args+=" -comp ${comp} -isol ${isol} -imax ${imax} -job ${job}"
 args+=" -maxnods ${maxnods} -alpha ${alpha} -omega ${omega} -gamma 1.0d0"
 args+=" -k ${k} -rbend ${rbend}"
 args+=" -ibc ${ibc}"
-args+=" -vis_level ${vis_level} -dir_output ${dir_output}"
+args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
 args+=" -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./bending ${args}

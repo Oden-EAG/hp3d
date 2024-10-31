@@ -492,6 +492,17 @@ subroutine input_DEFAULT(Fp)
 !       coordinates
         case('CylRec')
 !
+!  .....image of a linear rectangle through a global system of toroidal
+!       coordinates. Rdata(1:3), Rdata(4:6) give coordinates of centers of
+!       arcs P1P2 and P3P4, respectively.
+        case('TorRec')
+          allocate(RECTANGLES(nr)%Rdata(6), stat=istat)
+          if (istat.ne.SUCCESS) then
+            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
+          endif
+          read(nin,*) RECTANGLES(nr)%Rdata(1:3)
+          read(nin,*) RECTANGLES(nr)%Rdata(4:6)
+!
         case default
           write(*,1004) RECTANGLES(nr)%Type
  1004     format(' input_DEFAULT: unknown rectangle type! Type = ',a10)
@@ -545,6 +556,15 @@ subroutine input_DEFAULT(Fp)
 !
         select case(HEXAS(nh)%Type)
         case('Linear','TraHex','TrInHex','CylHex')
+! 
+!       TorHex: Idata(1) and Idata(2) store the rectangle numbers
+!       of the outer and inner toroidal quad faces, respectively.
+        case('TorHex')
+          allocate(HEXAS(nh)%Idata(2), stat=istat)
+          if (istat.ne.SUCCESS) then
+            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
+          endif
+          read(nin,*) HEXAS(nh)%Idata(1:2)
         case default
           write(*,1006) HEXAS(nh)%Type
  1006     format(' input_DEFAULT: unknown hexa type! Type = ',a10)

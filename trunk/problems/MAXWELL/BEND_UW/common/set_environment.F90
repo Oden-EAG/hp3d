@@ -37,7 +37,7 @@ subroutine set_environment_maxwell
 ! =============================
 ! ========= GEOMETRIES ========
 ! =============================
-   call get_option_string( '-file_geometry', 'Geometry file', './geometries/bent_square_waveguide_new', FILE_GEOM )
+   call get_option_string( '-file_geometry', 'Geometry file', './geometries/torus_part', FILE_GEOM )
 !
 ! =============================
 ! ========== PHYSICS ==========

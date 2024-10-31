@@ -145,6 +145,10 @@ subroutine recta(No,Eta, X,Dxdeta)
         call recta_CylRec(No,Eta, X,dxdeta_aux)
         Dxdeta(1:3,1:2) = dxdeta_aux(1:3,1:2)
 !
+!  ...toroidal rectangle..................................
+      case('TorRec')
+        call recta_TorRec(No,Eta, X,Dxdeta)
+!
       case default
         write(*,7003) RECTANGLES(No)%Type
    7003 format(' recta: unknown Type = ',a10)

@@ -66,17 +66,20 @@ subroutine hexa(No,Eta, X,Dxdeta)
           enddo
         enddo
 !
-!  ....transfinite interpolation Hexa................................................
-       case('TraHex','TrInHex') ; call hexa_TraHex(No,Eta, X,Dxdeta)
+!  ...transfinite interpolation Hexa................................................
+      case('TraHex','TrInHex') ; call hexa_TraHex(No,Eta, X,Dxdeta)
 !
-!  ....cylindrical coordinates Hexa
-       case('CylHex') ; call hexa_CylHex(No,Eta, X,Dxdeta)
+!  ...cylindrical coordinates Hexa
+      case('CylHex') ; call hexa_CylHex(No,Eta, X,Dxdeta)
 !
-       case default
+!  ...toroidal coordinates Hexa
+			case('TorHex') ; call hexa_TorHex(No,Eta, X,Dxdeta)
+!
+      case default
          write(*,7004) HEXAS(No)%Type
  7004    format(' hexa: unknown type! Type = ',a10)
          stop
-       endselect
+      endselect
 !
 !
 end subroutine hexa
@@ -395,3 +398,261 @@ end subroutine hexa_TraHex
 !
 !
    end subroutine hexa_CylHex
+
+!
+!-----------------------------------------------------------------------
+!
+!   routine name       - hexa_TorHex
+!
+!-----------------------------------------------------------------------
+!
+!   latest revision    - Oct 24
+!
+!   purpose            - routine evaluates physical coordinates
+!                        and its derivatives wrt to reference
+!                        coordinates for a point on the image
+!                        of a linear hexa through a global system
+!                        of toroidal coordinates (\rho,\phi,\theta):
+!                        x = \rho*sin(\phi),
+!                        y = (Rmaj+ \rho*cos(\phi))cos(\theta),
+!                        z = (Rmaj+ \rho*cos(\phi))sin(\theta)
+!                        
+!                        and their  derivative wrt to reference
+!                        coordinates
+
+!
+!   arguments :
+!     in:
+!               No     - a GMP hexahedron block number
+!               Eta    - reference coordinates of a point
+!                        in the reference hexa
+!     out:
+!               X      - physical coordinates of the point
+!               Dxdeta - derivatives of the physical coordinates wrt
+!                        to the reference coordinates
+!
+!-----------------------------------------------------------------------
+!
+   subroutine hexa_TorHex(No,Eta, X,Dxdeta)
+      !
+            use control
+            use GMP          , only : HEXAS,POINTS,NDIM,RECTANGLES
+            use node_types   , only : BRIC
+            implicit none
+      !----------------------------------------------------------------------
+            integer,                 intent(in)  :: No
+            real(8), dimension(3),   intent(in)  :: Eta(3)
+            real(8), dimension(3),   intent(out) :: X(3)
+            real(8), dimension(3,3), intent(out) :: Dxdeta(3,3)
+      !----------------------------------------------------------------------
+      !  ...vertex shape functions
+            real(8), dimension(8)   :: vshape
+            real(8), dimension(3,8) :: dvshape
+      !  ...toroidal coordinates
+						real(8)               :: rho,phi,theta,rhop,phip,thetap,phitmp
+						real(8), dimension(3) :: drhodeta,dphideta,dthetadeta
+      !----------------------------------------------------------------------
+      !     misc.
+						integer :: iprint,iv,np,i,nro,nri
+						integer, dimension(8) :: ipv
+						real(8) :: pi,twopi,raux,px,costheta,sintheta,cosphi,sinphi
+						real(8) :: theta12,theta34,rmaj,rmino,rmini
+						real(8), dimension(3) :: c12,c34,oc,cv
+      !----------------------------------------------------------------------
+      !
+            iprint=1
+      !
+            if ((HEXAS(No)%Type.ne.'TorHex'.or.(NDIM.ne.3))) then
+              write(*,7001) HEXAS(No)%Type
+       7001   format('Hexa_TorHex: WRONG HEXA TYPE = ',a10)
+              stop 1
+            endif
+      !
+            if (iprint.eq.1) then
+              write(*,7002) No,Eta
+       7002   format('Hexa_TorHex: No,Eta = ',i4,2x,3f8.3)
+            endif
+      !
+            pi = acos(-1.d0)
+            twopi = pi*2.d0
+			!  ...initialize output
+						X(1:3) = 0.d0; Dxdeta(1:3,1:3) = 0.d0
+			!
+			!  ...save coordinates of arcs' centers.
+						nro = HEXAS(No)%Idata(1)
+						nri = HEXAS(No)%Idata(2)
+			!     c12 is center of arc P1P2, c34 of arc P3P4, BOTH on OUTER face
+						c12 = RECTANGLES(nro)%Rdata(1:3)
+						c34 = RECTANGLES(nro)%Rdata(4:6)
+			!     c12 must ALSO be center for P5P6, c34 ALSO for P7P8, INNER face
+						if(norm2(c12-RECTANGLES(nri)%Rdata(1:3)).gt.GEOM_TOL.or.      &
+						   norm2(c34-RECTANGLES(nri)%Rdata(4:6)).gt.GEOM_TOL   ) then
+							write(*,*)'hexa_TorHex: INCOMPATIBLE TOROIDAL QUAD FACES:', &
+							          nro,nri
+							stop 1
+						endif
+      !
+			!  ...determine major radius
+						rmaj = NORM2(c12)
+			!
+			!  ...determine minor radius for outer surface
+			!     take radius from c12 to p1
+						np = HEXAS(No)%VertNo(1)
+						rmino = NORM2(POINTS(np)%Rdata(1:3)-c12)
+			!
+			!  ...determine minor radius for inner surface
+			!     take radius from c12 to p5
+						np = HEXAS(No)%VertNo(5)
+						rmini = NORM2(POINTS(np)%Rdata(1:3)-c12)
+			! 
+						if (iprint.eq.1) then
+							write(*,*) 'TorHex: rmaj,rmino,rmini = ',rmaj,rmino,rmini
+						endif
+			!
+			!  ...determine theta angles of both arcs
+						if (abs(c12(2)).gt.GEOM_TOL) then
+							theta12 = ATAN(c12(3)/c12(2))
+						else
+							theta12 = pi/2.d0 * SIGN(1.d0,c12(3))
+						endif 
+						if (c12(2).lt. -GEOM_TOL) then
+							theta12 = theta12 + pi
+						endif
+						if (abs(c34(2)).gt.GEOM_TOL) then
+							theta34 = ATAN(c34(3)/c34(2))
+						else
+							theta34 = pi/2.d0 * SIGN(1.d0,c34(3))
+						endif 
+						if (c34(2).lt. -GEOM_TOL) then
+							theta34 = theta34 + pi
+						endif
+						if (theta34.le.theta12) then 
+							theta12 = theta12 - twopi
+						endif
+			!
+      !  ...interpolate in x,r,theta
+            rho   = 0.d0; Drhodeta(1:3)     = 0.d0
+            phi   = 0.d0; Dphideta(1:3)     = 0.d0
+            theta = 0.d0; Dthetadeta(1:3)   = 0.d0
+			!
+			!  ...vertex shape functions
+						call vshape3(BRIC,Eta, vshape,dvshape)
+      !  ...list of vertices' indices to relate to toroidal quad face
+						! ipv=(/ 4,3,7,8,   1,2,6,5 /)						
+            do iv=1,8
+              np=HEXAS(No)%VertNo(np)
+							px = POINTS(np)%Rdata(1)
+							select case(iv)
+			!    ...select appropriate vector origin--arc center & point's rho
+							case(1,2)
+								oc = c12
+								rhop = rmino
+							case(3,4)
+								oc = c34
+								rhop = rmino
+							case(5,6)
+								oc = c12
+								rhop = rmini
+							case(7,8)
+								oc = c34
+								rhop = rmini
+							end select
+			!    ...store vector arc center--point iv
+							cv = POINTS(np)%Rdata(1:3)-oc
+			!    ...evaluate dot product between major radial unit vector and 
+			!       minor radial unit vector.
+							call dot_product(oc/rmaj,cv/rhop,raux)							
+			!    ...Get phi. If px is negative, phi must be corrected
+							if (px.ge.0.d0) then
+								phitmp = ACOS(raux)
+							else
+								phitmp = twopi - ACOS(raux)
+							endif
+			!
+			!  .....set theta and phi (adjust if necessary)
+							select case(iv)
+							case(1,5)
+								thetap = theta12
+								phip = phitmp
+							case(2,6)
+								thetap = theta12
+			!      ...if phi2 is less than phi1, adjust by adding 2pi
+								if (phitmp.lt.phip) then
+									phip = phitmp + twopi
+								else
+									phip = phitmp
+								endif
+							case(3,7)
+								thetap = theta34
+			!      ...if phi3 is twopi away from phi2, adjust by equaling phi3 to phi2
+								if (abs(abs(phip-phitmp)-twopi).lt.GEOM_TOL) then
+									phip = phip
+								else
+									phip = phitmp
+								endif
+							case(4,8)
+								thetap = theta34
+			!      ...if phi4 is more than phi1, adjust by subtracting 2pi
+								if (phitmp.gt.phip) then
+									phip = phitmp - twopi
+								else
+									phip = phitmp
+								endif
+							end select							
+			!              
+			!    ...evaluate rho, phi and theta according to vertex shape functions
+              rho   = rho   + rhop*vshape(iv)
+              phi   = phi   + phip*vshape(iv)
+              theta = theta + thetap*vshape(iv)
+      !    ...evaluate derivatives as well (w.r.t. eta)
+              drhodeta(1:3)   = drhodeta(1:3)   + rhop*dvshape(1:3,iv)
+              dphideta(1:3)   = dphideta(1:3)   + phip*dvshape(1:3,iv)
+              dthetadeta(1:3) = dthetadeta(1:3) + thetap*dvshape(1:3,iv)
+      
+              if (iprint.eq.1) then
+                write(*,*) 'hexa_TorHex:  iv =',iv
+								write(*,*) '      oc,cv,raux =',oc,cv,raux
+                write(*,*) 'rhop,phip,thetap =',rhop,phip,thetap
+              endif
+            enddo
+
+						if (iprint.eq.1) then
+							write(*,*) 'hexa_TorHex:  completed'
+							write(*,*) '              rho        =',rho
+							write(*,*) '              drhodeta   =',drhodeta
+							write(*,*) '              phi        =',phi
+							write(*,*) '              dphideta   =',dphideta
+							write(*,*) '              theta      =',phi
+							write(*,*) '              dthetadeta =',dthetadeta
+						endif
+
+			!  ...find Cartesian coordinates
+            costheta = COS(theta); sintheta = SIN(theta)
+            cosphi = COS(phi); sinphi = SIN(phi)
+            X(1) = rho*sinphi
+            X(2) = (rmaj+rho*cosphi)*costheta
+            X(3) = (rmaj+rho*cosphi)*sintheta
+            Dxdeta(1,1:3) =  sinphi*drhodeta(1:3)                &
+                            +rho*cosphi*dphideta(1:3)
+            Dxdeta(2,1:3) =  cosphi*costheta*drhodeta(1:3)       &
+						                -rho*costheta*sinphi*dphideta(1:3)   &
+                            -X(3)*dthetadeta(1:3)
+            Dxdeta(3,1:3) =  cosphi*sintheta*drhodeta(1:3)       &
+														-rho*sintheta*sinphi*dphideta(1:3)   &
+                            +X(2)*dthetadeta(1:3)
+            if (iprint.eq.1) then
+              write(*,*) 'rho   = ', rho
+              write(*,*) 'phi   = ', phi
+              write(*,*) 'theta = ', theta
+              write(*,7003) X
+              write(*,7004) (Dxdeta(i,1:3),i=1,3)
+       7003   format('Hexa_TorHex: ',/,'X      = ',3f8.3)
+       7004   format('Dxdeta = ',3f8.3,/,  &
+                     '         ',3f8.3,/,  &
+                     '         ',3f8.3)
+              call pause
+            endif
+      !
+      !
+         end subroutine hexa_TorHex
+      
