@@ -9,6 +9,7 @@ subroutine exec_job_adap_ref()
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh,DISTRIBUTED,HOST_MESH
    use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
+   use adaptivity    , only: ADAPT_STRAT
 !
    implicit none
 !
@@ -64,10 +65,16 @@ subroutine exec_job_adap_ref()
       endif
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
+      if(ADAPT_STRAT .eq. 1) then
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call HpAdapt     
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+      else  
 !..isotropic refinement
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-      call refine_DPG
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call refine_DPG
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+      endif
 !
 !  ...mesh distribution
       if (NUM_PROCS .gt. 1) then

@@ -1,3 +1,4 @@
+adaptivity.F90
 assembly.F90
 assembly_sc.F90
 bitvisit.F90

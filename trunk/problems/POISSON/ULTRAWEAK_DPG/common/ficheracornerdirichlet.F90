@@ -79,7 +79,7 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
     x3 = X(3)
 !    
 !..csn stands for case for solution (1 for analytical sol and 2 for Fichera Corner)
-    csn = 1
+    csn = 2
 !
     if(csn .eq. 1) then 
 !        
@@ -93,6 +93,7 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
         pi  = atan(1.d0)*4.d0
         a23 = 2.d0/3.d0
 !
+        r = sqrt(x1**2+x3**2)
         if (r<eps) goto 101
 !        
         if(x3.ge.abs(x1) .and. x1.le.0.d0)then
@@ -124,7 +125,7 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
 !
         101  continue
 !
-        x2 = X(2); x3 = X(3); r = sqrt(x2**2+x3**2)
+        r = sqrt(x2**2+x3**2)
         if (r<eps) goto 102
 !
         if(x3.ge.abs(x2) .and. x2.le.0.d0)then
@@ -156,7 +157,7 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
 !
         102  continue
 !
-        x1 = X(1);x2 = X(2); r = sqrt(x2**2+x1**2)
+        r = sqrt(x2**2+x1**2)
         if (r < eps) goto 103
         if (x1<=0.d0 .and. x2>=0.d0) then
             theta = atan2(x2,x1) - pi/2.d0

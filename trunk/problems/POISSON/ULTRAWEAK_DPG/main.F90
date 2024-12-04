@@ -108,9 +108,10 @@ program main
 !
    if (JOB .ne. 0) then
 !..for adaptive refinements
-      !call exec_job_adap_ref
+      ! call Hp_adapt_solve
+      call exec_job_adap_ref
 !..for uniform refinements
-      call exec_job
+      ! call exec_job
    else
       if (RANK .eq. ROOT) then
          call master_main
@@ -198,6 +199,7 @@ subroutine master_main()
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
       write(*,*) 'Multiple Adaptive Refinement + solve...27'
+      write(*,*) 'Multiple Hp Refinement + solve.........28'
       ! write(*,*) 'Multiple '
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
@@ -267,7 +269,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !..Refinements
-         case(20,21,22,23,26,27)
+         case(20,21,22,23,26,27,28)
             call exec_case(idec)
 !
 !..MPI Routines
@@ -394,7 +396,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !..Refinements
-         case(20,21,22,23,26,27)
+         case(20,21,22,23,26,27,28)
             call exec_case(idec)
 !
 !..MPI Routines

@@ -4,25 +4,36 @@
 !!                    Rule 2: an element refinement flag is
 !!                            always upgraded to accommodate
 !!                            existing refinements of faces
+!! Note: This routine is a modification of refine subroutine with an added functionality:
+!!       To maintain 1-irregularity in the mesh, the neighboring
+!!       elements of Mdle_in might be refined with the required minimum refinement. 
+!!       However, this refinement may differ from the one prescribed by the user. 
+!!       Hence, refine_list addtionally checks whether the neighboring element is in the list 
+!!       of elements marked for refinement. If it is marked, then the refinement 
+!!       done to maintain 1-irregularity will be the union of the computed minimum 
+!!       refinement and the user-prescribed refinement flag.
+!!
 !> @param[in] Mdle_in - middle node
 !> @param[in] Kref_in - refinement kind
-!> @date      Feb 2023
+!> @param[in] List    - list of elements to be refined with the corresponding 
+!>                      requested (optimal) refinements
+!>            Nrlist  - number of elements on the list
+!> @date      June 2024
 !--------------------------------------------------------------------
-subroutine refine(Mdle_in,Kref_in)
+subroutine refine_list(Mdle_in,Kref_in,List,Nrlist)
    use data_structure3D
    use constrained_nodes
    use refinements
    use mpi_param, only: RANK,ROOT
-   use adaptivity , only: CLOSURE_STRAT
    implicit none
 !
-   integer, intent(in) :: Mdle_in, Kref_in
+   integer, intent(in) :: Mdle_in, Kref_in,List(Nrlist,2),Nrlist
 !
    integer, dimension(MAXQUEUE) :: mdle_list,kref_list
    integer, dimension(2)        :: neig,nsid_list,norient_list
    integer, dimension(27)       :: nodesl,norientl
    integer, dimension(6)        :: kreff
-   integer :: i, n, loc, loc2, iface, iface_loc, kref, krefm, kref_iso
+   integer :: i, n, loc, loc2,loc3, iface, iface_loc, kref, krefm
    integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase, ntype
    logical :: iflag
 !
@@ -183,15 +194,19 @@ subroutine refine(Mdle_in,Kref_in)
 !
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               if(CLOSURE_STRAT .eq. 1) then 
-                  call find_element_ref(NODES(mdle_loc)%ntype,0,kreff, krefm)
+               call find_element_ref(NODES(mdle_loc)%ntype,0,kreff, krefm)
+
+!           ...check if the neighbor element is on the list of elements
+!              to be refined
+               call locate(mdle_loc,list,nrlist, loc3)
+               if (loc3.gt.0) then
+                 call upgrade_kref(list(loc3,2), krefm)
                endif
+!
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
-               if(CLOSURE_STRAT .eq. 0) then
-                  call get_isoref(mdle_loc, kref_iso)
-                  call find_element_ref(NODES(mdle_loc)%ntype,kref_iso,kreff, krefm)
-               endif
+            !    call get_isoref(mdle_loc, kref_iso)
+            !    call find_element_ref(NODES(mdle_loc)%ntype,kref_iso,kreff, krefm)
 !           ...-------------------------------------------------------------------
 !           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
                !select case (NODES(mdle_loc)%nntype)
@@ -272,4 +287,4 @@ subroutine refine(Mdle_in,Kref_in)
 !..end loop over queue
    enddo
 !
-end subroutine refine
+end subroutine refine_list
