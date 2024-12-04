@@ -4,6 +4,15 @@
 !!                    Rule 2: an element refinement flag is
 !!                            always upgraded to accommodate
 !!                            existing refinements of faces
+!! Note: This routine is a modification of refine subroutine with an added functionality:
+!!       To maintain 1-irregularity in the mesh, the neighboring
+!!       elements of Mdle_in might be refined with the required minimum refinement. 
+!!       However, this refinement may differ from the one prescribed by the user. 
+!!       Hence, refine_list addtionally checks whether the neighboring element is in the list 
+!!       of elements marked for refinement. If it is marked, then the refinement 
+!!       done to maintain 1-irregularity will be the union of the computed minimum 
+!!       refinement and the user-prescribed refinement flag.
+!!
 !> @param[in] Mdle_in - middle node
 !> @param[in] Kref_in - refinement kind
 !> @param[in] List    - list of elements to be refined with the corresponding 
@@ -11,7 +20,7 @@
 !>            Nrlist  - number of elements on the list
 !> @date      June 2024
 !--------------------------------------------------------------------
-subroutine refine_opt(Mdle_in,Kref_in,List,Nrlist)
+subroutine refine_list(Mdle_in,Kref_in,List,Nrlist)
    use data_structure3D
    use constrained_nodes
    use refinements
@@ -278,4 +287,4 @@ subroutine refine_opt(Mdle_in,Kref_in,List,Nrlist)
 !..end loop over queue
    enddo
 !
-end subroutine refine_opt
+end subroutine refine_list

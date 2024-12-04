@@ -66,7 +66,7 @@ subroutine HpAdapt
    integer, allocatable :: pref_intent(:), pref_close(:)
 !
    integer :: i,ic,mdle,iel,kref,subd,count,ierr
-   integer :: nord_new,nord
+   integer :: nord_new,nord,nordx,nordy,nordz,naux,pord
    real(8) :: error_org,rate_p
 !
 !..element type
@@ -451,7 +451,14 @@ subroutine HpAdapt
                   if(ref_indicator_flags((iel-1)*10 + 1) .eq. 2) then
 !                        
                         nord_new = ref_indicator_flags((iel-1)*10 + 3)
+                        call decode(nord_new,naux,nordz)
+                        call decode(naux,nordx,nordy)
+                        pord = MAX(nordx,nordy,nordz)
                         call nodmod(mdle,nord_new)
+                        if (pord .gt. MAXP) then
+                           write(*,*) "Order > Maxord in MDLE = ",mdle
+                           call pause
+                        endif
                         href_count = href_count + 1
                   endif
                endif
@@ -501,7 +508,8 @@ subroutine HpAdapt
                if(nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                   if(ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then
                      kref = ref_indicator_flags((iel-1)*10 + 2)
-                     call refine_opt(mdle,kref,href_flags(1:counter,:),counter)
+                     call refine_list(mdle,kref,href_flags(1:counter,:),counter)
+                     ! call refine(mdle,kref)
                      href_count = href_count + 1
 !
                   endif
@@ -561,6 +569,18 @@ subroutine HpAdapt
                         do ic = 1,nr_sons_close
                            nord_new = pref_close(ic)
                            mdle_child = first_son + ic - 1
+                           call decode(nord_new,naux,nordz)
+                           call decode(naux,nordx,nordy)
+                           pord = MAX(nordx,nordy,nordz)
+                           call nodmod(mdle,nord_new)
+                           if (pord .gt. MAXP) then
+                              write(*,*) "Order > Maxord in MDLE = ",mdle
+                              write(*,*) "kref_intent = ",kref_intent
+                              write(*,*) "Kref_appl = ",kref_close
+                              write(*,*) "p_intent = ",pref_intent(1:nr_sons_intent)
+                              write(*,*) "p_appl = ",pref_intent(1:nr_sons_close)
+                              call pause
+                           endif
                            call nodmod(mdle_child,nord_new)
                         enddo
                         deallocate(pref_intent)

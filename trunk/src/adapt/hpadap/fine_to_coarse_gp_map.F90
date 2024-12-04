@@ -222,8 +222,8 @@ subroutine subson_one_irregularity_map(Etype,Kref_intent,Kref_appl,Nr_sons_inten
    integer,    intent(in) :: Nr_sons_appl
    integer,    intent(out):: Pref_appl(Nr_sons_appl)
 !    
-   integer :: i
-   integer, allocatable :: el_pmap(:)
+   integer :: i,temp_b
+   integer, allocatable :: el_pmap(:),temp_a(:)
 !
    if(Etype .eq. MDLB) then
 !
@@ -313,34 +313,160 @@ subroutine subson_one_irregularity_map(Etype,Kref_intent,Kref_appl,Nr_sons_inten
       select case(Kref_appl)
 !
          case(100)
-            Pref_appl(1) = (el_pmap(1)+el_pmap(4)+el_pmap(5)+el_pmap(8))/4
-            Pref_appl(2) = (el_pmap(2)+el_pmap(3)+el_pmap(6)+el_pmap(7))/4
+            allocate(temp_a(4))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(4)
+            temp_a(3) = el_pmap(5)
+            temp_a(4) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(1) = temp_b
+!
+            temp_a = 0
+            temp_a(1) = el_pmap(2)
+            temp_a(2) = el_pmap(3)
+            temp_a(3) = el_pmap(6)
+            temp_a(4) = el_pmap(7)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(2) = temp_b
+            deallocate(temp_a)
 !
          case(010)
-            Pref_appl(1) = (el_pmap(1)+el_pmap(2)+el_pmap(5)+el_pmap(6))/4
-            Pref_appl(2) = (el_pmap(3)+el_pmap(4)+el_pmap(7)+el_pmap(8))/4
+            allocate(temp_a(4))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(2)
+            temp_a(3) = el_pmap(5)
+            temp_a(4) = el_pmap(6)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(1) = temp_b
+!
+            temp_a = 0
+            temp_a(1) = el_pmap(3)
+            temp_a(2) = el_pmap(4)
+            temp_a(3) = el_pmap(7)
+            temp_a(4) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(2) = temp_b
+            deallocate(temp_a)
 !
          case(001)
-            Pref_appl(1) = (el_pmap(1)+el_pmap(2)+el_pmap(3)+el_pmap(4))/4
-            Pref_appl(2) = (el_pmap(5)+el_pmap(6)+el_pmap(7)+el_pmap(8))/4
+            allocate(temp_a(4))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(2)
+            temp_a(3) = el_pmap(3)
+            temp_a(4) = el_pmap(4)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(1) = temp_b
+!
+            temp_a = 0
+            temp_a(1) = el_pmap(5)
+            temp_a(2) = el_pmap(6)
+            temp_a(3) = el_pmap(7)
+            temp_a(4) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,4,temp_b)
+            Pref_appl(2) = temp_b
+            deallocate(temp_a)
 !
          case(110)
-            Pref_appl(1) = (el_pmap(1) + el_pmap(5))/2
-            Pref_appl(2) = (el_pmap(2) + el_pmap(6))/2
-            Pref_appl(3) = (el_pmap(3) + el_pmap(7))/2
-            Pref_appl(4) = (el_pmap(4) + el_pmap(8))/2
+            allocate(temp_a(2))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(5)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(1) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(2)
+            temp_a(2) = el_pmap(6)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(2) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(3)
+            temp_a(2) = el_pmap(7)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(3) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(4)
+            temp_a(2) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(4) = temp_b
+            deallocate(temp_a)
 !
          case(101)
-            Pref_appl(1) = (el_pmap(1) + el_pmap(4))/2
-            Pref_appl(2) = (el_pmap(2) + el_pmap(3))/2
-            Pref_appl(3) = (el_pmap(6) + el_pmap(7))/2
-            Pref_appl(4) = (el_pmap(5) + el_pmap(8))/2
-!
+            allocate(temp_a(2))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(4)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(1) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(2)
+            temp_a(2) = el_pmap(3)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(2) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(6)
+            temp_a(2) = el_pmap(7)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(3) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(5)
+            temp_a(2) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(4) = temp_b
+            deallocate(temp_a)
+! !
          case(011)
-            Pref_appl(1) = (el_pmap(1) + el_pmap(2))/2
-            Pref_appl(2) = (el_pmap(3) + el_pmap(4))/2
-            Pref_appl(3) = (el_pmap(7) + el_pmap(8))/2
-            Pref_appl(4) = (el_pmap(5) + el_pmap(6))/2
+            allocate(temp_a(2))
+            temp_a = 0
+            temp_a(1) = el_pmap(1)
+            temp_a(2) = el_pmap(2)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(1) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(3)
+            temp_a(2) = el_pmap(4)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(2) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(7)
+            temp_a(2) = el_pmap(8)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(3) = temp_b
+
+            temp_a = 0
+            temp_a(1) = el_pmap(5)
+            temp_a(2) = el_pmap(6)
+            temp_b = 0
+            call poly_interpolate_hex(temp_a,2,temp_b)
+            Pref_appl(4) = temp_b
+            deallocate(temp_a)
 !
          case(111)
             do i = 1,8
@@ -353,3 +479,28 @@ subroutine subson_one_irregularity_map(Etype,Kref_intent,Kref_appl,Nr_sons_inten
    endif
 !
 end subroutine subson_one_irregularity_map
+
+!
+subroutine poly_interpolate_hex(el_pmap,nr_count,p_avg)
+
+   implicit none
+   integer, intent(in)  :: nr_count
+   integer, intent(in)  :: el_pmap(nr_count)
+   integer, intent(out) :: p_avg
+!  ..auxiliary variables
+   integer :: i,decode_order(nr_count,3),temp(3)
+   
+   do i = 1,nr_count
+      call decod(el_pmap(i),10,3,temp)
+      decode_order(i,1:3) = temp(1:3)
+   enddo
+!
+   temp = 0
+   do i = 1,nr_count
+      temp(1:3) = temp(1:3) + decode_order(i,1:3)
+   enddo
+   temp = temp/nr_count
+
+   call encod(temp,10,3, p_avg)
+
+end subroutine poly_interpolate_hex
