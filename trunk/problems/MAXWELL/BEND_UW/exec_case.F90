@@ -7,7 +7,8 @@
       use control
       use data_structure3D
       use par_mesh
-      use paraview      , only: VLEVEL,paraview_select_attr
+      use paraview      , only: VLEVEL,paraview_select_attr, &
+                                SECOND_ORDER_VIS,VIS_VTU
       use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
       use mpi_wrapper
 !
@@ -26,7 +27,7 @@
       integer :: i,mdle,kref
       real(8) :: res
 !
-      integer :: src,count,ierr
+      integer :: src,count,ierr,refs
 !
 !----------------------------------------------------------------------
 !
@@ -39,6 +40,10 @@
 !
 !     ...Paraview graphics
          case(3)
+!
+!        ...Raise the necessary flags for high order Paraview output
+            SECOND_ORDER_VIS = .true.
+            VIS_VTU = .true.
 !
             iPvAttr = (/.false.,.true./) ! write field output only
             if (RANK .eq. ROOT) then
@@ -53,15 +58,20 @@
             call MPI_BCAST (iPvAttr,count,MPI_LOGICAL,src,MPI_COMM_WORLD,ierr)
 !
             if (RANK .eq. ROOT) then
-               write(*,*) 'paraview output: select VLEVEL (0-4)...'
-               read (*,*) vis_level
-               select case(vis_level)
-                  case('0','1','2','3','4')
-                     VLEVEL = vis_level
-                  case default
-                     write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
-                     VLEVEL = '3'
-               end select
+               if ( .not. SECOND_ORDER_VIS) then
+                  write(*,*) 'paraview output: select VLEVEL (0-4)...'
+                  read (*,*) vis_level
+                  select case(vis_level)
+                     case('0','1','2','3','4')
+                        VLEVEL = vis_level
+                     case default
+                        write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
+                        VLEVEL = '3'
+                  end select
+               else
+                  VLEVEL = '0'
+                  write(*,*) 'VLEVEL=0 (Paraview 2nd order visualization enabled).'
+               endif
             endif
 !
             count = len(VLEVEL); src = ROOT
@@ -114,6 +124,29 @@
             call global_pref
             call update_gdof
             call update_Ddof
+!
+!
+!     ...anisotropic h-refinements (in z)
+         case(23)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Select number of refinements:'
+               read(*,*) refs
+            endif
+            count = 1; src = ROOT
+            call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            write(*,*) 'global anisotropic h-refinement...'
+            do i=1,refs
+               call global_href_aniso(0,1)
+               ! if (IBCFLAG .eq. 3) then
+               !    call propagate_flag(3,3)
+               !    call propagate_flag(5,3)
+               ! endif
+            enddo
+            call global_href_aniso(0,1)
+            ! call global_href_aniso_bric(0,0,1)
+            call update_gdof
+            call update_Ddof
+!
 !
 !     ...distribute mesh
          case(30)

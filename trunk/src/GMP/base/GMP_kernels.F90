@@ -428,7 +428,10 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
  10   continue
 !
 !  ...if bubble is not needed, return
-      if (RECTANGLES(No)%Type.ne.'PTIRec') then
+      if ((RECTANGLES(No)%Type.eq.'TraQua') .or.              &
+          (RECTANGLES(No)%Type.eq.'BilQua') .or.              & 
+          (RECTANGLES(No)%Type.eq.'CylRec') .or.              & 
+          (RECTANGLES(No)%Type.eq.'TorRec')      ) then
         X(1:3)=0.d0 ; Dxdt(1:3,1:2)=0.d0
 !        write(*,*)'rectaB: warning! Bubble is not needed!'
         write(*,6000) No,RECTANGLES(No)%Type

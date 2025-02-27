@@ -44,6 +44,11 @@
       VTYPE              :: dvalQ (  MAXEQNQ,3  )
       VTYPE              :: d2valQ(  MAXEQNQ,3,3)
 !
+!  ...space for temporary solutions
+      VTYPE   :: E
+      VTYPE   :: dE(3)
+      VTYPE   :: d2E(3,3)
+!
 #if HP3D_DEBUG
 !  ...printing flag : 0 - silent ; 1 - verbose
       integer :: iprint
@@ -62,6 +67,21 @@
 !     ...exact solution UNKNOWN: solving homogeneous equation
          case(0)
 !
+            if (ISOL.eq.16) then
+!           ...use the exact solution to determine Dirichlet data
+!           ...get Electric field component
+               call mfd_solutions(X, E,dE,d2E)
+!
+!           ...E-field value for component 1
+               ValE(1,1) = E ! E-field trace;
+!
+!           ...E-field 1st order derivatives for component 1
+               DvalE(1,1,1:3) = dE(1:3)
+!
+!           ...E-field 2nd order derivatives for component 1
+               D2valE(1,1,1:3,1:3) = d2E(1:3,1:3)        
+            endif
+!s            
             continue
 !
 !     ...exact solution KNOWN

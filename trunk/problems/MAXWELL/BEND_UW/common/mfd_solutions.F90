@@ -26,6 +26,7 @@
       use data_structure3D
       use commonParam
       use parameters, only : ZERO, ZONE, ZIMG
+      use bessel_evaluation
 !
       implicit none
 !
@@ -35,14 +36,18 @@
       complex(8), intent(out) :: Grad2p(3,3)
 !
 !  ...intermediate variables
-      real(8) :: w0, p0, rk, pi_mod
+      real(8) :: w0, p0, rk, pi_mod , wavenum0
       real(8) :: theta_x, theta_y
       real(8) :: rad_x, rad_y
       real(8) :: sinx, siny, cosx, cosy
       real(8) :: x, y, z
       real(8) :: Rx(3,3), Ry(3,3), Rxy(3,3)
 !
-!  ...functions and their derivatives
+!  ...separable solution - factor functions and their derivatives
+      complex(8) :: u, du_r,d2u_r ,znu
+      complex(8) :: w, dw_th, d2w_th
+      real(8) :: v,dv_x1,d2v_x1
+!
       complex(8) :: zf_x, zf_y, zf_z, cn
       complex(8) :: dzf_x,dzf_y, dzf_z
       complex(8) :: ddzf_x, ddzf_y, ddzf_z
@@ -59,8 +64,9 @@
       real(8) :: dydxs, dydys, dydzs
       real(8) :: dzdxs, dzdys, dzdzs
 !
-      real(8) :: x1, x2, x3, xshift, yshift, zshift
-      real(8) :: r, alpha, a, b, dr_x2, dr_x3,d2r_x2,d2r_x3,d2r_x2x3, u, du_r,d2u_r
+      real(8) :: x1, x2, x3, xshift, yshift, zshift, alpha, a, b, cf
+      real(8) :: r,dr_x2,dr_x3,d2r_x2,d2r_x3,d2r_x2x3
+      real(8) :: th,dth_x2,dth_x3,d2th_x2,d2th_x3,d2th_x2x3
 !
 !---------------------------------------------------------------------------------------
 !
@@ -98,77 +104,6 @@
          Grad2p(3,2) =  pi_mod**2*dcos(x2*pi_mod)*dcos(x3*pi_mod)*dsin(x1*pi_mod)*(1.0D0,1.0D0)
          Grad2p(3,3) = -pi_mod**2*dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
 !
-!  ...affine function depending on x
-      case(10)
-         cn = 1.d0*ZONE
-         a = 0.d0;    b =1.d0
-         p = cn*(a*x1+b)
-!     ...1st order derivatives
-         Gradp(1) = cn*a
-!     ...second order derivatives are all zero
-!
-!  ...quadratic bubble depending on x
-      case(11)
-         cn = 1.d0*ZONE
-         p = cn*(x1-x1**2)
-!     ...1st order derivatives
-         Gradp(1) = cn*(1.d0-2.d0*x1)
-!     ...second order derivatives
-         Grad2p(1,1) = cn*(-2.d0)
-!
-!  ...polynomial depending on r^2 = y^2+z^2
-      case(12)
-         cn = 1.d0*ZONE
-         p = cn*(x2**2 + x3**2 - RBEND**2)
-!     ...1st order derivatives
-         Gradp(2) = cn*2.d0*x2
-         Gradp(3) = cn*2.d0*x3
-!     ...second order derivatives
-         Grad2p(2,2) = cn*2.d0
-         Grad2p(3,3) = cn*2.d0
-!
-!  ...linear w.r.t   r = sqrt(y^2+z^2)
-      case(13)
-            r = dsqrt(x2**2+x3**2)
-            dr_x2 = 2.d0*x2/r
-            dr_x3 = 2.d0*x3/r
-            d2r_x2 = 2.d0/r-4.d0*x2**2/r**3
-            d2r_x3 = 2.d0/r-4.d0*x3**2/r**3
-            d2r_x2x3 = -4.d0*x2*x3/r**3
-!
-            cn = 1.d0*ZONE
-            p = cn*r
-!     ...1st order derivatives
-            Gradp(2) = cn*dr_x2
-            Gradp(3) = cn*dr_x3
-!     ...second order derivatives
-            Grad2p(2,2) = cn*d2r_x2
-            Grad2p(3,2) = cn*d2r_x2x3
-            Grad2p(2,3) = Grad2p(3,2)
-            Grad2p(3,3) = cn*d2r_x3
-!  ...rational function depending on r = sqrt(y^2+z^2)
-      case(14)
-            r = dsqrt(x2**2+x3**2)
-            dr_x2 = 2.d0*x2/r
-            dr_x3 = 2.d0*x3/r
-            d2r_x2 = 2.d0/r-4.d0*x2**2/r**3
-            d2r_x3 = 2.d0/r-4.d0*x3**2/r**3
-            d2r_x2x3 = -4.d0*x2*x3/r**3
-!
-            cn = RBEND*ZONE
-            u = r**(-1)
-            du_r = -r**(-2)
-            d2u_r = 2.d0*r**(-3)
-            p = cn*u
-!     ...1st order derivatives
-            Gradp(2) = cn*du_r*dr_x2
-            Gradp(3) = cn*du_r*dr_x3
-!     ...second order derivatives
-            Grad2p(2,2) = cn*(d2u_r*dr_x2**2+du_r*d2r_x2)
-            Grad2p(3,2) = cn*(d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3)
-            Grad2p(2,3) = Grad2p(3,2)
-            Grad2p(3,3) = cn*(d2u_r*dr_x3**2+du_r*d2r_x3)
-!            
 !  ...polynomial solution vanishing on the boundary
       case(2)
 !
@@ -374,8 +309,197 @@
                      + (p_xy*dxdzs + p_yy*dydzs + p_zy*dzdzs)*dydzs    &
                      + (p_xz*dxdzs + p_yz*dydzs + p_zz*dzdzs)*dzdzs
 !
+!
+!  ...affine function depending on x
+      case(10)
+         cn = 1.d0*ZONE
+         a = 0.d0;    b =1.d0
+         p = cn*(a*x1+b)
+!     ...1st order derivatives
+         Gradp(1) = cn*a
+!     ...second order derivatives are all zero
+!
+!  ...quadratic bubble depending on x
+      case(11)
+         cn = 1.d0*ZONE
+         p = cn*(x1-x1**2)
+!     ...1st order derivatives
+         Gradp(1) = cn*(1.d0-2.d0*x1)
+!     ...second order derivatives
+         Grad2p(1,1) = cn*(-2.d0)
+!
+!  ...polynomial depending on r^2 = y^2+z^2
+      case(12)
+         cn = 1.d0*ZONE
+         p = cn*(x2**2 + x3**2 - RBEND**2)
+!     ...1st order derivatives
+         Gradp(2) = cn*2.d0*x2
+         Gradp(3) = cn*2.d0*x3
+!     ...second order derivatives
+         Grad2p(2,2) = cn*2.d0
+         Grad2p(3,3) = cn*2.d0
+!
+!  ...linear w.r.t   r = sqrt(y^2+z^2)
+      case(13)
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = x2/r
+            dr_x3 = x3/r
+            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+            d2r_x2x3 = -1.d0*x2*x3/r**3
+!
+            cn = 1.d0*ZONE
+            p = cn*r
+!     ...1st order derivatives
+            Gradp(2) = cn*dr_x2
+            Gradp(3) = cn*dr_x3
+!     ...second order derivatives
+            Grad2p(2,2) = cn*d2r_x2
+            Grad2p(3,2) = cn*d2r_x2x3
+            Grad2p(2,3) = Grad2p(3,2)
+            Grad2p(3,3) = cn*d2r_x3
+!  ...rational function depending on r = sqrt(y^2+z^2)
+      case(14)
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = 2.d0*x2/r
+            dr_x3 = 2.d0*x3/r
+            d2r_x2 = 2.d0/r-4.d0*x2**2/r**3
+            d2r_x3 = 2.d0/r-4.d0*x3**2/r**3
+            d2r_x2x3 = -4.d0*x2*x3/r**3
+!
+            cn = RBEND*ZONE
+            u = r**(-1)
+            du_r = -r**(-2)
+            d2u_r = 2.d0*r**(-3)
+            p = cn*u
+!     ...1st order derivatives
+            Gradp(2) = cn*du_r*dr_x2
+            Gradp(3) = cn*du_r*dr_x3
+!     ...second order derivatives
+            Grad2p(2,2) = cn*(d2u_r*dr_x2**2+du_r*d2r_x2)
+            Grad2p(3,2) = cn*(d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3)
+            Grad2p(2,3) = Grad2p(3,2)
+            Grad2p(3,3) = cn*(d2u_r*dr_x3**2+du_r*d2r_x3)
+!            
+!  ...Separable function u(r)*v(x)*w(theta)
+      case(15)
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = x2/r
+            dr_x3 = x3/r
+            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+            d2r_x2x3 = -1.d0*x2*x3/r**3
+!
+            ! cn = RBEND*ZONE
+            ! u = r**(-1)
+            ! du_r = -r**(-2)
+            ! d2u_r = 2.d0*r**(-3)
+            ! v = HALFWIDTH**2 - x1**2
+            ! dv_x1 = -2.d0*x1
+            ! d2v_x1 = 2.d0
+!            
+            ! call real_eval_aaa(r - RBEND,u,du_r)
+
+            wavenum0 = OMEGA*sqrt(EPSILON*MU)
+!        ...u(r) is an eigenfunction of Bessel's equation with appropriate b.c.s
+            call bessel_preset(wavenum0, RBEND, r,    u, du_r, d2u_r)
+            ! 
+            ! write (*,*) 'mfd_solutions: local wavenum0=',wavenum0
+            ! call pause
+            ! write(*,*) 'mfd_solutions: u,du_r,d2u_r=',u,du_r,d2u_r
+
+            ! u = ZONE; du_r = ZERO; d2u_r = ZERO
+
+            cf = 0.5d0*PI/HALFWIDTH
+            v =     1.d0 ! COS(x1*cf)
+            dv_x1 = 0.d0 !-SIN(x*cf)*cf
+            d2v_x1 = 0.d0
+
+            th = atan2(x3,x2)
+            dth_x2    = -x3/r**2
+            dth_x3    =  x2/r**2
+            d2th_x2   =  x3*2.d0*r*dr_x2/r**4
+            d2th_x2x3 = -(r**2-x3*2.d0*r*dr_x3)/r**4
+            d2th_x3   = -x2*2.d0*r*dr_x3/r**4
+
+            znu = sqrt(ZLAMBDA_MODE)-ENVELOPEK*RBEND
+            ! write(*,*) 'mfd_solutions: znu=',znu
+            w = exp(-ZI*znu*th)
+            dw_th = -ZI*znu*w
+            d2w_th = -znu**2*w
+!     ...mfd solution for the polarized component of E
+            cn = 1.d0*ZONE
+            p = cn * u * v * w
+!     ...1st order derivatives
+            Gradp(1) = cn * u * dv_x1 * w
+            Gradp(2) = cn * (du_r*dr_x2 * v * w  +  u * v * dw_th*dth_x2 )
+            Gradp(3) = cn * (du_r*dr_x3 * v * w  +  u * v * dw_th*dth_x3 )
+!     ...second order derivatives
+            Grad2p(1,1) = cn * (u * d2v_x1 * w )
+            Grad2p(1,2) = cn * (du_r*dr_x2 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x2)
+            Grad2p(1,3) = cn * (du_r*dr_x3 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x3)
+            Grad2p(2,1) = Grad2p(1,2)
+            Grad2p(2,2) = cn * ( (d2u_r*dr_x2**2+du_r*d2r_x2) * v * w            &
+                                + 2.d0*(du_r*dr_x2 * v * dw_th*dth_x2)           &
+                                + u * v * (d2w_th*dth_x2**2+dw_th*d2th_x2) )
+            Grad2p(2,3) = cn * ( (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v * w       &
+                                + du_r*dr_x2 * v * dw_th*dth_x3                  &
+                                + du_r*dr_x3 * v * dw_th*dth_x2                  &
+                                + u * v * (dw_th*dth_x2*dth_x3+d2w_th*d2th_x2x3))
+            Grad2p(3,1) = Grad2p(1,3)
+            Grad2p(3,2) = Grad2p(2,3)
+            Grad2p(3,3) = cn * ( (d2u_r*dr_x3**2+du_r*d2r_x3) * v * w            &
+                                + 2.d0*(du_r*dr_x3 * v * dw_th*dth_x3)           &
+                                + u * v * (d2w_th*dth_x3**2+dw_th*d2th_x3) )
+!
+!  ...Function for partly bent waveguide
+      case(16)
+         if (x3.ge.0.d0) then
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = x2/r
+            dr_x3 = x3/r
+            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+            d2r_x2x3 = -1.d0*x2*x3/r**3
+         else
+            r = x2
+            dr_x2 = 1.d0
+            dr_x3 = 0.d0
+            d2r_x2 = 0.d0
+            d2r_x3 = 0.d0
+            d2r_x2x3 = 0.d0
+         endif
+!
+            cn = ZONE
+            cf = 0.5d0*PI/HALFWIDTH
+            u = COS((r-RBEND) * cf)
+            du_r = -SIN((r-RBEND)*cf) * cf
+            d2u_r = -u * cf**2
+            v = 1.d0
+            dv_x1 = 0.d0
+            d2v_x1 = 0.d0
+! 
+            p = cn * u * v
+!     ...1st order derivatives
+            Gradp(1) = cn * u * dv_x1
+            Gradp(2) = cn * du_r*dr_x2 * v
+            Gradp(3) = cn * du_r*dr_x3 * v
+!     ...second order derivatives
+            Grad2p(1,1) = cn * u * d2v_x1
+            Grad2p(1,2) = cn * du_r*dr_x2 * dv_x1
+            Grad2p(1,3) = cn * du_r*dr_x3 * dv_x1
+            Grad2p(2,1) = Grad2p(1,2)
+            Grad2p(2,2) = cn * (d2u_r*dr_x2**2+du_r*d2r_x2) * v
+            Grad2p(2,3) = cn * (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v
+            Grad2p(3,1) = Grad2p(1,3)
+            Grad2p(3,2) = Grad2p(2,3)
+            Grad2p(3,3) = cn * (d2u_r*dr_x3**2+du_r*d2r_x3) * v
+! 
    end select
 !
 !
    end subroutine mfd_solutions
+
+
+
 

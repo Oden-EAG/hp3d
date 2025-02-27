@@ -1,5 +1,6 @@
 SRC_MODULE  = \
-        modules/commonParam.F90
+        modules/commonParam.F90 \
+        modules/bessel_evaluation.F90
 
 SRC_COMMON  = \
         common/commonRoutines.F90 \

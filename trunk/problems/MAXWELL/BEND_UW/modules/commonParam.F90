@@ -26,13 +26,19 @@ module commonParam
 !
 !..material constants
    real(8) :: MU,EPSILON
+!..base amplitudes of E and H to obtain a particular irradiance
+   real(8) :: E_AMPL, H_AMPL
 !
 !..frequency
    real(8) :: OMEGA
 !..envelope wavenumber k
-   real(8) :: WAVENUM_K
+   real(8) :: ENVELOPEK
 !..bending radius
    real(8) :: RBEND
+!..waveguide half width
+   real(8) :: HALFWIDTH
+!..bent fiber spanning angle
+   real(8) :: SPANGLE
 !
 !..impedance BC:
 !  GAMMA  : impedance constant

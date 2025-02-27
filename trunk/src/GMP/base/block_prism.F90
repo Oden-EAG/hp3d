@@ -351,7 +351,9 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         call decode(PRISMS(No)%FigNo(ifig), nr,norient)
 !  .....skip if rectangle type does not apply
         if ((RECTANGLES(nr)%Type.eq.'TraQua') .or.              &
-            (RECTANGLES(nr)%Type.eq.'BilQua')      ) cycle
+            (RECTANGLES(nr)%Type.eq.'BilQua') .or.              & 
+            (RECTANGLES(nr)%Type.eq.'CylRec') .or.              & 
+            (RECTANGLES(nr)%Type.eq.'TorRec')      ) cycle
 !
 !  .....printing
         if (iprint.eq.1) then

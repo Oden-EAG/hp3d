@@ -73,7 +73,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
       case('CylHex') ; call hexa_CylHex(No,Eta, X,Dxdeta)
 !
 !  ...toroidal coordinates Hexa
-			case('TorHex') ; call hexa_TorHex(No,Eta, X,Dxdeta)
+      case('TorHex') ; call hexa_TorHex(No,Eta, X,Dxdeta)
 !
       case default
          write(*,7004) HEXAS(No)%Type
@@ -449,18 +449,18 @@ end subroutine hexa_TraHex
             real(8), dimension(8)   :: vshape
             real(8), dimension(3,8) :: dvshape
       !  ...toroidal coordinates
-						real(8)               :: rho,phi,theta,rhop,phip,thetap,phitmp
-						real(8), dimension(3) :: drhodeta,dphideta,dthetadeta
+            real(8)               :: rho,phi,theta,rhop,phip,thetap,phitmp
+            real(8), dimension(3) :: drhodeta,dphideta,dthetadeta
       !----------------------------------------------------------------------
       !     misc.
-						integer :: iprint,iv,np,i,nro,nri
-						integer, dimension(8) :: ipv
-						real(8) :: pi,twopi,raux,px,costheta,sintheta,cosphi,sinphi
-						real(8) :: theta12,theta34,rmaj,rmino,rmini
-						real(8), dimension(3) :: c12,c34,oc,cv
+            integer :: iprint,iv,np,i,nro,nri
+            integer, dimension(8) :: ipv
+            real(8) :: pi,twopi,raux,px,costheta,sintheta,cosphi,sinphi
+            real(8) :: theta12,theta56,rmaj,rmino,rmini
+            real(8), dimension(3) :: c12,c56,oc,cv
       !----------------------------------------------------------------------
       !
-            iprint=1
+            iprint=0
       !
             if ((HEXAS(No)%Type.ne.'TorHex'.or.(NDIM.ne.3))) then
               write(*,7001) HEXAS(No)%Type
@@ -475,132 +475,146 @@ end subroutine hexa_TraHex
       !
             pi = acos(-1.d0)
             twopi = pi*2.d0
-			!  ...initialize output
-						X(1:3) = 0.d0; Dxdeta(1:3,1:3) = 0.d0
-			!
-			!  ...save coordinates of arcs' centers.
-						nro = HEXAS(No)%Idata(1)
-						nri = HEXAS(No)%Idata(2)
-			!     c12 is center of arc P1P2, c34 of arc P3P4, BOTH on OUTER face
-						c12 = RECTANGLES(nro)%Rdata(1:3)
-						c34 = RECTANGLES(nro)%Rdata(4:6)
-			!     c12 must ALSO be center for P5P6, c34 ALSO for P7P8, INNER face
-						if(norm2(c12-RECTANGLES(nri)%Rdata(1:3)).gt.GEOM_TOL.or.      &
-						   norm2(c34-RECTANGLES(nri)%Rdata(4:6)).gt.GEOM_TOL   ) then
-							write(*,*)'hexa_TorHex: INCOMPATIBLE TOROIDAL QUAD FACES:', &
-							          nro,nri
-							stop 1
-						endif
+      !  ...initialize output
+            X(1:3) = 0.d0; Dxdeta(1:3,1:3) = 0.d0
       !
-			!  ...determine major radius
-						rmaj = NORM2(c12)
-			!
-			!  ...determine minor radius for outer surface
-			!     take radius from c12 to p1
-						np = HEXAS(No)%VertNo(1)
-						rmino = NORM2(POINTS(np)%Rdata(1:3)-c12)
-			!
-			!  ...determine minor radius for inner surface
-			!     take radius from c12 to p5
-						np = HEXAS(No)%VertNo(5)
-						rmini = NORM2(POINTS(np)%Rdata(1:3)-c12)
-			! 
-						if (iprint.eq.1) then
-							write(*,*) 'TorHex: rmaj,rmino,rmini = ',rmaj,rmino,rmini
-						endif
-			!
-			!  ...determine theta angles of both arcs
-						if (abs(c12(2)).gt.GEOM_TOL) then
-							theta12 = ATAN(c12(3)/c12(2))
-						else
-							theta12 = pi/2.d0 * SIGN(1.d0,c12(3))
-						endif 
-						if (c12(2).lt. -GEOM_TOL) then
-							theta12 = theta12 + pi
-						endif
-						if (abs(c34(2)).gt.GEOM_TOL) then
-							theta34 = ATAN(c34(3)/c34(2))
-						else
-							theta34 = pi/2.d0 * SIGN(1.d0,c34(3))
-						endif 
-						if (c34(2).lt. -GEOM_TOL) then
-							theta34 = theta34 + pi
-						endif
-						if (theta34.le.theta12) then 
-							theta12 = theta12 - twopi
-						endif
-			!
+      !  ...save coordinates of arcs' centers.
+            nro = HEXAS(No)%Idata(1)
+            nri = HEXAS(No)%Idata(2)
+      !     c12 is center of arc P1P2, c56 of arc P5P6, BOTH on INNER face
+            c12 = RECTANGLES(nri)%Rdata(1:3)
+            c56 = RECTANGLES(nri)%Rdata(4:6)
+      !     c12 must ALSO be center for P3P4, c56 ALSO for P7P8, OUTER face
+            if(norm2(c12-RECTANGLES(nro)%Rdata(1:3)).gt.GEOM_TOL.or.      &
+               norm2(c56-RECTANGLES(nro)%Rdata(4:6)).gt.GEOM_TOL   ) then
+              write(*,*)'hexa_TorHex: INCOMPATIBLE TOROIDAL QUAD FACES:', &
+                        nro,nri
+              stop 1
+            endif
+      !
+      !  ...determine major radius
+            rmaj = NORM2(c12)
+      !
+      !  ...determine minor radius for outer surface
+      !     take radius from c12 to p4
+            np = HEXAS(No)%VertNo(4)
+            rmino = NORM2(POINTS(np)%Rdata(1:3)-c12)
+      !
+      !  ...determine minor radius for inner surface
+      !     take radius from c12 to p1
+            np = HEXAS(No)%VertNo(1)
+            rmini = NORM2(POINTS(np)%Rdata(1:3)-c12)
+      ! 
+            if (iprint.eq.1) then
+              write(*,*) 'TorHex: rmaj,rmino,rmini = ',rmaj,rmino,rmini
+            endif
+      !
+      !  ...determine theta angles of both arcs
+            if (abs(c12(2)).gt.GEOM_TOL) then
+              theta12 = ATAN(c12(3)/c12(2))
+            else
+              theta12 = pi/2.d0 * SIGN(1.d0,c12(3))
+            endif 
+            if (c12(2).lt. -GEOM_TOL) then
+              theta12 = theta12 + pi
+            endif
+            if (abs(c56(2)).gt.GEOM_TOL) then
+              theta56 = ATAN(c56(3)/c56(2))
+            else
+              theta56 = pi/2.d0 * SIGN(1.d0,c56(3))
+            endif 
+            if (c56(2).lt. -GEOM_TOL) then
+              theta56 = theta56 + pi
+            endif
+            if (theta56.le.theta12) then 
+              theta12 = theta12 - twopi
+            endif
+      !
       !  ...interpolate in x,r,theta
             rho   = 0.d0; Drhodeta(1:3)     = 0.d0
             phi   = 0.d0; Dphideta(1:3)     = 0.d0
             theta = 0.d0; Dthetadeta(1:3)   = 0.d0
-			!
-			!  ...vertex shape functions
-						call vshape3(BRIC,Eta, vshape,dvshape)
-      !  ...list of vertices' indices to relate to toroidal quad face
-						! ipv=(/ 4,3,7,8,   1,2,6,5 /)						
+      !
+      !  ...vertex shape functions
+            call vshape3(BRIC,Eta, vshape,dvshape)
             do iv=1,8
-              np=HEXAS(No)%VertNo(np)
-							px = POINTS(np)%Rdata(1)
-							select case(iv)
-			!    ...select appropriate vector origin--arc center & point's rho
-							case(1,2)
-								oc = c12
-								rhop = rmino
-							case(3,4)
-								oc = c34
-								rhop = rmino
-							case(5,6)
-								oc = c12
-								rhop = rmini
-							case(7,8)
-								oc = c34
-								rhop = rmini
-							end select
-			!    ...store vector arc center--point iv
-							cv = POINTS(np)%Rdata(1:3)-oc
-			!    ...evaluate dot product between major radial unit vector and 
-			!       minor radial unit vector.
-							call dot_product(oc/rmaj,cv/rhop,raux)							
-			!    ...Get phi. If px is negative, phi must be corrected
-							if (px.ge.0.d0) then
-								phitmp = ACOS(raux)
-							else
-								phitmp = twopi - ACOS(raux)
-							endif
-			!
-			!  .....set theta and phi (adjust if necessary)
-							select case(iv)
-							case(1,5)
-								thetap = theta12
-								phip = phitmp
-							case(2,6)
-								thetap = theta12
-			!      ...if phi2 is less than phi1, adjust by adding 2pi
-								if (phitmp.lt.phip) then
-									phip = phitmp + twopi
-								else
-									phip = phitmp
-								endif
-							case(3,7)
-								thetap = theta34
-			!      ...if phi3 is twopi away from phi2, adjust by equaling phi3 to phi2
-								if (abs(abs(phip-phitmp)-twopi).lt.GEOM_TOL) then
-									phip = phip
-								else
-									phip = phitmp
-								endif
-							case(4,8)
-								thetap = theta34
-			!      ...if phi4 is more than phi1, adjust by subtracting 2pi
-								if (phitmp.gt.phip) then
-									phip = phitmp - twopi
-								else
-									phip = phitmp
-								endif
-							end select							
-			!              
-			!    ...evaluate rho, phi and theta according to vertex shape functions
+              np=HEXAS(No)%VertNo(iv)
+              px = POINTS(np)%Rdata(1)
+
+              if (iprint.eq.3) then
+                write(*,*) 'TorHex: iv, np = ', iv, np
+              endif
+
+              select case(iv)
+      !    ...select appropriate vector origin--arc center & point's rho
+              case(1,2)
+                oc = c12
+                thetap = theta12
+                rhop = rmini
+              case(3,4)
+                oc = c12
+                thetap = theta12
+                rhop = rmino
+              case(5,6)
+                oc = c56
+                thetap = theta56
+                rhop = rmini
+              case(7,8)
+                oc = c56
+                thetap = theta56
+                rhop = rmino
+              end select
+      !    ...store vector arc center--point iv
+              cv = POINTS(np)%Rdata(1:3)-oc
+      !    ...evaluate dot product between major radial unit vector and 
+      !       minor radial unit vector.
+              call dot_product(oc/rmaj,cv/rhop,raux)
+      !    ...check if |raux|>1
+              if (abs(raux).gt.1.d0) then
+                if (abs(raux)-1.d0 .gt. GEOM_TOL) then
+                  write(*,*) 'recta_TorRec: Error in dot product result, must be in [-1,1]; raux=',raux
+                  stop 1
+                else
+      !        ...raux is within the tolerance, so we adjust it
+                  raux = SIGN(1.d0,raux)
+                endif
+              endif
+      !    ...Get phi. If px is negative, phi must be corrected
+              if (px.ge.0.d0) then
+                phitmp = ACOS(raux)
+              else
+                phitmp = twopi - ACOS(raux)
+              endif
+      !
+      !  .....set phi (adjust if necessary)
+              select case(iv)
+              case(1,5)                
+                phip = phitmp
+              case(2,6)                
+      !      ...if phi2<phi1 or phi6<phi5, adjust by adding 2pi
+                if (phitmp.lt.phip) then
+                  phip = phitmp + twopi
+                else
+                  phip = phitmp
+                endif
+              case(3,7)                
+      !      ...if phi3 +/- 2pi == phi2, or phi7 +/- 2pi = phi6
+      !         adjust by equaling phi3 to phi2, or phi7 to phi6
+                if (abs(abs(phip-phitmp)-twopi).lt.GEOM_TOL) then
+                  phip = phip
+                else
+                  phip = phitmp
+                endif
+              case(4,8)                
+      !      ...if phi4 is more than phi3, adjust by subtracting 2pi
+                if (phitmp.gt.phip) then
+                  phip = phitmp - twopi
+                else
+                  phip = phitmp
+                endif
+              end select              
+      !              
+      !    ...evaluate rho, phi and theta according to vertex shape functions
               rho   = rho   + rhop*vshape(iv)
               phi   = phi   + phip*vshape(iv)
               theta = theta + thetap*vshape(iv)
@@ -611,22 +625,22 @@ end subroutine hexa_TraHex
       
               if (iprint.eq.1) then
                 write(*,*) 'hexa_TorHex:  iv =',iv
-								write(*,*) '      oc,cv,raux =',oc,cv,raux
+                write(*,*) '      oc,cv,raux =',oc,cv,raux
                 write(*,*) 'rhop,phip,thetap =',rhop,phip,thetap
               endif
             enddo
 
-						if (iprint.eq.1) then
-							write(*,*) 'hexa_TorHex:  completed'
-							write(*,*) '              rho        =',rho
-							write(*,*) '              drhodeta   =',drhodeta
-							write(*,*) '              phi        =',phi
-							write(*,*) '              dphideta   =',dphideta
-							write(*,*) '              theta      =',phi
-							write(*,*) '              dthetadeta =',dthetadeta
-						endif
+            if (iprint.eq.1) then
+              write(*,*) 'hexa_TorHex:  completed'
+              write(*,*) '              rho        =',rho
+              write(*,*) '              drhodeta   =',drhodeta
+              write(*,*) '              phi        =',phi
+              write(*,*) '              dphideta   =',dphideta
+              write(*,*) '              theta      =',phi
+              write(*,*) '              dthetadeta =',dthetadeta
+            endif
 
-			!  ...find Cartesian coordinates
+      !  ...find Cartesian coordinates
             costheta = COS(theta); sintheta = SIN(theta)
             cosphi = COS(phi); sinphi = SIN(phi)
             X(1) = rho*sinphi
@@ -635,10 +649,10 @@ end subroutine hexa_TraHex
             Dxdeta(1,1:3) =  sinphi*drhodeta(1:3)                &
                             +rho*cosphi*dphideta(1:3)
             Dxdeta(2,1:3) =  cosphi*costheta*drhodeta(1:3)       &
-						                -rho*costheta*sinphi*dphideta(1:3)   &
+                            -rho*costheta*sinphi*dphideta(1:3)   &
                             -X(3)*dthetadeta(1:3)
             Dxdeta(3,1:3) =  cosphi*sintheta*drhodeta(1:3)       &
-														-rho*sintheta*sinphi*dphideta(1:3)   &
+                            -rho*sintheta*sinphi*dphideta(1:3)   &
                             +X(2)*dthetadeta(1:3)
             if (iprint.eq.1) then
               write(*,*) 'rho   = ', rho

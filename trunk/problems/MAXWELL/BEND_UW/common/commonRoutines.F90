@@ -166,7 +166,7 @@
    subroutine get_matrixK(mdle,Xp, RK)
 !
       use data_structure3D
-      use commonParam, only: RBEND, WAVENUM_K
+      use commonParam, only: RBEND, ENVELOPEK
       use parameters, only: ZERO, ZONE
 !
       implicit none
@@ -188,7 +188,7 @@
 !                                                 ( z    0    0 )  
 ! 
 !  ...first compute coefficient   k*Rbend / (y^2 + z^2)
-      rr = WAVENUM_K * RBEND / (y**2+z**2)
+      rr = ENVELOPEK * RBEND / (y**2+z**2)
 !  ...then fill the non-zero entries
       RK(1,2) = -y*rr
       RK(1,3) = -z*rr
@@ -212,7 +212,7 @@
    subroutine get_matrixKKT(Mdle,Xp, RKKT)
 !
       use data_structure3D
-      use commonParam, only: RBEND,WAVENUM_K
+      use commonParam, only: RBEND,ENVELOPEK
       use parameters, only: ZERO, ZONE
 !
       implicit none
@@ -234,7 +234,7 @@
 !                                                           (     0      0    z^2 )
 ! 
 !  ...first compute coefficient    k^2*Rbend^2 / (y^2 + z^2)^2
-      rr = WAVENUM_K**2 * RBEND**2 / (y**2+z**2)**2
+      rr = ENVELOPEK**2 * RBEND**2 / (y**2+z**2)**2
 !  ...then fill the non-zero entries
       RKKT(1,1) =  (y**2+z**2) * rr
       RKKT(2,2) =  y**2 * rr
@@ -258,7 +258,7 @@
    subroutine apply_matrixK(Mdle,Xp,ZE,ZKE)
 !
       use data_structure3D
-      use commonParam, only: RBEND, WAVENUM_K
+      use commonParam, only: RBEND, ENVELOPEK
       use parameters, only: ZERO, ZONE
 !
       implicit none
@@ -271,21 +271,50 @@
       integer :: i
       real(8) :: y,z,rr
 !
+!
+#if HP3D_DEBUG
+!..Set iprint = 0/1 (Non-/VERBOSE)
+      integer :: iprint
+      iprint = 0
+      ! if (Mdle.eq.937) iprint = 1
+#endif
 !------------------------------------------------------------------------------
 !!
 !  ...initialize matrix and copy values of y and z
       ZKE = ZERO
       y = Xp(2); z = Xp(3);
-!  ...Recall matrix K = k * Rbend / (y^2 + z^2) * ( 0   -y   -z )
-!                                                 ( y    0    0 )
-!                                                 ( z    0    0 )  
+
+! !     ENABLE THIS <<IF, ELSE, ENDIF>> CONTROL STRUCTURE IF PARTLY BENT BEHAVIOR IS WANTED
+!       if (z.gt.0.d0) then
+
+!     ...Recall matrix K = k * Rbend / (y^2 + z^2) * ( 0   -y   -z )
+!                                                    ( y    0    0 )
+!                                                    ( z    0    0 )  
 ! 
-!  ...first compute coefficient   k*Rbend / (y^2 + z^2)
-      rr = WAVENUM_K * RBEND / (y**2+z**2)
-!  ...then fill the entries of K*E
-      ZKE(1) = -y*rr*ZE(2) -z*rr*ZE(3)
-      ZKE(2) =  y*rr*ZE(1)
-      ZKE(3) =  z*rr*ZE(1)
+!     ...first compute coefficient   k*Rbend / (y^2 + z^2)
+         rr = ENVELOPEK * RBEND / (y**2+z**2)
+!     ...then fill the entries of K*E
+         ZKE(1) = -y*rr*ZE(2) -z*rr*ZE(3)
+         ZKE(2) =  y*rr*ZE(1)
+         ZKE(3) =  z*rr*ZE(1)
+
+!       else
+! !     ...in this case, K = ( 0 -k  0 )
+! !                          ( k  0  0 )
+! !                          ( 0  0  0 )
+! !     ...so fill the entries of K*E with
+!          ZKE(1) = -ENVELOPEK*ZE(2)
+!          ZKE(2) =  ENVELOPEK*ZE(1)
+!          ZKE(3) =  ZERO
+!       endif
+#if HP3D_DEBUG
+      if (iprint.eq.1) then
+         write(*,*) 'apply_matrixK: Xp = ', Xp
+         write(*,*) 'apply_matrixK: ZE = ', ZE
+         write(*,*) 'apply_matrixK: rr = ', rr 
+         write(*,*) 'apply_matrixK: ZKE= ', ZKE
+      endif
+#endif
 !
    end subroutine apply_matrixK
 !
@@ -308,7 +337,7 @@
    subroutine get_gradKE(mdle,Xp,ZE,ZDE,ZDKE)
 !
       use data_structure3D
-      use commonParam, only: RBEND, WAVENUM_K
+      use commonParam, only: RBEND, ENVELOPEK
       use parameters, only: ZERO, ZONE
 !
       implicit none
@@ -332,11 +361,11 @@
 !                                            (     zE_x      )  
 ! 
 !  ...first compute coefficient Rbend / (y^2 + z^2)
-      rr = WAVENUM_K * RBEND / (y**2+z**2)
+      rr = ENVELOPEK * RBEND / (y**2+z**2)
 !  ...and its gradient
       drr(1) = 0.d0 
-      drr(2) = -2.d0*y * WAVENUM_K * RBEND / (y**2+z**2)**2
-      drr(3) = -2.d0*z * WAVENUM_K * RBEND / (y**2+z**2)**2
+      drr(2) = -2.d0*y * ENVELOPEK * RBEND / (y**2+z**2)**2
+      drr(3) = -2.d0*z * ENVELOPEK * RBEND / (y**2+z**2)**2
 !  ...then fill the gradient of K*E
       ZDKE(1,:) = drr(:)*(-y*ZE(2)-z*ZE(3))  + rr*(-y*ZDE(2,:)-e_y*ZE(2)   &
                                                    -z*ZDE(3,:)-e_z*ZE(3) )

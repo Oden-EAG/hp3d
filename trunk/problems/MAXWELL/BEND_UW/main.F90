@@ -251,7 +251,7 @@ subroutine master_main()
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
-      !write(*,*) 'Multiple uniform h-refs + solve........22'
+      write(*,*) 'Anisotropic (logitudinal) h-refine.....23'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -321,7 +321,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21)
+         case(20,21,23)
             call exec_case(idec)
 !
 !     ...MPI Routines

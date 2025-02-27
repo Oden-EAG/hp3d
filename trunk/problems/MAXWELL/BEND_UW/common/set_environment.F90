@@ -78,15 +78,25 @@ subroutine set_environment_maxwell
    call get_option_real('-mu'     , 'MU'     , 1.d0, MU     )
    call get_option_real('-epsilon', 'EPSILON', 1.d0, EPSILON)
 !
+!..Base amplitudes of electrid and magnetic fields E_AML, H_AMPL
+   call get_option_real('-e0' , 'E_AMPL', 1.d0, E_AMPL )
+   call get_option_real('-h0' , 'H_AMPL', 1.d0, H_AMPL )
+!
 !..Set frequency OMEGA and impedance constant GAMMA
    call get_option_real('-omega' , 'OMEGA', 2.d0*PI, OMEGA)
    call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
 !
-!..Set envelope wavenumber WAVENUM_K
-   call get_option_real('-k' , 'WAVENUM_K', 4.d0, WAVENUM_K)
+!..Set envelope wavenumber ENVELOPEK
+   call get_option_real('-k' , 'ENVELOPEK', 1.98d0*PI, ENVELOPEK)
 !
 !..Set bending radius RBEND
-   call get_option_real('-rbend' , 'RBEND', 10.d0, RBEND)
+   call get_option_real('-rbend' , 'RBEND', 25.d0, RBEND)
+!
+!..Set waveguide half width HALFWIDTH
+   call get_option_real('-halfwidth' , 'HALFWIDTH', 1.d0, HALFWIDTH)
+!
+!..Set bent fiber sppaning angle SPANGLE
+   call get_option_real('-spangle' , 'SPANGLE', 0.5235987755982989d0, SPANGLE)
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)
@@ -120,6 +130,10 @@ subroutine set_environment_maxwell
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
 #endif
+
+! write(*,*) 'set_environment_maxwell: OMEGA = ',OMEGA
+! write(*,*) 'set_environment_maxwell: MU    = ',MU
+! write(*,*) 'set_environment_maxwell: ENVELOPEK = ',ENVELOPEK
 !
 end subroutine set_environment_maxwell
 !

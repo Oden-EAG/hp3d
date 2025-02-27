@@ -62,10 +62,10 @@
 !----------------------------------------------------------------------
 !
       select case(No)
-      case(6)
-        iprint=0
+      case(1,2,3,4)
+        iprint=2
       case default
-        iprint=0
+        iprint=2
       end select
 !
       if ((RECTANGLES(No)%Type.ne.'TorRec'.or.(NDIM.ne.3))) then
@@ -184,6 +184,17 @@
 !    ...evaluate dot product between major radial unit vector and 
 !       minor radial unit vector.
         call dot_product(oc/rmaj,cv/rmin,raux)
+!    ...check if |raux|>1
+        if (abs(raux).gt.1.d0) then
+          if (abs(raux)-1.d0 .gt. GEOM_TOL) then
+            write(*,*) 'recta_TorRec: Error in dot product result, must be in [-1,1]; raux=',raux
+            stop 1
+          else
+!        ...raux is within the tolerance, so we adjust it
+            raux = SIGN(1.d0,raux)
+          endif
+        endif
+
 !    ...Get phi. If px is negative, phi must be corrected
         if (px.ge.0.d0) then
           phitmp = ACOS(raux)
@@ -229,8 +240,10 @@
         dphideta(1:2)   = dphideta(1:2)   + phip*dvshape(1:2,iv)
         dthetadeta(1:2) = dthetadeta(1:2) + thetap*dvshape(1:2,iv)
 
-        if (iprint.eq.1) then
-          write(*,*) 'recta_TorRec: iv, phip,thetap=',iv,phip,thetap
+        if (iprint.eq.2) then
+          write(*,*) 'recta_TorRec: rectangle No  =',No
+          write(*,*) 'recta_TorRec: iv,raux,phitmp=',iv,raux,phitmp
+          write(*,*) 'recta_TorRec: iv,thetap,phip=',iv,thetap,phip
         endif
 
       enddo

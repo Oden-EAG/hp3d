@@ -1,0 +1,112 @@
+3 3 NDIM,MANDIM
+
+0 NRSURFS
+
+1 NRDOMAIN
+
+8 NRPOINT
+
+Regular             point 1
+  0.00000000000000d0  13.00000000000000d0   0.00000000000000d0
+
+Regular             point 2
+  3.00000000000000d0  10.00000000000000d0   0.00000000000000d0  
+
+Regular             point 3
+  3.00000000000000d0   0.00000000000000d0  10.00000000000000d0
+
+Regular             point 4
+  0.00000000000000d0   0.00000000000000d0  13.00000000000000d0
+
+Regular             point 5
+  0.00000000000000d0  11.00000000000000d0   0.00000000000000d0
+
+Regular             point 6
+  1.00000000000000d0  10.00000000000000d0   0.00000000000000d0
+
+Regular             point 7
+  1.00000000000000d0   0.00000000000000d0  10.00000000000000d0
+
+Regular             point 8
+  0.00000000000000d0   0.00000000000000d0  11.00000000000000d0
+
+12 NRCURVE
+
+QuaCir              curve 1
+1 2
+0.d0 10.d0 0.d0
+
+CylCoord            curve 2
+2 3
+
+QuaCir              curve 3
+4 3
+0.d0 0.d0 10.d0
+
+CylCoord            curve 4
+1 4
+
+QuaCir              curve 5
+5 6
+0.d0 10.d0 0.d0
+
+CylCoord            curve 6
+6 7
+
+QuaCir              curve 7
+8 7
+0.d0 0.d0 10.d0
+
+CylCoord            curve 8
+5 8
+
+Seglin              curve 9
+1 5
+
+Seglin              curve 10
+2 6
+
+Seglin              curve 11
+3 7
+
+Seglin              curve 12
+4 8
+
+0  NRTRIAN
+
+6 NRRECTA
+
+TorRec              rectangle 1
+1 2 3 4
+0.d0 10.d0 0.d0     center of arc v1v2
+0.d0 0.d0 10.d0     center of arc v3v4
+
+TorRec              rectangle 2
+5 6 7 8
+0.d0 10.d0 0.d0     center of arc v1v2
+0.d0 0.d0 10.d0     center of arc v3v4
+
+TraQua              rectangle 3
+1 2 6 5
+
+CylRec              rectangle 4
+2 3 7 6
+
+TraQua              rectangle 5
+4 3 7 8
+
+CylRec              rectangle 6
+1 4 8 5
+
+0 NRPRISM
+
+1 NRHEXAS
+
+TorHex              hexahedron 1
+1    1 2 3 4 5 6 7 8
+1 2                 indices of outer and inner toroidal quad faces
+
+0 NRTETRA
+
+0 NRPYRAM
+

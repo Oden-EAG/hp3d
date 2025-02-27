@@ -340,10 +340,14 @@
 !              ...For 1st option to integrate
 !              ...Evaluate A^* on (E ; 0)
                   call get_Astar(Mdle,x,cmplx(fldE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
-                                          cmplx(crlE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
+                                        cmplx(crlE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
                                                                AstarE1,AstarE2)
                   gramP(k) = gramP(k)  &
                            + SUM(AstarE1*conjg(AstarF1) + AstarE2*conjg(AstarF2))*weight
+!                           
+!              ...add L2 term
+                  call dot_product(fldF,fldE, FF)
+                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
                end select
 !
 !              (H_j,G_i) terms = Int[G_^*i H_j] terms (G_22)
@@ -362,10 +366,14 @@
 !              ...For 1st option to integrate
 !              ...Evaluate A^* on (0 ; H)
                   call get_Astar(Mdle,x,(/ZERO,ZERO,ZERO/),cmplx(fldH,0.d0,8),   &
-                                          (/ZERO,ZERO,ZERO/),cmplx(crlH,0.d0,8),   &
+                                        (/ZERO,ZERO,ZERO/),cmplx(crlH,0.d0,8),   &
                                                                AstarH1,AstarH2)
                   gramP(k) = gramP(k)  &
                            + SUM(AstarH1*conjg(AstarG1) + AstarH2*conjg(AstarG2))*weight
+!                           
+!              ...add L2 term
+                  ! call dot_product(fldF,fldE, FF)
+                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
                end select
 !
                if (TEST_NORM .ne. GRAPH_NORM) cycle

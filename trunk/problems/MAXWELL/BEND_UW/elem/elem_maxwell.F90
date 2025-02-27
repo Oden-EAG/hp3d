@@ -144,6 +144,7 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
 !..Set iprint = 0/1 (Non-/VERBOSE)
    integer :: iprint
    iprint = 0
+   ! if (Mdle.eq.118) iprint = 1
 #endif
 !
 !-------------------------------------------------------------------------------
@@ -265,6 +266,9 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
 !
 !  ...get the RHS
       call getf(Mdle,x, zJ, zL)
+      ! write(*,*) "elem_maxwell: zJ =",zJ
+      ! write(*,*) "elem_maxwell: zL =",zL
+      ! call pause
 !
 !  ...apply pullbacks
       call DGEMM('T','N',3,NrdofEE,3,1.d0     ,dxidx,3,shapEE,3,0.d0,shapF,3)
@@ -401,6 +405,10 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
                                         AstarE1,AstarE2)
                   gramP(k) = gramP(k)  &
                            + SUM(AstarE1*conjg(AstarF1) + AstarE2*conjg(AstarF2))*weight
+!                           
+!              ...add L2 term
+                  call dot_product(fldF,fldE, FF)
+                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
             end select
 !
 !           (H_j,G_i) terms = Int[G_^*i H_j] terms (G_22)
@@ -423,6 +431,10 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
                                         AstarH1,AstarH2)
                   gramP(k) = gramP(k)  &
                            + SUM(AstarH1*conjg(AstarG1) + AstarH2*conjg(AstarG2))*weight
+!                           
+!              ...add L2 term
+                  ! call dot_product(fldF,fldE, FF)
+                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
             end select
 !
             if (TEST_NORM .ne. GRAPH_NORM) cycle
@@ -610,41 +622,36 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
    stiff_ALL(1:i1,j1+j2+1)    = bload_E(1:i1)
 !
    deallocate(stiff_EE_T,stiff_EQ_T)
-   do i = 1,NrdofEE
-      k = 2*(i-1)
-!      do m = 1,NrdofQ
-!         l = j1 + 6*(m-1)
-!         if (i.eq.1 .and. m.eq.1) then
-!            write(*,*)
-!            write(*,124) stiff_ALL(k+1,l+1)
-!            write(*,124) stiff_ALL(k+1,l+2)
-!            write(*,124) stiff_ALL(k+1,l+3)
-!            write(*,124) stiff_ALL(k+1,l+4)
-!            write(*,124) stiff_ALL(k+1,l+5)
-!            write(*,124) stiff_ALL(k+1,l+6)
-!            write(*,*)
-!            write(*,124) stiff_ALL(k+2,l+1)
-!            write(*,124) stiff_ALL(k+2,l+2)
-!            write(*,124) stiff_ALL(k+2,l+3)
-!            write(*,124) stiff_ALL(k+2,l+4)
-!            write(*,124) stiff_ALL(k+2,l+5)
-!            write(*,124) stiff_ALL(k+2,l+6)
-!            124 format(f12.5,f12.5)
-!         endif
-!      enddo
-!      do m = 1,NrdofEE
-!         l = 2*(m-1)
-!         if (i.eq.1 .and. m.eq.5) then
-!            write(*,*) m
-!            write(*,125) gramP(ij_upper_to_packed(k+1,l+1))
-!            write(*,125) gramP(ij_upper_to_packed(k+1,l+2))
-!            write(*,125) gramP(ij_upper_to_packed(k+2,l+1))
-!            write(*,125) gramP(ij_upper_to_packed(k+2,l+2))
-!            125 format(f12.5,f12.5)
-!         endif
-!      enddo
-   enddo
+   if (iprint.eq.1) then
+      do i = 1,NrdofEE
+         write(*,*)   'i=',i
+         k = 2*(i-1)
+        do m = 1,NrdofQ
+           l = j1 + 6*(m-1)
+           ! if (i.eq.1 .and. m.eq.1) then
+              write(*,124) stiff_ALL(k+1,l+1:l+6)
+              write(*,124) stiff_ALL(k+2,l+1:l+6)
+              124 format(6f14.9,6f14.9)
+           ! endif
+        enddo
+        ! do m = 1,NrdofEE
+        !    l = 2*(m-1)
+        !    if (i.eq.1 .and. m.eq.5) then
+        !       write(*,*) m
+        !       write(*,125) gramP(ij_upper_to_packed(k+1,l+1))
+        !       write(*,125) gramP(ij_upper_to_packed(k+1,l+2))
+        !       write(*,125) gramP(ij_upper_to_packed(k+2,l+1))
+        !       write(*,125) gramP(ij_upper_to_packed(k+2,l+2))
+        !       125 format(f12.5,f12.5)
+        !    endif
+        ! enddo
+      enddo
+      write(*,*) 'bload_E='
+      write(*,124) bload_E(1:i1)
+      call pause
+   endif
 !
+
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
    call ZPPTRF('U',NrTest,gramP,info)
    if (info.ne.0) then
