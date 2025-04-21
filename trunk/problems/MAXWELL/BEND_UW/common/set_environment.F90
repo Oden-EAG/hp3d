@@ -87,16 +87,40 @@ subroutine set_environment_maxwell
    call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
 !
 !..Set envelope wavenumber ENVELOPEK
-   call get_option_real('-k' , 'ENVELOPEK', 1.98d0*PI, ENVELOPEK)
+   call get_option_real('-k' , 'ENVELOPEK', 0.996d0*2.d0*PI, ENVELOPEK)
 !
 !..Set bending radius RBEND
    call get_option_real('-rbend' , 'RBEND', 25.d0, RBEND)
 !
 !..Set waveguide half width HALFWIDTH
-   call get_option_real('-halfwidth' , 'HALFWIDTH', 1.d0, HALFWIDTH)
+   call get_option_real('-halfwidth' , 'HALFWIDTH', 0.5d0, HALFWIDTH)
 !
-!..Set bent fiber sppaning angle SPANGLE
-   call get_option_real('-spangle' , 'SPANGLE', 0.5235987755982989d0, SPANGLE)
+!..Set bent fiber sppaning angle THETAEND
+   call get_option_real('-thetaend' , 'THETAEND', 0.5235987755982989d0, THETAEND)
+!
+!..Set PML proportion w.r.t. THETAEND
+   call get_option_real('-pmlprop' , 'PMLPROP', 0.25d0, PMLPROP)
+!
+!..Set CORE radius RCORE
+   call get_option_real('-rcore' , 'RCORE', 0.5d0, RCORE)
+!
+!..Set CLADDING radius RCLAD
+   call get_option_real('-rclad' , 'RCLAD', 5.0d0, RCLAD)
+!
+!..Set COATING radius RCOAT
+   call get_option_real('-rcoat' , 'RCOAT', 10.d0, RCOAT)
+!
+!..Set CORE refractive index REFRCORE
+   call get_option_real('-ncore' , 'REFRCORE', 1.4512d0, REFRCORE)
+!
+!..Set CLADDING refractive index REFRCLAD
+   call get_option_real('-nclad' , 'REFRCLAD', 1.45d0, REFRCLAD)
+!
+!..Set COATING refractive index REFRCOAT
+   call get_option_real('-ncoat' , 'REFRCOAT', 1.38d0, REFRCOAT)
+!
+!..Set COATING attenuation in ratio per unit length
+   call get_option_real('-attncoat' , 'ATTNCOAT', 10.d0**0.003d0*25.4d-6, ATTNCOAT)
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)

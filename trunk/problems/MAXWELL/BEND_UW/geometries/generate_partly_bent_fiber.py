@@ -65,7 +65,14 @@ r_prism = 0.5*r_core;
 r_inner_clad = 10.0*r_core;
 r_outer_clad = 20.0*r_core;
 R = 2600.0*r_core;
-theta_end = math.pi/90.0;
+
+keff=1.100582; # for mode LP01 and usual data
+wleff=2.0*math.pi/keff;
+nwl_bent = 6;
+nwl_strt = 2;
+theta_end = nwl_bent*wleff/R;
+print("wleff=",wleff)
+print("theta_end=",theta_end)
 #
 # angle (wrt plane yz) to place first point in cross section. 
 # Typical values 0 or pi/4
@@ -73,15 +80,16 @@ phi1 = math.pi/4.0;
 hexlayers_core = 1; # don't include the inner prisms layer
 hexlayers_inner_clad = 1; # 
 hexlayers_outer_clad = 1; # 
-theta_subdiv = 1;
+theta_subdiv = 3;
+
 
 
 dr_core = (r_core-r_prism)/hexlayers_core
-dr_inner_clad = (r_inner_clad-r_core)/hexlayers_inner_clad
-dr_outer_clad = (r_outer_clad-r_inner_clad)/hexlayers_outer_clad
+dr_inner_clad = (r_inner_clad-r_core)/max(hexlayers_inner_clad,1)
+dr_outer_clad = (r_outer_clad-r_inner_clad)/max(hexlayers_outer_clad,1)
 
 # and open geometry file
-f = open("bent_fiber_test_2","w+")
+f = open("partly_bent_fiber_test_4wl","w+")
 
 # Dimension
 f.write("3 3 NDIM,MANDIM\n")
@@ -95,6 +103,12 @@ f.write("\n")
 
 
 # Points
+
+# adjust subdivisions if there is a straight portion
+if nwl_strt>0:
+	theta_subdiv += 1
+	zp = -nwl_strt*wleff;
+
 
 # nr of points per cross section, without the one in the axis
 npcs = 4*(1+hexlayers_core+hexlayers_inner_clad+hexlayers_outer_clad)
@@ -110,44 +124,73 @@ cc = np.zeros((theta_subdiv+1,3))
 ci = np.zeros(theta_subdiv+1,dtype=int)
 
 for div in range(theta_subdiv+1):
-	th = div*theta_end/theta_subdiv
+	if nwl_strt>0:
+		if div==0:
+			th = 0
+		else:
+			th = (div-1)*theta_end/(theta_subdiv-1)
+	else:
+		th = div*theta_end/theta_subdiv
 	# prism layer in core
 	r = r_prism
 	for t in range(4):
 		ip += 1
 		phi = phi1 + t*math.pi/2.0
-		x,y,z = toroidal2cartesian(R,r,phi,th); print_point(x,y,z,ip)
+		x,y,z = toroidal2cartesian(R,r,phi,th); 
+		if nwl_strt>0 and div==0:
+			z = zp
+		print_point(x,y,z,ip)
 	# hex layers in core
 	for l in range(hexlayers_core):
 		r = r_prism + dr_core*(l+1)
 		for t in range(4):
 			ip += 1
 			phi = phi1 + t*math.pi/2.0
-			x,y,z = toroidal2cartesian(R,r,phi,th); print_point(x,y,z,ip)
+			x,y,z = toroidal2cartesian(R,r,phi,th); 
+			if nwl_strt>0 and div==0:
+				z = zp
+			print_point(x,y,z,ip)
 	# hex layers in inner clad
 	for l in range(hexlayers_inner_clad):
 		r = r_core + dr_inner_clad*(l+1)
 		for t in range(4):
 			ip += 1
 			phi = phi1 + t*math.pi/2.0
-			x,y,z = toroidal2cartesian(R,r,phi,th); print_point(x,y,z,ip)
+			x,y,z = toroidal2cartesian(R,r,phi,th); 
+			if nwl_strt>0 and div==0:
+				z = zp
+			print_point(x,y,z,ip)
 	# hex layers in outer clad
 	for l in range(hexlayers_outer_clad):
 		r = r_inner_clad + dr_outer_clad*(l+1)
 		for t in range(4):
 			ip += 1
 			phi = phi1 + t*math.pi/2.0
-			x,y,z = toroidal2cartesian(R,r,phi,th); print_point(x,y,z,ip)
+			x,y,z = toroidal2cartesian(R,r,phi,th);
+			if nwl_strt>0 and div==0:
+				z = zp
+			print_point(x,y,z,ip)
 	# 
 # points in cross section's axis  
 for div in range(theta_subdiv+1):
-	th = div*theta_end/theta_subdiv
+	if nwl_strt>0:
+		if div==0:
+			th = 0
+		else:
+			th = (div-1)*theta_end/(theta_subdiv-1)
+	else:
+		th = div*theta_end/theta_subdiv
 	r = 0.0; phi = 0.0
 	ip += 1
-	x,y,z = toroidal2cartesian(R,r,phi,th); print_point(x,y,z,ip)
+	x,y,z = toroidal2cartesian(R,r,phi,th);
+	if nwl_strt>0 and div==0:
+		z = zp
+	print_point(x,y,z,ip)
 	# save in memory coordinates and index of this center point
 	cc[div] = [x,y,z]
 	ci[div] = ip
+
+	# print("div,ci[div],cc[div]=",div,ci[div],cc[div])
 	#
 
 
@@ -217,13 +260,19 @@ for div in range(theta_subdiv):
 		ic += 1
 		p1 = p + npcs*div
 		p2 = p1+ npcs
-		print_curve('CylCoord',p1,p2,ic)
+		if nwl_strt>0 and div==0:
+			print_curve('Seglin',p1,p2,ic)	
+		else:
+			print_curve('CylCoord',p1,p2,ic)
 # curves of central axis
 for div in range(theta_subdiv):
 	ic += 1
 	p1 = ci[div]
 	p2 = ci[div+1]
-	print_curve('CylCoord',p1,p2,ic)
+	if nwl_strt>0 and div==0:
+		print_curve('Seglin',p1,p2,ic)	
+	else:
+		print_curve('CylCoord',p1,p2,ic)
 
 
 # triangles
@@ -261,7 +310,10 @@ for div in range(theta_subdiv):
 			p2 = npcs*div +4*l + t%4 +1
 			p3 = npcs*(div+1) +4*l + t%4 +1
 			p4 = npcs*(div+1) +4*l + t
-			print_rectangle('TorRec',p1,p2,p3,p4,ir,cc[div],cc[div+1])
+			if nwl_strt>0 and div==0:
+				print_rectangle('TraQua',p1,p2,p3,p4,ir)
+			else:
+				print_rectangle('TorRec',p1,p2,p3,p4,ir,cc[div],cc[div+1])
 # now, the cylindrical rectangles
 for div in range(theta_subdiv):
 	for t in range(1,5):
@@ -270,7 +322,10 @@ for div in range(theta_subdiv):
 		p2 = npcs*div + t
 		p3 = npcs*(div+1) + t
 		p4 = ci[div+1]
-		print_rectangle('CylRec',p1,p2,p3,p4,ir)
+		if nwl_strt>0 and div==0:
+			print_rectangle('BilQua',p1,p2,p3,p4,ir)
+		else:
+			print_rectangle('CylRec',p1,p2,p3,p4,ir)
 	for l in range(hexlayers_core+hexlayers_inner_clad+hexlayers_outer_clad):
 		for t in range(1,5):
 			ir += 1
@@ -278,7 +333,10 @@ for div in range(theta_subdiv):
 			p2 = npcs*div +4*(l+1) + t
 			p3 = npcs*(div+1) +4*(l+1) + t
 			p4 = npcs*(div+1) +4*l + t
-			print_rectangle('CylRec',p1,p2,p3,p4,ir)
+			if nwl_strt>0 and div==0:
+				print_rectangle('BilQua',p1,p2,p3,p4,ir)
+			else:
+				print_rectangle('CylRec',p1,p2,p3,p4,ir)
 # at last, the transfinite rectangles
 for div in range(theta_subdiv+1):
 	for l in range(hexlayers_core+hexlayers_inner_clad+hexlayers_outer_clad):
@@ -334,7 +392,10 @@ for div in range(theta_subdiv):
 				ndom = 3
 			else:
 				ndom = 4
-			print_hexa('TorHex',ndom,p1,p2,p3,p4,p5,p6,p7,p8,ih,nqo,nqi)
+			if nwl_strt>0 and div==0:
+				print_hexa('TraHex',ndom,p1,p2,p3,p4,p5,p6,p7,p8,ih)
+			else:
+				print_hexa('TorHex',ndom,p1,p2,p3,p4,p5,p6,p7,p8,ih,nqo,nqi)
 
 # Tetrahedra
 f.write("0 NRTETRA\n")

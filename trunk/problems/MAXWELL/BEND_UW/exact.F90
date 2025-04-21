@@ -71,7 +71,7 @@
 !
 !  ...get Electric field component
       call mfd_solutions(Xp, E,dE,d2E)
-      write(*,*) 'exact: Xp, Ex=',Xp,E
+      ! write(*,*) 'exact: Xp, Ex=',Xp,E
 !
 !  ...E-field value
       ValE(icomp,idx) = E ! E-field trace;

@@ -54,7 +54,7 @@ export KMP_INIT_AT_FORK=FALSE
 # component number for manufactured solution
 comp=1
 # solution number
-isol=101
+isol=15
 # DPG test norm scaling
 alpha=0.01d0
 # vacuum permeability
@@ -76,28 +76,22 @@ rbend=1300.0
 # half width
 halfwidth=0.5 # 12.7d0
 # spanning angle of bent fiber
-thend=0.02634907421924702 # 
+thend=0.03222289521504481 # 
 # pml proportion
-pml=0.3333333333333333
+pml=0.0
 # core refractive index
-ncore=1.4512
+ncore=1.0
 # cladding refractive index
-nclad=1.45
+nclad=1.0
 # coating refractive index
-ncoat=1.38
+ncoat=1.0
 # coating attenuation coefficient (ratio/[unit length] NOT in dB...)
-attncoat=2.55760643888358E-05
+attncoat=0.0
 # set BC flag -> 0: dirichlet, 2: impedance via penalty term, 3: impedance via elimination
 ibc=0
 
 # prefix for paraview
-# pref='bslab_Dir1_EnvAns1_short' # with file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# pref='bslab_Dir1_EnvAns0_short' # with file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# pref='bslab_Dir2_EnvAns1' # with file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# pref='bslab_Dir2_EnvAns0' # with file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# pref='fiber_15deg_lp01'
-# pref='fiber_2deg_lp01'
-pref='pbfiber_8wl_lp01_fine'
+pref='bslab_4wl_env'
 
 #
 # ==================
@@ -106,8 +100,6 @@ pref='pbfiber_8wl_lp01_fine'
 #
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
-# file_geometry='./geometries/torus_part2'
-# file_geometry='./geometries/bent_fiber_test_30'
 # file_geometry='./geometries/partly_bent_slab_d2_cR420_DEG30'
 # file_geometry='./geometries/bent_waveguide_sq1_R10_DEG90'
 # file_geometry='./geometries/bent_waveguide_sq1_R10_DEG30'
@@ -115,9 +107,7 @@ pref='pbfiber_8wl_lp01_fine'
 # file_geometry='./geometries/bent_waveguide_d2_cR420_DEG30'
 # file_geometry='./geometries/bent_waveguide_d12p7_cR35000_DEG5'
 # file_geometry='./geometries/bent_waveguide_d0p5_cR5_DEG5' 
-# file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# file_geometry='./geometries/bent_fiber_test_15'
-file_geometry='./geometries/partly_bent_fiber_test_4wl'
+file_geometry='./geometries/bent_waveguide_d0p5_cR1300_4wl'
 
 
 ctrl='control/control'

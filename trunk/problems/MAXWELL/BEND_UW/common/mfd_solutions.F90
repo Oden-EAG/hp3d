@@ -25,7 +25,6 @@
 !
       use data_structure3D
       use commonParam
-      use parameters, only : ZERO, ZONE, ZIMG
       use bessel_evaluation
 !
       implicit none
@@ -67,6 +66,8 @@
       real(8) :: x1, x2, x3, xshift, yshift, zshift, alpha, a, b, cf
       real(8) :: r,dr_x2,dr_x3,d2r_x2,d2r_x3,d2r_x2x3
       real(8) :: th,dth_x2,dth_x3,d2th_x2,d2th_x3,d2th_x2x3
+
+      real(8) :: kappa_clad,kappa_core
 !
 !---------------------------------------------------------------------------------------
 !
@@ -494,12 +495,83 @@
             Grad2p(3,1) = Grad2p(1,3)
             Grad2p(3,2) = Grad2p(2,3)
             Grad2p(3,3) = cn * (d2u_r*dr_x3**2+du_r*d2r_x3) * v
+
+      case(101)
+            kappa_core=3.8895274d0
+            kappa_clad=7.9496412d0
+            call get_LP01_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
    end select
 !
 !
    end subroutine mfd_solutions
+!
+!------------------------------------------------------
+! subroutine get_LP01
+!------------------------------------------------------
+function BESSEL_K0(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,0.d0, a,fval,b,c)
+end function
 
+function BESSEL_K1(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,1.d0, a,fval,b,c)
+end function
 
+subroutine get_LP01_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam
+   use control
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8), intent(out) :: E, dE(3)
+!  
+   real(8) :: BESSEL_K0, BESSEL_K1
+   real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
+!
+!------------------------------------------------------
+!
+   if (NEXACT.ne.0) then
+      write(*,*) 'get_LP01_transversal: Error. Transversal LP01 mode to be used if NEXACT=0 only. Stop'
+   endif
 
+   E = ZERO; dE = ZERO
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
 
+!..radial coordinate
+   r = sqrt(x1*x1+x2*x2)
+!  evaluate mode only on bottom face and if 0<=r<=rclad
+   if (x3.lt.GEOM_TOL .and. r.le.RCLAD) then
+!
+      if (abs(r).lt.GEOM_TOL) then
+         r_x = 1.d0
+         r_y = 1.d0
+      else
+         r_x = x1/r
+         r_y = x2/r
+      endif
+!
+      if (r .le. RCORE) then
+         ca = Ampl/BESSEL_J0(Kappa_core*RCORE)
+         E = ca*BESSEL_J0(Kappa_core*r)
+         cb = -ca*Kappa_core*BESSEL_J1(Kappa_core*r)
+      else
+         ca = Ampl/BESSEL_K0(Kappa_clad*RCORE)
+         E = ca*BESSEL_K0(Kappa_clad*r)
+         cb = -ca*Kappa_clad*BESSEL_K1(Kappa_clad*r)
+      endif
+      dE(1) = cb*r_x
+      dE(2) = cb*r_y
+   endif
+!
+end subroutine get_LP01_transversal

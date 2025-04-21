@@ -38,15 +38,15 @@
 !
 !     Mode number, Bessel order, Coefficients for the linear combination of the two l.i. solutions
 !     mode 1 for k0 = 149.993333460866, r0 = 1300.d0, a=0.5d0
-      integer, parameter    :: Imode         =            1
-       complex(8), parameter :: ZLAMBDA_MODE =                  (38007107126.7520380677389983893284821d0,0.00000000000000000000000000000000000)
-       complex(8), parameter :: ZCOEF10      =                 (1.57184336725612745203169806371674874d0,-0.00000000000000000000000000000000000)
-       complex(8), parameter :: ZCOEF01      =                  (2588.85382397807097836830171213751471d0,0.00000000000000000000000000000000000)
+      ! integer, parameter    :: Imode         =            1
+      !  complex(8), parameter :: ZLAMBDA_MODE =                  (38007107126.7520380677389983893284821d0,0.00000000000000000000000000000000000)
+      !  complex(8), parameter :: ZCOEF10      =                 (1.57184336725612745203169806371674874d0,-0.00000000000000000000000000000000000)
+      !  complex(8), parameter :: ZCOEF01      =                  (2588.85382397807097836830171213751471d0,0.00000000000000000000000000000000000)
 ! !     mode 2 for k0 = 149.993333460866, r0 = 1300.d0, a=0.5d0       ~~~~~~~~~~ADD PREFIX OF DOUBLE PRECISION NUMBBERS!!!!
-      ! integer, parameter    :: Imode        =            2
-      ! complex(8), parameter :: ZLAMBDA_MODE =                  (37954285745.8141508857519816549451173d0,0.00000000000000000000000000000000000)
-      ! complex(8), parameter :: ZCOEF10      =                (0.380494806890728985773127546667222389d0,-0.00000000000000000000000000000000000)
-      ! complex(8), parameter :: ZCOEF01      =                 (-8933.70820961992077300315636080164352d0,0.00000000000000000000000000000000000)
+      integer, parameter    :: Imode        =            2
+      complex(8), parameter :: ZLAMBDA_MODE =                  (37954285745.8141508857519816549451173d0,0.00000000000000000000000000000000000)
+      complex(8), parameter :: ZCOEF10      =                (0.380494806890728985773127546667222389d0,-0.00000000000000000000000000000000000)
+      complex(8), parameter :: ZCOEF01      =                 (-8933.70820961992077300315636080164352d0,0.00000000000000000000000000000000000)
 ! !    mode 3 for k0 = 149.993333460866, r0 = 1300.d0, a=0.5d0       ~~~~~~~~~~ADD PREFIX OF DOUBLE PRECISION NUMBBERS!!!!
       ! integer, parameter    :: Imode        =            3
       ! complex(8), parameter :: ZLAMBDA_MODE =                  (37871108378.4249748433402696483647618d0,0.00000000000000000000000000000000000)

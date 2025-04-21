@@ -136,13 +136,15 @@
             call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
             write(*,*) 'global anisotropic h-refinement...'
             do i=1,refs
+               ! call global_href_aniso_bric(0,0,1)
                call global_href_aniso(0,1)
+               write(*,*) '.....after global_href_aniso'
                ! if (IBCFLAG .eq. 3) then
                !    call propagate_flag(3,3)
                !    call propagate_flag(5,3)
                ! endif
             enddo
-            call global_href_aniso(0,1)
+            ! call global_href_aniso(0,1)
             ! call global_href_aniso_bric(0,0,1)
             call update_gdof
             call update_Ddof

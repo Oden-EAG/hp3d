@@ -32,6 +32,8 @@
 !  ...(enriched) order of element nodes
       integer :: norder(19),norderP(19),nordP
       integer :: ntype
+!   ..use blas3 optimized assembly
+      logical, parameter :: opt_blas = .true.
 !
 !---------------------------------------------------------------------
 !
@@ -66,8 +68,14 @@
 !
       nrTest = 2*nrdofEE
 !
-      call elem_residual_maxwell(Mdle,nrTest,                       &
-                                 nrdofEE,nrdofH,nrdofE,nrdofQ,      &
-                                 Resid,Nref_flag)
+      if (opt_blas) then
+         call elem_residual_maxwell_opt(Mdle,nrTest,                       &
+                                    nrdofEE,nrdofH,nrdofE,nrdofQ,      &
+                                    Resid,Nref_flag)
+      else
+         call elem_residual_maxwell(Mdle,nrTest,                       &
+                                    nrdofEE,nrdofH,nrdofE,nrdofQ,      &
+                                    Resid,Nref_flag)
+      endif
 !
 end subroutine elem_residual

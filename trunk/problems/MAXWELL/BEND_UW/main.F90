@@ -406,6 +406,9 @@ subroutine master_main()
             enddo
             close(UNIT=9)
             ! END WRITE FOR DEBUGGING
+         case default
+!
+            write(*,*)  'master_main: Unknown case!'
 !
       end select
 !
@@ -484,7 +487,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21)
+         case(20,21,23)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -511,6 +514,10 @@ subroutine worker_main()
 !     ...Debugging routines
          case(70,71)
             call exec_case(idec)
+!
+         case default
+!
+            write(*,*)  'worker_main: Unknown case!'
 !
       end select
 !

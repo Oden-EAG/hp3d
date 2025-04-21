@@ -6,6 +6,7 @@ SRC_COMMON  = \
         common/commonRoutines.F90 \
         common/exact_error.F90 \
         common/mfd_solutions.F90 \
+        common/bessel_fn.F90 \
         common/residual.F90 \
         common/set_environment.F90
 
@@ -14,9 +15,10 @@ SRC_UW      = \
         dirichlet.F90 \
         elem/elem.F90 \
         elem/elem_maxwell.F90 \
-        elem/elem_opt.F90 \
+        elem/elem_maxwell_opt.F90 \
         elem/elem_residual.F90 \
         elem/elem_residual_maxwell.F90 \
+        elem/elem_residual_maxwell_opt.F90 \
         exact.F90 \
         exec_case.F90 \
         exec_job.F90 \

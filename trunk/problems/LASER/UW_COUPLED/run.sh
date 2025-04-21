@@ -26,7 +26,7 @@ dir_output='../outputs/'
 vis_level=3
 #
 # MPI Procs
-nproc=1
+nproc=4
 #
 # OMP THREADS
 nthreads=1

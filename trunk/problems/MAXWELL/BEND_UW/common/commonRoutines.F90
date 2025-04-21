@@ -114,7 +114,7 @@
 
 
 !------------------------------------------------------------------------------
-!> @brief      Evaluates unconstrained stiffness matrix and load vector
+!> @brief      Determines local permittivity tensor epsilon
 !!
 !> @param[in]  Mdle     - element middle node number
 !> @param[in]  x        - physical point to evaluate permittivity
@@ -123,31 +123,177 @@
 !!
 !> @date       July 2023
 !------------------------------------------------------------------------------
-   subroutine get_permittivity(mdle,x, eps)
+   subroutine get_local_epsilon(Mdle,Xp,Zeps)
 !
-      use data_structure3D
-      use commonParam
-      use parameters, only: ZERO, ZONE
+      use commonParam, only: EPSILON, ZERO, ZONE
 !
       implicit none
 !
-      integer,    intent(in)  :: mdle
-      real(8),    intent(in)  :: x(3)
-      complex(8), intent(out) :: eps(3,3)
+      integer,    intent(in)  :: Mdle
+      real(8),    intent(in)  :: Xp(3)
+      complex(8), intent(out) :: Zeps(3,3)
+!
+      integer :: i
+      complex(8) :: zrefr
+!
+!------------------------------------------------------------------------------
+!
+!  ...get refractive index of element's subdomain
+      call get_refrac(Mdle,zrefr)
+!  ...set permittivity to identity for now.
+      Zeps = ZERO
+      do i=1,3
+         Zeps(i,i) = zrefr**2 * EPSILON
+      enddo
+!
+   end subroutine get_local_epsilon
+
+
+
+
+
+
+   subroutine get_local_mu(Mdle,Xp,Zmu)
+!
+      use commonParam, only: MU, ZERO
+!
+      implicit none
+!
+      integer,    intent(in)  :: Mdle
+      real(8),    intent(in)  :: Xp(3)
+      complex(8), intent(out) :: Zmu(3,3)
 !
       integer :: i
 !
 !------------------------------------------------------------------------------
 !
-! TODO: Implement your own custom permittivity here
-!
-!  ...set permittivity to identity for now.
-      eps = ZERO
+!  ...set permeability to mu_0 for now
+      Zmu = ZERO
       do i=1,3
-         eps(i,i) = ZONE
+         Zmu(i,i) = cmplx(MU,0.d0,8)
       enddo
 !
-   end subroutine get_permittivity
+   end subroutine get_local_mu
+
+
+
+
+
+
+   subroutine get_local_rotation(Mdle,Xp,RQ)
+!
+      implicit none
+!
+      integer, intent(in)  :: Mdle
+      real(8), intent(in)  :: Xp(3)
+      real(8), intent(out) :: RQ(3,3)
+
+      real(8) :: th
+
+      th = atan2(Xp(3),Xp(2))
+
+      RQ(:,:) = 0.d0 
+
+      RQ(1,1) = 1.d0
+      RQ(2,2) = cos(th)
+      RQ(3,2) =-sin(th)
+      RQ(2,3) =-RQ(3,2)
+      RQ(3,3) = RQ(2,2)
+
+   end subroutine
+
+
+
+
+
+
+   subroutine get_pml_beta(Mdle,Xp,Zbeta,Zdbeta,Zd2beta)
+
+      use commonParam, only: THETAEND,PMLPROP,OMEGA
+      implicit none
+      integer, intent(in) :: Mdle
+      real(8), intent(in) :: Xp(3)
+      complex(8),intent(out) :: Zbeta,Zdbeta,Zd2beta
+
+      real(8) :: c,pn,f,df,d2f,th,th_pml,th_trn,th_dif
+      integer :: n
+
+      th = atan2(Xp(3),Xp(2))
+
+      th_pml = THETAEND*PMLPROP
+      th_trn = THETAEND - th_pml
+      th_dif = Th - th_trn
+
+      if (Th.gt.THETAEND.or.th_dif.lt.0.d0) then
+         write(*,*) ' get_pml_beta: theta>THETAEND or theta<th_trn'
+         write(*,*) ' theta,th_trn,THETAEND = ',Th,th_trn,THETAEND
+         write(*,*) ' stop'
+         stop
+      endif
+
+      n = 3       !!! NEEDS TO BE AT LEAST 2 !!!
+      c = 50.d0 /(OMEGA* th_pml**n)
+      f   = c*th_dif**n
+      df  = c*th_dif**(n-1) * n
+      d2f = c*th_dif**(n-2) * (n*(n-1))
+      if((f.le.0.d0).or.(df.le.0.d0).or.(d2f.le.0)) then
+         write(*,*) ' get_pml_beta: f, df,d2f are negative. stop.'
+         stop
+      endif
+      zbeta   = cmplx( Th , -f  , 8)
+      zdbeta  = cmplx(1.d0, -df , 8)
+      zd2beta = cmplx(0.d0, -d2f, 8)
+
+   end subroutine
+
+
+
+
+
+
+   subroutine get_stretch_JQ(Zdbeta,RQ,ZJQ,ZJQinv)
+
+      implicit none 
+      complex(8), intent(in) :: Zdbeta
+      real(8),    intent(in) :: RQ(3,3)
+      complex(8), intent(out):: ZJQ(3,3),ZJQinv(3,3)
+
+      complex(8) :: ZQaux(3,3)
+
+      ! precompute J * Q
+      ZQaux(1:2,:) = cmplx(RQ(1:2,:),0.d0,8)
+      ZQaux(3,:) = RQ(3,:)*Zdbeta
+      ! multiply Q^T * J * Q
+      ZJQ = matmul(transpose(RQ),ZQaux)
+      !
+      ! precompute Jinv * Q
+      ! ZQaux(1:2,:) = cmplx(RQ(1:2,:),0.d0,8)
+      ZQaux(3,:) = RQ(3,:)/Zdbeta
+      ! multiply Q^T * Jinv * Q
+      ZJQinv = matmul(transpose(RQ),ZQaux)
+
+   end subroutine
+
+
+
+
+
+   subroutine is_pml(Mdle,Xp,ActivePML)
+      use commonParam, only: PMLPROP,THETAEND
+      implicit none 
+      integer, intent(in) :: Mdle 
+      real(8), intent(in) :: Xp(3)
+      logical, intent(out):: ActivePML
+
+      real(8) :: th
+
+      ActivePML = .false.
+      th = atan2(Xp(3),Xp(2))
+      if (th.ge.(1.d0-PMLPROP)*THETAEND) ActivePML = .true.
+
+   end subroutine
+
+
 
 
 
@@ -284,8 +430,8 @@
       ZKE = ZERO
       y = Xp(2); z = Xp(3);
 
-! !     ENABLE THIS <<IF, ELSE, ENDIF>> CONTROL STRUCTURE IF PARTLY BENT BEHAVIOR IS WANTED
-!       if (z.gt.0.d0) then
+!     ENABLE THIS <<IF, ELSE, ENDIF>> CONTROL STRUCTURE IF PARTLY BENT BEHAVIOR IS WANTED
+      if (z.gt.0.d0) then
 
 !     ...Recall matrix K = k * Rbend / (y^2 + z^2) * ( 0   -y   -z )
 !                                                    ( y    0    0 )
@@ -298,15 +444,15 @@
          ZKE(2) =  y*rr*ZE(1)
          ZKE(3) =  z*rr*ZE(1)
 
-!       else
-! !     ...in this case, K = ( 0 -k  0 )
-! !                          ( k  0  0 )
-! !                          ( 0  0  0 )
-! !     ...so fill the entries of K*E with
-!          ZKE(1) = -ENVELOPEK*ZE(2)
-!          ZKE(2) =  ENVELOPEK*ZE(1)
-!          ZKE(3) =  ZERO
-!       endif
+      else
+!     ...in this case, K = ( 0 -k  0 )
+!                          ( k  0  0 )
+!                          ( 0  0  0 )
+!     ...so fill the entries of K*E with
+         ZKE(1) = -ENVELOPEK*ZE(2)
+         ZKE(2) =  ENVELOPEK*ZE(1)
+         ZKE(3) =  ZERO
+      endif
 #if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*) 'apply_matrixK: Xp = ', Xp
@@ -373,9 +519,34 @@
       ZDKE(3,:) = drr(:)*          z*ZE(1)   + rr*( z*ZDE(1,:)+e_z*ZE(1) )
 !
    end subroutine get_gradKE
+
+
+
+   subroutine get_refrac(Mdle,Zrefr)
+      use commonParam, only: ZONE, OMEGA, EPSILON, MU, REFRCORE, REFRCLAD, REFRCOAT,ATTNCOAT
+      implicit none
+!
+      integer,    intent(in) :: Mdle
+      complex(8), intent(out):: Zrefr
+!
+      integer :: ndom
+!
+      call find_domain(Mdle, ndom)
+      select case(ndom)
+      case(1,2)
+         Zrefr = cmplx(REFRCORE,0.0,8)
+      case(3)
+         Zrefr = cmplx(REFRCLAD,0.0,8)
+      case(4)
+         Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
+      case default
+         Zrefr = ZONE
+      end select
+
+   end subroutine
 !------------------------------------------------------------------------------
 !> @brief      Returns output of adjoint operator A^* on a pair of
-!!             complex-valued H(curl) test functions F and G
+!!             complex-valued H(curl) test functions [F ; G]
 !!
 !> @param[in]  Mdle     - element middle node number
 !> @param[in]  Xp       - physical point to evaluate result
@@ -388,8 +559,7 @@
 !> @date       Oct 2024
 !------------------------------------------------------------------------------
    subroutine get_Astar(Mdle,Xp,F,G,CF,CG,Astar1,Astar2)
-      use parameters, only: ZERO, ZONE
-      use commonParam, only: ZI, OMEGA, EPSILON, MU
+      use commonParam, only: ZERO, ZONE, ZI, OMEGA, EPSILON, MU
 !
       implicit none
 !
@@ -398,7 +568,14 @@
       complex(8), intent(in) :: F(3),G(3),CF(3),CG(3)
       complex(8), intent(out):: Astar1(3),Astar2(3)
 !
-      complex(8):: zKF(3),zKG(3)
+      complex(8):: zKF(3),zKG(3),zeps(3,3),zmu(3,3)
+      complex(8):: zbeta,zdbeta,zd2beta,zJQ(3,3),zJQinv(3,3)
+      real(8) :: rQ(3,3)
+      logical :: activePML
+!
+!  ...get local permittivity and permeability, as complex tensors
+      call get_local_epsilon(Mdle,Xp,zeps)
+      call get_local_mu(Mdle,Xp,zmu)
 !      
 !  ...apply matrix K to F and G
       call apply_matrixK(Mdle,Xp,F,zKF)
@@ -406,10 +583,99 @@
 !  ...get i.K^T.F and i.K^T.G; We use skew-symmetry K^T = -K 
       zKF = ZI*(-zKF)
       zKG = ZI*(-zKG)
+!
+!  ...check if we're within the PML
+      call is_pml(Mdle,Xp,activePML)
+      ! if so, modify terms with the stretch jacobians
+      if (activePML) then 
+         call get_pml_beta(Mdle,Xp,zbeta,zdbeta,zd2beta)
+         call get_local_rotation(Mdle,Xp,rQ)
+         call get_stretch_JQ(zdbeta,rQ,zJQ,zJQinv)
+         !
+         zeps = zdbeta*matmul(zJQinv,matmul(zeps,transpose(zJQinv)))
+         zmu  = zdbeta*matmul(zJQinv,matmul(zmu, transpose(zJQinv)))
+         zKF = zKF * zdbeta
+         zKG = zKG * zdbeta
+      endif
 !  ...compute 1st vector of output A^*
-      Astar1 = -conjg(ZI*OMEGA*EPSILON)*F + CG - conjg(zKG)
+      Astar1 = -conjg(ZI*OMEGA*matmul(zeps,F)) + CG - conjg(zKG)
 !  ...compute 2nd vector of output A^*
-      Astar2 =  conjg(ZI*OMEGA*MU     )*G + CF - conjg(zKF)
+      Astar2 =  conjg(ZI*OMEGA*matmul(zmu, G)) + CF - conjg(zKF)
 !      
    end subroutine get_Astar
 
+!------------------------------------------------------------------------------
+!> @brief      Returns output of adjoint operator A^* on multiple pairs of
+!!             complex-valued H(curl) test functions [F ; 0] and [0 ; F]
+!!
+!> @param[in]  Mdle    - element middle node number
+!> @param[in]  Xp      - physical point to evaluate result
+!> @param[in]  NE      - number of test function pairs
+!> @param[in]  F       - Hcurl test functions, size 3 by NE
+!> @param[in]  CF      - Curl of F (columnwise)
+!!
+!> @param[out] AstarF1 - 1st block of output A^*[F ; 0]
+!> @param[out] AstarF2 - 2nd block of output A^*[F ; 0]
+!> @param[out] AstarG1 - 1st block of output A^*[0 ; G]
+!> @param[out] AstarG2 - 2nd block of output A^*[0 ; G]
+!!
+!> @date       Mar 2025
+!------------------------------------------------------------------------------
+   subroutine get_Astar_multiple(Mdle,Xp,NE,F,CF,AstarF1,AstarF2,AstarG1,AstarG2)
+      use parameters, only: ZERO, ZONE
+      use commonParam, only: ZI, OMEGA, EPSILON, MU
+!
+      implicit none
+!
+      integer,    intent(in) :: Mdle,NE
+      real(8),    intent(in) :: Xp(3),F(3,NE),CF(3,NE)
+      complex(8), intent(out):: AstarF1(3,NE),AstarF2(3,NE),AstarG1(3,NE),AstarG2(3,NE)
+!
+      real(8) :: rKF(3,NE),rK(3,3)
+      complex(8):: ziKTF(3,NE),zeps(3,3),zmu(3,3)
+      complex(8):: zbeta,zdbeta,zd2beta,zJQ(3,3),zJQinv(3,3)
+      real(8) :: rQ(3,3)
+      logical :: activePML
+!
+!  ...get local permittivity and permeability, as complex tensors
+      call get_local_epsilon(Mdle,Xp,zeps)
+      call get_local_mu(Mdle,Xp,zmu)
+!      
+!  ...apply matrix K to F
+      call get_matrixK(Mdle,Xp,rK)
+      rKF(:,:) = 0.d0
+      call DGEMM('N','N',3,NE,3,1.d0,rK,3,F,3,0.d0,rKF,3)
+!  ...get i.K^T.F ; We use skew-symmetry K^T = -K 
+      ziKTF = ZI*(-rKF)
+!
+!  ...check if we're within the PML
+      call is_pml(Mdle,Xp,activePML)
+      ! if so, modify zeps, zmu and ziKTF with the stretch jacobians
+      if (activePML) then 
+         call get_pml_beta(Mdle,Xp,zbeta,zdbeta,zd2beta)
+         call get_local_rotation(Mdle,Xp,rQ)
+         call get_stretch_JQ(zdbeta,rQ,zJQ,zJQinv)
+         !
+         zeps = zdbeta*matmul(zJQinv,matmul(zeps,transpose(zJQinv)))
+         !
+         zmu  = zdbeta*matmul(zJQinv,matmul(zmu, transpose(zJQinv)))
+         !
+         ziKTF = ziKTF * zdbeta
+      endif
+!
+!  ...multiply permittivity tensor and F
+      call ZGEMM('N','N',3,NE,3,ZONE,zeps,3,cmplx(F,0.d0,8),3,ZERO,AstarF1,3)
+!
+!  ...multiply permeability tensor and G
+      call ZGEMM('N','N',3,NE,3,ZONE,zmu, 3,cmplx(F,0.d0,8),3,ZERO,AstarG2,3)
+!
+!  ...compute 1st block of output A^* (F;0)
+      AstarF1 = -conjg(ZI*OMEGA*AstarF1)
+!  ...compute 2nd block of output A^* (F;0)
+      AstarF2 = CF - conjg(ziKTF)
+!  ...compute 1st block of output A^* (0;G)
+      AstarG1 = AstarF2                     ! = CG - conjg(ziKTG)
+!  ...compute 2nd block of output A^* (0;G)
+      AstarG2 = conjg(ZI*OMEGA*AstarG2)
+!      
+   end subroutine get_Astar_multiple

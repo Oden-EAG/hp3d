@@ -48,7 +48,7 @@ subroutine elem(Mdle, Itest,Itrial)
    logical, parameter :: timer = .false.
 !
 !..use blas3 optimized assembly
-   logical, parameter :: opt_blas = .false.
+   logical, parameter :: opt_blas = .true.
 !
 !----------------------------------------------------------------------
 !
@@ -108,13 +108,13 @@ subroutine elem(Mdle, Itest,Itrial)
    if (timer) start_time = MPI_Wtime()
 !
    if (opt_blas) then
-      call elem_opt(Mdle,nrTest,nrTrial,                       &
+      call elem_bend_env_maxwell_opt(Mdle,nrTest,nrTrial,      &
          nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
          BLOC(1)%nrow,BLOC(2)%nrow,                            &
          BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,        &
          BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array)
    else
-      call elem_bend_env_maxwell(Mdle,nrTest,nrTrial,                   &
+      call elem_bend_env_maxwell(Mdle,nrTest,nrTrial,          &
          nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
          BLOC(1)%nrow,BLOC(2)%nrow,                            &
          BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,        &

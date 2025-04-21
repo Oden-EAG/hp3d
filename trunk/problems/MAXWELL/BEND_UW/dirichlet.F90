@@ -67,7 +67,7 @@
 !     ...exact solution UNKNOWN: solving homogeneous equation
          case(0)
 !
-            if (ISOL.eq.16) then
+            if (ISOL.eq.101) then
 !           ...use the exact solution to determine Dirichlet data
 !           ...get Electric field component
                call mfd_solutions(X, E,dE,d2E)

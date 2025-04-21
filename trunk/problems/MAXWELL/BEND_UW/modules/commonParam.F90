@@ -38,7 +38,13 @@ module commonParam
 !..waveguide half width
    real(8) :: HALFWIDTH
 !..bent fiber spanning angle
-   real(8) :: SPANGLE
+   real(8) :: THETAEND
+!..PML proportion w.r.t THETAEND
+   real(8) :: PMLPROP
+!  FIBER RADII
+   real(8) :: RCORE,RCLAD,RCOAT
+!  FIBER REFRACTIVE INDICES AND ATTENUATION IN COATING
+   real(8) :: REFRCORE,REFRCLAD,REFRCOAT,ATTNCOAT
 !
 !..impedance BC:
 !  GAMMA  : impedance constant

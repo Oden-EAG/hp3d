@@ -13,9 +13,9 @@
 !> @param[out] Resid       - element residual (squared)
 !> @param[out] Nref_flag   - suggested h-refinement flag
 !!
-!> @date       July 2023
+!> @date       March 2025
 !------------------------------------------------------------------------------
-   subroutine elem_residual_maxwell(Mdle,NrTest,                    &
+   subroutine elem_residual_maxwell_opt(Mdle,NrTest,                    &
                                     NrdofEE,NrdofH,NrdofE,NrdofQ,   &
                                     Resid,Nref_flag)
 !
@@ -77,26 +77,30 @@
       real(8), dimension(3,MAXbrickEE) :: shapEE
       real(8), dimension(3,MAXbrickEE) :: curlEE
 !
-!  ...Gram matrix in packed format
-      VTYPE, allocatable :: gramP(:)
+!   ..Gram matrix in full format (although we'll use upper half only)
+      real(8),    allocatable :: gram_r(:,:)
+      complex(8), allocatable :: gram_FF(:,:),gram_FG(:,:),gram_GG(:,:)
+      complex(8), allocatable :: gram(:,:)
 !
 !  ...intermediate values
       real(8) :: FF, CC, afac
       real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rKTF(3)
       real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
-      complex(8) :: AstarF1(3),AstarF2(3)
-      complex(8) :: AstarG1(3),AstarG2(3)
-      complex(8) :: AstarE1(3),AstarE2(3)
-      complex(8) :: AstarH1(3),AstarH2(3)
+      complex(8) :: AstarF1(3,NrdofEE),AstarF2(3,NrdofEE)
+      complex(8) :: AstarG1(3,NrdofEE),AstarG2(3,NrdofEE)
+!   ..dynamic allocation arrays for filling values at quadrature points
+      real(8),    allocatable :: all_shapF(:,:),all_curlF(:,:)
+      complex(8), allocatable :: all_AstarF1(:,:),all_AstarF2(:,:),   &
+                                 all_AstarG1(:,:),all_AstarG2(:,:)
 !
 !  ...load vector for the enriched space
-      VTYPE, dimension(NrTest)   :: bload_E,bload_Ec
+      VTYPE, dimension(NrTest)   :: bload_E
       VTYPE, dimension(2*NrdofE) :: bload_Imp
 !
 !  ...quadrature data
       real(8) :: xiloc(3,MAXNINT3ADD), waloc(MAXNINT3ADD)
       real(8) :: tloc(2,MAXNINT2ADD), wtloc(MAXNINT2ADD)
-      real(8) :: weight,wa
+      real(8) :: weight,wa,sqrt_weight
 !
 !  ...BC's flags
       integer :: ibc(6,NRINDEX)
@@ -119,6 +123,8 @@
 !  ...various variables for the problem
       integer :: k1,k2,m,n,nint,k,l,ivar,iflag
       integer :: nordP,nsign,ifc,info,nrdof
+
+      integer :: nda, loff, koff, joff, ioff, nE, nQ, i , j
       VTYPE   :: za(3,3),zc(3,3),zc1
 !
       integer, external :: ij_upper_to_packed
@@ -139,7 +145,6 @@
             stop
       end select
 !
-      allocate(gramP(NrTest*(NrTest+1)/2))
 !
 !  ...element type
       ntype = NODES(Mdle)%ntype
@@ -163,8 +168,13 @@
       call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !  ...clear space for auxiliary matrices
-      bload_E(:) = ZERO;   gramP(:) = ZERO;
-      bload_Ec(:) = ZERO;  bload_Imp(:) = ZERO
+      bload_E(:) = ZERO
+      bload_Imp(:) = ZERO
+
+!   ..allocate matrices
+      nE =   NrdofEE
+      nQ = 3*NrdofQ
+      allocate(gram(NrTest,NrTest))
 !
 !--------------------------------------------------------------------------
 !
@@ -176,6 +186,12 @@
       INTEGRATION = NORD_ADD
       call set_3D_int_DPG(ntype,norder,norient_face, nint,xiloc,waloc)
       INTEGRATION = 0
+!      
+!   ..we allocate the auxiliary arrays with this dimension
+      nda = 3*nint
+      allocate(all_shapF(nE,nda),all_curlF(nE,nda))
+      allocate(all_AstarF1(nE,nda),all_AstarF2(nE,nda))
+      allocate(all_AstarG1(nE,nda),all_AstarG2(nE,nda))
 !
 !  ...loop over
       do l=1,nint
@@ -220,9 +236,10 @@
          call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, &
                       x,dxdxi,dxidx,rjac,iflag)
 !
-!
 !     ...integration weight
          weight = rjac*wa
+         sqrt_weight = sqrt(weight)
+!
 !     ...compute the approximate solution
          zsolQ = ZERO
 !
@@ -235,10 +252,26 @@
 !     ...zJ (maxwell rhs)
          call getf(Mdle,x, zJ,zL)
 !
+!         
+!     ...STORE ALL THE VALUES OF ADJOINT AT INTEGRATION POINTS
+!     ...offset in auxiliary matrices
+         loff = 3*(l-1)
 !     ...apply pullbacks
-         call DGEMM('T','N',3,nrdofEE,3,1.d0     ,dxidx,3,shapEE,3,0.d0,shapF,3)
-         call DGEMM('N','N',3,nrdofEE,3,1.d0/rjac,dxdxi,3,curlEE,3,0.d0,curlF,3)
-!
+         call DGEMM('T','N',3,nE,3,1.d0     ,dxidx,3,shapEE,3,0.d0,shapF,3)!
+!     ...save in the big matrix of size nE by 3*nint
+         all_shapF(1:nE,loff+1:loff+3) = sqrt_weight*transpose(shapF)
+!   
+         call DGEMM('N','N',3,nE,3,1.d0/rjac,dxdxi,3,curlEE,3,0.d0,curlF,3)
+!     ...save in the big matrix of size nE by 3*nint
+         all_curlF(1:nE,loff+1:loff+3) = sqrt_weight*transpose(curlF)
+!   
+!     ...Evaluate A^* on (F ; 0) and on (0 ; G)
+         call get_Astar_multiple(Mdle,x,nE,shapF,curlF,AstarF1,AstarF2,AstarG1,AstarG2)
+!     ...save in big array of size nE by 3*nint; apply conjugate now for convenience
+         all_AstarF1(1:nE,loff+1:loff+3) = conjg(sqrt_weight*transpose(AstarF1))
+         all_AstarF2(1:nE,loff+1:loff+3) = conjg(sqrt_weight*transpose(AstarF2))
+         all_AstarG1(1:nE,loff+1:loff+3) = conjg(sqrt_weight*transpose(AstarG1))
+         all_AstarG2(1:nE,loff+1:loff+3) = conjg(sqrt_weight*transpose(AstarG2))
 !
 !     ...loop through enriched H(curl) test functions
          do k1=1,NrdofEE
@@ -263,126 +296,130 @@
                        + (fldG(1)*zL(1)+fldG(2)*zL(2)+fldG(3)*zL(3))  &
                        * weight
 !
-!        ...For 1st option to integrate
-!        ...Evaluate A^* on (F ; 0)
-            call get_Astar(Mdle,x,cmplx(fldF,0.d0,8),(/ZERO,ZERO,ZERO/),                &
-                                  cmplx(crlF,0.d0,8),(/ZERO,ZERO,ZERO/),AstarF1,AstarF2)
-!        ...Evaluate A^* on (0 ; G)
-            call get_Astar(Mdle,x,(/ZERO,ZERO,ZERO/),cmplx(fldG,0.d0,8),                &
-                                  (/ZERO,ZERO,ZERO/),cmplx(crlG,0.d0,8),AstarG1,AstarG2)
-!
 !   1ST OPTION TO INTEGRATE: evaluate adjoint operator
 !        ...First equation. Test function F
             n = 2*k1-1
 !        ...Accumulate    -( E , AstarF1 )   -( H , AstarF2 )
             bload_E(n) = bload_E(n)                                  &
-                       - ( SUM(zsolQ(1:3)*conjg(AstarF1(:)))         &
-                          +SUM(zsolQ(4:6)*conjg(AstarF2(:))))*weight
+                       - ( SUM(zsolQ(1:3)*conjg(AstarF1(:,k1)))         &
+                          +SUM(zsolQ(4:6)*conjg(AstarF2(:,k1))))*weight
 !
 !        ...Second equation. Test function G
             n = 2*k1
 !        ...Accumulate    -( E , AstarG1 )   -( H , AstarG2 )
             bload_E(n) = bload_E(n)                                  &
-                       - ( SUM(zsolQ(1:3)*conjg(AstarG1(:)))         &
-                          +SUM(zsolQ(4:6)*conjg(AstarG2(:))))*weight
-!
-!        ---Gram matrix---
-!
-!        ...loop through enriched H(curl) test functions --- Gram matrix's columns
-            do k2=k1,NrdofEE
-!           ...THESE ARE NOT the same E and H from the trial space. 
-!              Those were L^2 while these are H(curl)            
-               fldE(:) = shapF(:,k2); fldH = fldE
-               crlE(:) = curlF(:,k2); crlH = crlE
-!
-!           ...accumulate for the Hermitian Gram matrix
-!              (compute upper triangular only)
-!           ...testNorm = Scaled Adjoint Graph norm
-!                ||v|| = alpha*(v,v) + (A^* v, A^* v)
-!              with v = (F;G)^T
-!              Gram_ij=(phi_j,phi_i)_testNorm is 2x2 matrix
-!              -------------------------
-!              | (F_i,E_j)   (F_i,H_j) |
-!              | (G_i,E_j)   (G_i,H_j) |
-!              -------------------------
-!              F_i/G_i are outer loop shape functions (fldF,fldG)
-!              E_j/H_j are inner loop shape functions (fldE,fldH)
-!
-!              (E_j,F_i) terms = Int[F_^*i E_j] terms (Gram_11)
-               n = 2*k1-1; m = 2*k2-1
-               k = ij_upper_to_packed(n,m)
-!
-               select case(TEST_NORM)
-               case(MATH_NORM)
-!              ...compute (E,F)_L2 and (curlE,curlF)_L2
-                  call dot_product(fldF,fldE, FF)
-                  call dot_product(crlF,crlE, CC)
-                  gramP(k) = gramP(k) + cmplx((CC+FF)*weight,0.d0,8)
-               case(GRAPH_NORM)
-!
-!              ...For 1st option to integrate
-!              ...Evaluate A^* on (E ; 0)
-                  call get_Astar(Mdle,x,cmplx(fldE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
-                                        cmplx(crlE,0.d0,8),(/ZERO,ZERO,ZERO/),   &
-                                                               AstarE1,AstarE2)
-                  gramP(k) = gramP(k)  &
-                           + SUM(AstarE1*conjg(AstarF1) + AstarE2*conjg(AstarF2))*weight
-!                           
-!              ...add L2 term
-                  call dot_product(fldF,fldE, FF)
-                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
-               end select
-!
-!              (H_j,G_i) terms = Int[G_^*i H_j] terms (G_22)
-               n = 2*k1; m = 2*k2
-               k = ij_upper_to_packed(n,m)
-!
-               select case(TEST_NORM)
-               case(MATH_NORM)
-!             ...compute (H,G)_L2 and (curlH,curlG)_L2 .
-!              ...they're equal to FF and CC, resp.
-! call dot_product(fldF,fldE, FF)
-! call dot_product(crlF,crlE, CC)
-                  gramP(k) = gramP(k) + cmplx((CC+FF)*weight,0.d0,8)
-               case(GRAPH_NORM)
-!
-!              ...For 1st option to integrate
-!              ...Evaluate A^* on (0 ; H)
-                  call get_Astar(Mdle,x,(/ZERO,ZERO,ZERO/),cmplx(fldH,0.d0,8),   &
-                                        (/ZERO,ZERO,ZERO/),cmplx(crlH,0.d0,8),   &
-                                                               AstarH1,AstarH2)
-                  gramP(k) = gramP(k)  &
-                           + SUM(AstarH1*conjg(AstarG1) + AstarH2*conjg(AstarG2))*weight
-!                           
-!              ...add L2 term
-                  ! call dot_product(fldF,fldE, FF)
-                  gramP(k) = gramP(k) + cmplx(ALPHA_NORM*FF*weight,0.d0,8)
-               end select
-!
-               if (TEST_NORM .ne. GRAPH_NORM) cycle
-!
-!              (H_j,F_i) terms = Int[F_^*i H_j] terms (G_12)
-               n = 2*k1-1; m = 2*k2
-               k = ij_upper_to_packed(n,m)
-!
-               gramP(k) = gramP(k)    &
-                        + SUM(AstarH1*conjg(AstarF1) + AstarH2*conjg(AstarF2))*weight
-!
-!           ...compute lower triangular part of 2x2 G_ij matrix
-!              only if it is not a diagonal block, G_ii
-               if (k1 .ne. k2) then
-!                 (E_j,G_i) terms = Int[G_^*i E_j] terms (G_21)
-                  n = 2*k1; m = 2*k2-1
-                  k = ij_upper_to_packed(n,m)
-!
-                  gramP(k) = gramP(k)    &
-                           + SUM(AstarE1*conjg(AstarG1) + AstarE2*conjg(AstarG2))*weight
-               endif
+                       - ( SUM(zsolQ(1:3)*conjg(AstarG1(:,k1)))         &
+                          +SUM(zsolQ(4:6)*conjg(AstarG2(:,k1))))*weight
 !
 !        ...end of loop through enriched H(curl) test functions
-            enddo
          enddo
+!   
+!   ..end of loop through integration points
       enddo
+!
+!
+!     --- Gram matrix: assemble and factorize ---
+!   
+      allocate(gram_r(nE,nE))
+      gram_r(:,:) = 0.d0
+!   
+      select case(TEST_NORM)
+         case( MATH_NORM)
+            afac = 1.d0
+!   
+!        ...α*(F,F)
+!        ...α*(G,G)
+            call DSYRK('U','N',nE,nda,afac,all_shapF,nE,0.d0,gram_r,nE) ! real-valued
+!        ...(curl F, curl F)
+!        ...(curl G, curl G)
+            call DSYRK('U','N',nE,nda,1.d0,all_curlF,nE,1.d0,gram_r,nE) ! real-valued
+!        ...Cholesky factorization of the real symmetric matrix Gram_r 
+            call DPOTRF('U',nE,gram_r,nE,info)
+            if (info.ne.0) then
+               write(*,*) 'elem_maxwell_opt: DPOTRF: Mdle,info = ',Mdle,info,'. stop.'
+               stop
+            endif
+            do j = 1,nE
+               joff = 2*(j-1)
+               do i = 1,j
+                  ioff = 2*(i-1)
+!              ...Assemble            
+!                 (F,F) + (CF,CF)         0 
+!                       0           (G,G) + (CG,CG)
+                  gram(ioff+1,joff+1) = cmplx(gram_r(i,j),0.d0,8)
+                  gram(ioff+2,joff+2) = cmplx(gram_r(i,j),0.d0,8)
+               enddo
+            enddo
+            deallocate(gram_r,all_shapF,all_curlF)
+      
+         case(GRAPH_NORM)
+            afac = ALPHA_NORM
+!     
+!           ...α*(F,F)
+!           ...α*(G,G)
+            call DSYRK('U','N',nE,nda,afac,all_shapF,nE,0.d0,gram_r,nE) ! real-valued
+            do j = 1,nE
+               joff = 2*(j-1)
+               do i = 1,j
+                  ioff = 2*(i-1)
+!              ...Accumulate into the complex-valued matrix
+!                 α*(F,F)     0 
+!                    0     α*(G,G)
+                  gram(ioff+1,joff+1) = cmplx(gram_r(i,j),0.d0,8)
+                  gram(ioff+2,joff+2) = cmplx(gram_r(i,j),0.d0,8)
+               enddo
+            enddo
+            deallocate(gram_r,all_shapF,all_curlF)
+!            
+            allocate(gram_FF(nE,nE),gram_GG(nE,nE),gram_FG(nE,nE))
+            gram_FF(:,:) = ZERO; gram_GG(:,:) = ZERO; gram_FG(:,:) = ZERO
+!     
+!        ...accumulate (AstarF1,AstarF1)
+            call ZHERK('U','N',nE,nda,ZONE,all_AstarF1,nE,  &
+                       ZERO,gram_FF(1:nE,1:nE ),nE)
+!        ...accumulate (AstarF2,AstarF2)
+            call ZHERK('U','N',nE,nda,ZONE,all_AstarF2,nE,  &
+                       ZONE,gram_FF(1:nE,1:nE ),nE)
+!     
+!        ...accumulate (AstarG1,AstarG1)
+            call ZHERK('U','N',nE,nda,ZONE,all_AstarG1,nE,  &
+                       ZERO,gram_GG(1:nE,1:nE ),nE)
+!        ...accumulate (AstarG2,AstarG2)
+            call ZHERK('U','N',nE,nda,ZONE,all_AstarG2,nE,  &
+                       ZONE,gram_GG(1:nE,1:nE ),nE)
+!     
+!        ...accumulate (AstarF1,AstarG1)
+            call ZGEMM('N','C',nE,nE,nda,ZONE,all_AstarF1,nE,all_AstarG1,nE,  &
+                       ZERO,gram_FG(1:nE,1:nE ),nE)
+!        ...accumulate (AstarF2,AstarG2)
+            call ZGEMM('N','C',nE,nE,nda,ZONE,all_AstarF2,nE,all_AstarG2,nE,  &
+                       ZONE,gram_FG(1:nE,1:nE ),nE)
+!     
+!        ...organize blocks within upper part of gram
+            do j = 1,nE
+               joff = 2*(j-1)
+               do i = 1,j
+                  ioff = 2*(i-1)
+                  ! (F,F), (G,G)
+                  gram(ioff+1,joff+1) = gram_FF(i,j)
+                  gram(ioff+2,joff+2) = gram_GG(i,j)
+                  ! (F,G), (G,F)
+                  gram(ioff+1,joff+2) = gram_FG(i,j)
+                  gram(ioff+2,joff+1) = conjg(gram_FG(j,i))
+               enddo
+            enddo
+            deallocate(gram_FF,gram_GG,gram_FG)
+            call ZPOTRF('U',NrTest,gram,NrTest,info)
+            if (info.ne.0) then
+               write(*,*) 'elem_maxwell_opt: ZPOTRF: Mdle,info = ',Mdle,info,'. stop.'
+               stop
+            endif
+         case default
+            write(*,*) 'elem_maxwell: invalid test norm!'
+            stop
+      end select
+      deallocate(all_AstarF1,all_AstarF2)
+      deallocate(all_AstarG1,all_AstarG2)
 !
 !--------------------------------------------------------------------------
 !
@@ -553,31 +590,23 @@
 #endif
 !
 !--------------------------------------------------------------------------
-!
-!  ...factorize the test Gram matrix
-      call ZPPTRF('U', NrTest, gramP, info)
+!   ..Solve triangular system to obtain R~, (LX=) U^*X = [l]
+      call ZTRTRS('U','C','N',NrTest,1,gram,NrTest,bload_E,NrTest,info)
       if (info.ne.0) then
-         write(*,*) 'elem_residual_maxwell: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+         write(*,*) 'elem_residual_maxwell_opt: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
          stop
       endif
+! !..C. Matrix multiply: B^* G^-1 B (=B~^* B~)
+!    call ZHERK('U','C',1,NrTest,ZONE,bload_E,NrTest,ZERO,zBDPG,NrTrial+1)
+! !
+!    deallocate(stiff_ALL)
 !
-!  ...save copies of the RHS to compute later the residual
-      bload_Ec = bload_E
-!
-!  ...compute the product of inverted test Gram matrix with RHS,
-!  ...bload_E is overwritten with the solution
-      call ZPPTRS('U', NrTest, 1, gramP, bload_E, NrTest, info)
-      if (info.ne.0) then
-         write(*,*) 'elem_residual_maxwell: ZPPTRS: Mdle,info = ',Mdle,info,'. stop.'
-         stop
-      endif
-!
-      deallocate(gramP)
+      deallocate(gram)
 !
 !  ...compute the residual
       zresid = ZERO
       do k=1,NrTest
-         zresid = zresid + bload_Ec(k)*conjg(bload_E(k))
+         zresid = zresid + bload_E(k)*conjg(bload_E(k))
       enddo
 !
 !  ...account for impedance BC penalty term (L2 penalty method)
@@ -607,5 +636,5 @@
       endif
 #endif
 !
-   end subroutine elem_residual_maxwell
+   end subroutine elem_residual_maxwell_opt
 

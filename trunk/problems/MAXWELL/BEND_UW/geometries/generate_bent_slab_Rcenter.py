@@ -16,11 +16,21 @@ import math
 # and spanning angle in degrees
 a = 0.5;
 R = 1300.0;
-TH = 3.0; 
+
+
+keff= 1.49993333460866E+02-1.49393360127023E+02;
+wleff=2.0*math.pi/keff;
+nwl_bent = 4;
+TH = nwl_bent*wleff/R;
+print("wleff=",wleff)
+print("theta_end=",TH)
+
+# TH = 3.0*math.pi/180.0; 
+
 # compute cosine and sine of angle
-cth = math.cos(TH*math.pi/180.0); sth = math.sin(TH*math.pi/180.0);
+cth = math.cos(TH); sth = math.sin(TH);
 # and open geometry file
-f = open("bent_waveguide_d0p5_cR1300_DEG3","w+")
+f = open("bent_waveguide_d0p5_cR1300_4wl","w+")
 
 # Dimension
 f.write("3 3 NDIM,MANDIM\n")
