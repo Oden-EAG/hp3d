@@ -17,7 +17,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
 !..misc
-   integer :: attr,bdom,comp,flag,i
+   integer :: attr,bdom,comp,flag,i,nxyz(3)
    integer :: nr_attr,attr_list(NR_PHYSA)
 !
 !-------------------------------------------------------------------------------
@@ -26,6 +26,21 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !..setting uniform isotropic polynomial order "IP"
    call set_order(IP, Nelem_order)
+
+   if (SLAB_GUIDE.eq.1) then 
+
+      do i=1,NRELIS
+         ! decode order
+         call decod(Nelem_order(i),10,3,nxyz)
+         ! replace order for x
+         nxyz(1)=1
+         ! encode back
+         call encod(nxyz,10,3,Nelem_order(i))
+      enddo
+
+   endif
+
+
 !
 !  STEP 2 : set up physics
 !

@@ -110,11 +110,24 @@
 !
 !     ...single uniform h-refinement
          case(20)
-            write(*,*) 'global h-refinement...'
-            call global_href
-            if (IBCFLAG .eq. 3) then
-               call propagate_flag(3,3)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Select number of refinements:'
+               read(*,*) refs
             endif
+            count = 1; src = ROOT
+            call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            do i=1,refs
+               if (SLAB_GUIDE.eq.1) then  
+                  write(*,*) 'global yz h-refinement...'
+                  call global_href_aniso_bric(0,1,1)
+               else
+                  write(*,*) 'global isotropic h-refinement...'
+                  call global_href
+               endif
+               if (IBCFLAG .eq. 3) then
+                  call propagate_flag(3,3)
+               endif
+            enddo
             call update_gdof
             call update_Ddof
 !
@@ -136,13 +149,12 @@
             call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
             write(*,*) 'global anisotropic h-refinement...'
             do i=1,refs
-               ! call global_href_aniso_bric(0,0,1)
                call global_href_aniso(0,1)
                write(*,*) '.....after global_href_aniso'
-               ! if (IBCFLAG .eq. 3) then
-               !    call propagate_flag(3,3)
-               !    call propagate_flag(5,3)
-               ! endif
+               if (IBCFLAG .eq. 3) then
+                  call propagate_flag(3,3)
+                  ! call propagate_flag(5,3)
+               endif
             enddo
             ! call global_href_aniso(0,1)
             ! call global_href_aniso_bric(0,0,1)

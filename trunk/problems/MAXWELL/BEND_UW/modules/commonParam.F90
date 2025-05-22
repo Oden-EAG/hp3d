@@ -35,13 +35,15 @@ module commonParam
    real(8) :: ENVELOPEK
 !..bending radius
    real(8) :: RBEND
-!..waveguide half width
-   real(8) :: HALFWIDTH
-!..bent fiber spanning angle
-   real(8) :: THETAEND
-!..PML proportion w.r.t THETAEND
-   real(8) :: PMLPROP
-!  FIBER RADII
+!..upper and lower bounds of cylindrical and toroidal coordinates
+   real(8) :: THUP,THLO,RUP,RLO,XUP,XLO,RHOUP,RHOLO
+!..PML proportion w.r.t upper and lower bounds of each coordinate
+   real(8) :: PMLTHUP,PMLTHLO,PMLRUP,PMLRLO,PMLXUP,PMLXLO,PMLRHOUP,PMLRHOLO
+!..flag: PML for toroidal geometry rho coordinate
+   integer :: TOROIDAL_PML
+!..flag: slab geometry
+   integer :: SLAB_GUIDE
+!  WAVEGUIDE/FIBER RADII(or halfwidths)
    real(8) :: RCORE,RCLAD,RCOAT
 !  FIBER REFRACTIVE INDICES AND ATTENUATION IN COATING
    real(8) :: REFRCORE,REFRCLAD,REFRCOAT,ATTNCOAT

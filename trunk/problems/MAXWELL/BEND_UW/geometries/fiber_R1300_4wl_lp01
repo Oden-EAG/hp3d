@@ -1,0 +1,682 @@
+3 3 NDIM,MANDIM
+
+0 NRSURFS
+
+4 NRDOMAIN
+
+34  NRPOINT
+
+Regular            point   1 
+  0.17677669529664d0 1300.17677669529667d0   0.00000000000000d0
+
+Regular            point   2 
+  0.17677669529664d0 1299.82322330470333d0   0.00000000000000d0
+
+Regular            point   3 
+ -0.17677669529664d0 1299.82322330470333d0   0.00000000000000d0
+
+Regular            point   4 
+ -0.17677669529664d0 1300.17677669529667d0   0.00000000000000d0
+
+Regular            point   5 
+  0.35355339059327d0 1300.35355339059333d0   0.00000000000000d0
+
+Regular            point   6 
+  0.35355339059327d0 1299.64644660940667d0   0.00000000000000d0
+
+Regular            point   7 
+ -0.35355339059327d0 1299.64644660940667d0   0.00000000000000d0
+
+Regular            point   8 
+ -0.35355339059327d0 1300.35355339059333d0   0.00000000000000d0
+
+Regular            point   9 
+  3.53553390593274d0 1303.53553390593265d0   0.00000000000000d0
+
+Regular            point  10 
+  3.53553390593274d0 1296.46446609406735d0   0.00000000000000d0
+
+Regular            point  11 
+ -3.53553390593274d0 1296.46446609406735d0   0.00000000000000d0
+
+Regular            point  12 
+ -3.53553390593274d0 1303.53553390593265d0   0.00000000000000d0
+
+Regular            point  13 
+  4.41941738241592d0 1304.41941738241599d0   0.00000000000000d0
+
+Regular            point  14 
+  4.41941738241592d0 1295.58058261758401d0   0.00000000000000d0
+
+Regular            point  15 
+ -4.41941738241592d0 1295.58058261758401d0   0.00000000000000d0
+
+Regular            point  16 
+ -4.41941738241592d0 1304.41941738241599d0   0.00000000000000d0
+
+Regular            point  17 
+  0.17677669529664d0 1292.72195567657650d0 139.03091731517353d0
+
+Regular            point  18 
+  0.17677669529664d0 1292.37042945436110d0 138.99311103137032d0
+
+Regular            point  19 
+ -0.17677669529664d0 1292.37042945436110d0 138.99311103137032d0
+
+Regular            point  20 
+ -0.17677669529664d0 1292.72195567657650d0 139.03091731517353d0
+
+Regular            point  21 
+  0.35355339059327d0 1292.89771878768420d0 139.04982045707513d0
+
+Regular            point  22 
+  0.35355339059327d0 1292.19466634325340d0 138.97420788946872d0
+
+Regular            point  23 
+ -0.35355339059327d0 1292.19466634325340d0 138.97420788946872d0
+
+Regular            point  24 
+ -0.35355339059327d0 1292.89771878768420d0 139.04982045707513d0
+
+Regular            point  25 
+  3.53553390593274d0 1296.06145478762210d0 139.39007701130390d0
+
+Regular            point  26 
+  3.53553390593274d0 1289.03093034331550d0 138.63395133523991d0
+
+Regular            point  27 
+ -3.53553390593274d0 1289.03093034331550d0 138.63395133523991d0
+
+Regular            point  28 
+ -3.53553390593274d0 1296.06145478762210d0 139.39007701130390d0
+
+Regular            point  29 
+  4.41941738241592d0 1296.94027034316082d0 139.48459272081192d0
+
+Regular            point  30 
+  4.41941738241592d0 1288.15211478777701d0 138.53943562573190d0
+
+Regular            point  31 
+ -4.41941738241592d0 1288.15211478777701d0 138.53943562573190d0
+
+Regular            point  32 
+ -4.41941738241592d0 1296.94027034316082d0 139.48459272081192d0
+
+Regular            point  33 
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+Regular            point  34 
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+81  NRCURVE
+
+Seglin                curve   1
+  1  33
+
+Seglin                curve   2
+  2  33
+
+Seglin                curve   3
+  3  33
+
+Seglin                curve   4
+  4  33
+
+QuaCir                curve   5
+  1   2
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve   6
+  2   3
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve   7
+  3   4
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve   8
+  4   1
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+Seglin                curve   9
+  5   1
+
+Seglin                curve  10
+  6   2
+
+Seglin                curve  11
+  7   3
+
+Seglin                curve  12
+  8   4
+
+QuaCir                curve  13
+  5   6
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  14
+  6   7
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  15
+  7   8
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  16
+  8   5
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+Seglin                curve  17
+  9   5
+
+Seglin                curve  18
+ 10   6
+
+Seglin                curve  19
+ 11   7
+
+Seglin                curve  20
+ 12   8
+
+QuaCir                curve  21
+  9  10
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  22
+ 10  11
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  23
+ 11  12
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  24
+ 12   9
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+Seglin                curve  25
+ 13   9
+
+Seglin                curve  26
+ 14  10
+
+Seglin                curve  27
+ 15  11
+
+Seglin                curve  28
+ 16  12
+
+QuaCir                curve  29
+ 13  14
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  30
+ 14  15
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  31
+ 15  16
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+QuaCir                curve  32
+ 16  13
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0
+
+Seglin                curve  33
+ 17  34
+
+Seglin                curve  34
+ 18  34
+
+Seglin                curve  35
+ 19  34
+
+Seglin                curve  36
+ 20  34
+
+QuaCir                curve  37
+ 17  18
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  38
+ 18  19
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  39
+ 19  20
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  40
+ 20  17
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+Seglin                curve  41
+ 21  17
+
+Seglin                curve  42
+ 22  18
+
+Seglin                curve  43
+ 23  19
+
+Seglin                curve  44
+ 24  20
+
+QuaCir                curve  45
+ 21  22
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  46
+ 22  23
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  47
+ 23  24
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  48
+ 24  21
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+Seglin                curve  49
+ 25  21
+
+Seglin                curve  50
+ 26  22
+
+Seglin                curve  51
+ 27  23
+
+Seglin                curve  52
+ 28  24
+
+QuaCir                curve  53
+ 25  26
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  54
+ 26  27
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  55
+ 27  28
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  56
+ 28  25
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+Seglin                curve  57
+ 29  25
+
+Seglin                curve  58
+ 30  26
+
+Seglin                curve  59
+ 31  27
+
+Seglin                curve  60
+ 32  28
+
+QuaCir                curve  61
+ 29  30
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  62
+ 30  31
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  63
+ 31  32
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+QuaCir                curve  64
+ 32  29
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0
+
+CylCoord              curve  65
+  1  17
+
+CylCoord              curve  66
+  2  18
+
+CylCoord              curve  67
+  3  19
+
+CylCoord              curve  68
+  4  20
+
+CylCoord              curve  69
+  5  21
+
+CylCoord              curve  70
+  6  22
+
+CylCoord              curve  71
+  7  23
+
+CylCoord              curve  72
+  8  24
+
+CylCoord              curve  73
+  9  25
+
+CylCoord              curve  74
+ 10  26
+
+CylCoord              curve  75
+ 11  27
+
+CylCoord              curve  76
+ 12  28
+
+CylCoord              curve  77
+ 13  29
+
+CylCoord              curve  78
+ 14  30
+
+CylCoord              curve  79
+ 15  31
+
+CylCoord              curve  80
+ 16  32
+
+CylCoord              curve  81
+ 33  34
+
+8          NRTRIAN
+
+TransTri              triangle   1
+  1  33   2
+
+TransTri              triangle   2
+  2  33   3
+
+TransTri              triangle   3
+  3  33   4
+
+TransTri              triangle   4
+  4  33   1
+
+TransTri              triangle   5
+ 17  34  18
+
+TransTri              triangle   6
+ 18  34  19
+
+TransTri              triangle   7
+ 19  34  20
+
+TransTri              triangle   8
+ 20  34  17
+
+56          NRRECTA
+
+TorRec                rectangle   1
+  1   2  18  17
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   2
+  2   3  19  18
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   3
+  3   4  20  19
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   4
+  4   1  17  20
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   5
+  5   6  22  21
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   6
+  6   7  23  22
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   7
+  7   8  24  23
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   8
+  8   5  21  24
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle   9
+  9  10  26  25
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  10
+ 10  11  27  26
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  11
+ 11  12  28  27
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  12
+ 12   9  25  28
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  13
+ 13  14  30  29
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  14
+ 14  15  31  30
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  15
+ 15  16  32  31
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+TorRec                rectangle  16
+ 16  13  29  32
+  0.00000000000000d0 1300.00000000000000d0   0.00000000000000d0		 center of arc v1v2
+  0.00000000000000d0 1292.54619256546880d0 139.01201417327192d0		 center of arc v3v4
+
+CylRec                rectangle  17
+ 33   1  17  34
+
+CylRec                rectangle  18
+ 33   2  18  34
+
+CylRec                rectangle  19
+ 33   3  19  34
+
+CylRec                rectangle  20
+ 33   4  20  34
+
+CylRec                rectangle  21
+  1   5  21  17
+
+CylRec                rectangle  22
+  2   6  22  18
+
+CylRec                rectangle  23
+  3   7  23  19
+
+CylRec                rectangle  24
+  4   8  24  20
+
+CylRec                rectangle  25
+  5   9  25  21
+
+CylRec                rectangle  26
+  6  10  26  22
+
+CylRec                rectangle  27
+  7  11  27  23
+
+CylRec                rectangle  28
+  8  12  28  24
+
+CylRec                rectangle  29
+  9  13  29  25
+
+CylRec                rectangle  30
+ 10  14  30  26
+
+CylRec                rectangle  31
+ 11  15  31  27
+
+CylRec                rectangle  32
+ 12  16  32  28
+
+TraQua                rectangle  33
+  1   2   6   5
+
+TraQua                rectangle  34
+  2   3   7   6
+
+TraQua                rectangle  35
+  3   4   8   7
+
+TraQua                rectangle  36
+  4   1   5   8
+
+TraQua                rectangle  37
+  5   6  10   9
+
+TraQua                rectangle  38
+  6   7  11  10
+
+TraQua                rectangle  39
+  7   8  12  11
+
+TraQua                rectangle  40
+  8   5   9  12
+
+TraQua                rectangle  41
+  9  10  14  13
+
+TraQua                rectangle  42
+ 10  11  15  14
+
+TraQua                rectangle  43
+ 11  12  16  15
+
+TraQua                rectangle  44
+ 12   9  13  16
+
+TraQua                rectangle  45
+ 17  18  22  21
+
+TraQua                rectangle  46
+ 18  19  23  22
+
+TraQua                rectangle  47
+ 19  20  24  23
+
+TraQua                rectangle  48
+ 20  17  21  24
+
+TraQua                rectangle  49
+ 21  22  26  25
+
+TraQua                rectangle  50
+ 22  23  27  26
+
+TraQua                rectangle  51
+ 23  24  28  27
+
+TraQua                rectangle  52
+ 24  21  25  28
+
+TraQua                rectangle  53
+ 25  26  30  29
+
+TraQua                rectangle  54
+ 26  27  31  30
+
+TraQua                rectangle  55
+ 27  28  32  31
+
+TraQua                rectangle  56
+ 28  25  29  32
+
+4          NRPRISM
+
+TIprism               prism   1
+1 	   1  33   2  17  34  18
+
+TIprism               prism   2
+1 	   2  33   3  18  34  19
+
+TIprism               prism   3
+1 	   3  33   4  19  34  20
+
+TIprism               prism   4
+1 	   4  33   1  20  34  17
+
+12          NRHEXAS
+
+TorHex                hexahedron   1
+2 	   1   2   6   5  17  18  22  21
+  5   1		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   2
+2 	   2   3   7   6  18  19  23  22
+  6   2		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   3
+2 	   3   4   8   7  19  20  24  23
+  7   3		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   4
+2 	   4   1   5   8  20  17  21  24
+  8   4		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   5
+3 	   5   6  10   9  21  22  26  25
+  9   5		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   6
+3 	   6   7  11  10  22  23  27  26
+ 10   6		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   7
+3 	   7   8  12  11  23  24  28  27
+ 11   7		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   8
+3 	   8   5   9  12  24  21  25  28
+ 12   8		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron   9
+4 	   9  10  14  13  25  26  30  29
+ 13   9		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron  10
+4 	  10  11  15  14  26  27  31  30
+ 14  10		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron  11
+4 	  11  12  16  15  27  28  32  31
+ 15  11		 indices of outer and inner toroidal quad faces
+
+TorHex                hexahedron  12
+4 	  12   9  13  16  28  25  29  32
+ 16  12		 indices of outer and inner toroidal quad faces
+
+0 NRTETRA
+
+0 NRPYRAM

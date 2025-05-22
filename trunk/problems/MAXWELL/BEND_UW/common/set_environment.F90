@@ -92,35 +92,56 @@ subroutine set_environment_maxwell
 !..Set bending radius RBEND
    call get_option_real('-rbend' , 'RBEND', 25.d0, RBEND)
 !
-!..Set waveguide half width HALFWIDTH
-   call get_option_real('-halfwidth' , 'HALFWIDTH', 0.5d0, HALFWIDTH)
+!..Set upper and lower bounds for coordinate THETA
+   call get_option_real('-thup' , 'THUP', 0.5235987755982989d0, THUP)
+   call get_option_real('-thlo' , 'THLO', 0.d0, THLO)
 !
-!..Set bent fiber sppaning angle THETAEND
-   call get_option_real('-thetaend' , 'THETAEND', 0.5235987755982989d0, THETAEND)
+!..Set upper and lower bounds for coordinate R
+   call get_option_real('-rup' , 'RUP', 1310.d0, RUP)
+   call get_option_real('-rlo' , 'RLO', 1290.d0, RLO)
 !
-!..Set PML proportion w.r.t. THETAEND
-   call get_option_real('-pmlprop' , 'PMLPROP', 0.25d0, PMLPROP)
+!..Set upper and lower bounds for coordinate X
+   call get_option_real('-xup' , 'XUP', 0.d0, XUP)
+   call get_option_real('-xlo' , 'XLO', 1.d0, XLO)
 !
-!..Set CORE radius RCORE
+!..Set upper and lower bounds for coordinate RHO
+   call get_option_real('-rhoup' , 'RHOUP', 0.d0, RHOUP)
+   call get_option_real('-rholo' , 'RHOLO',10.d0, RHOLO)
+!
+!..Set PML proportion for upper and lower bounds of coordinate TH (≤0.5)
+   call get_option_real('-pmlthup' ,'PMLTHUP', 0.d0, PMLTHUP)
+   call get_option_real('-pmlthlo' ,'PMLTHLO', 0.d0, PMLTHLO)
+!
+!..Set PML proportion for upper and lower bounds of coordinate R (≤0.5)
+   call get_option_real('-pmlrup' , 'PMLRUP', 0.d0, PMLRUP)
+   call get_option_real('-pmlrlo' , 'PMLRLO', 0.d0, PMLRLO)
+!
+!..Set PML proportion for upper and lower bounds of coordinate X (≤0.5)
+   call get_option_real('-pmlxup' , 'PMLXUP', 0.d0, PMLXUP)
+   call get_option_real('-pmlxlo' , 'PMLXLO', 0.d0, PMLXLO)
+!
+!..Set PML proportion for upper and lower bounds of coordinate RHO (≤0.5)
+   call get_option_real('-pmlrhoup','PMLRHOUP', 0.d0, PMLRHOUP)
+   call get_option_real('-pmlrholo','PMLRHOLO', 0.d0, PMLRHOLO)
+!
+!..Set PML flag in toroidal geometry (radial direction of bent fiber's cross section)
+   call get_option_int('-torpml' , 'TOROIDAL_PML', 0 , TOROIDAL_PML)
+!
+!..Set flag for slab waveguide geometry
+   call get_option_int('-slab' , 'SLAB_GUIDE', 0 , SLAB_GUIDE)
+!
+!..Set core's radius RCORE, cladding's radius RCLAD, coating's radius RCOAT (halfwidths in slab guide)
    call get_option_real('-rcore' , 'RCORE', 0.5d0, RCORE)
-!
-!..Set CLADDING radius RCLAD
    call get_option_real('-rclad' , 'RCLAD', 5.0d0, RCLAD)
-!
-!..Set COATING radius RCOAT
    call get_option_real('-rcoat' , 'RCOAT', 10.d0, RCOAT)
 !
-!..Set CORE refractive index REFRCORE
+!..Set real part of refractive indices of core, cladding, coating: REFRCORE, REFRCLAD, REFRCOAT
    call get_option_real('-ncore' , 'REFRCORE', 1.4512d0, REFRCORE)
-!
-!..Set CLADDING refractive index REFRCLAD
    call get_option_real('-nclad' , 'REFRCLAD', 1.45d0, REFRCLAD)
-!
-!..Set COATING refractive index REFRCOAT
    call get_option_real('-ncoat' , 'REFRCOAT', 1.38d0, REFRCOAT)
 !
 !..Set COATING attenuation in ratio per unit length
-   call get_option_real('-attncoat' , 'ATTNCOAT', 10.d0**0.003d0*25.4d-6, ATTNCOAT)
+   call get_option_real('-attncoat' , 'ATTNCOAT', log(10.d0)*0.003d0*25.4d-6, ATTNCOAT)
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)

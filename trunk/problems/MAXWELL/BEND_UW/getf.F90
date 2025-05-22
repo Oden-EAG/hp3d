@@ -37,7 +37,7 @@ subroutine getf(Mdle,Xp, ZJ,ZL)
    VTYPE :: dvalQ (  MAXEQNQ,3  )
    VTYPE :: d2valQ(  MAXEQNQ,3,3)
 !
-   VTYPE :: zaux,zKH(3),zKE(3)
+   VTYPE :: zaux,H(3),E(3),CH(3),CE(3)
 !
 #if HP3D_DEBUG
    integer :: iprint
@@ -76,35 +76,47 @@ subroutine getf(Mdle,Xp, ZJ,ZL)
          ! write(*,*) 'getf: dHx  = ',dvalE(1,2,:)*(-ZI*OMEGA*MU)
          ! write(*,*) 'getf: dHy  = ',dvalE(2,2,:)*(-ZI*OMEGA*MU)
          ! write(*,*) 'getf: dHz  = ',dvalE(3,2,:)*(-ZI*OMEGA*MU)
+!     ...SHORT FORM
+         E(1:3)= valE(1:3,1)
+         H(1:3)= valE(1:3,2)
+         CE(1) = dvalE(3,1,2) - dvalE(2,1,3)
+         CE(2) = dvalE(1,1,3) - dvalE(3,1,1)
+         CE(3) = dvalE(2,1,1) - dvalE(1,1,2)
+         CH(1) = dvalE(3,2,2) - dvalE(2,2,3)
+         CH(2) = dvalE(1,2,3) - dvalE(3,2,1)
+         CH(3) = dvalE(2,2,1) - dvalE(1,2,2)
+         !  Get the image of A on exact E and H, including PML transformations
+         call get_A(Mdle,Xp,E,H,CE,CH,ZJ,ZL)
 
+! !     ...LONG FORM
 !
-!     ...ZJ = curl H - i K.H -iωεE
-!     ...first term
-         ZJ(1) = dvalE(3,2,2) - dvalE(2,2,3)
-         ZJ(2) = dvalE(1,2,3) - dvalE(3,2,1)
-         ZJ(3) = dvalE(2,2,1) - dvalE(1,2,2)
-         ZJ(1:3) = ZJ(1:3)
-!     ...apply the transformation matrix K to H
-         call apply_matrixK(Mdle,Xp,valE(1:3,2),zKH)
-!     ...compute the constant iωε    
-         zaux = ZI*OMEGA*EPSILON
-!     ...add 2nd and 3rd terms            
-         ZJ(1:3) = ZJ(1:3) - ZI*zKH - zaux*valE(1:3,1)
-         ! ZJ(1:3) = valE(1:3,1)
-!         
-!     ...ZL = curl E - i K.E +iωμH
-!     ...first term
-         ZL(1) = dvalE(3,1,2) - dvalE(2,1,3)
-         ZL(2) = dvalE(1,1,3) - dvalE(3,1,1)
-         ZL(3) = dvalE(2,1,1) - dvalE(1,1,2)
+! !     ...ZJ = curl H - i K.H -iωεE
+! !     ...first term
+!          ZJ(1) = dvalE(3,2,2) - dvalE(2,2,3)
+!          ZJ(2) = dvalE(1,2,3) - dvalE(3,2,1)
+!          ZJ(3) = dvalE(2,2,1) - dvalE(1,2,2)
+!          ZJ(1:3) = ZJ(1:3)
+! !     ...apply the transformation matrix K to H
+!          call apply_matrixK(Mdle,Xp,valE(1:3,2),zKH)
+! !     ...compute the constant iωε    
+!          zaux = ZI*OMEGA*EPSILON
+! !     ...add 2nd and 3rd terms            
+!          ZJ(1:3) = ZJ(1:3) - ZI*zKH - zaux*valE(1:3,1)
+!          ! ZJ(1:3) = valE(1:3,1)
+! !         
+! !     ...ZL = curl E - i K.E +iωμH
+! !     ...first term
+!          ZL(1) = dvalE(3,1,2) - dvalE(2,1,3)
+!          ZL(2) = dvalE(1,1,3) - dvalE(3,1,1)
+!          ZL(3) = dvalE(2,1,1) - dvalE(1,1,2)
 
-      ! write(*,*) "getf: curlE= ",zL
-!     ...apply the transformation matrix K to E
-         call apply_matrixK(Mdle,Xp,valE(1:3,1),zKE)
-!     ...compute the constant iωμ    
-         zaux = ZI*OMEGA*MU
-!     ...add 2nd and 3rd terms            
-         ZL(1:3) = ZL(1:3) - ZI*zKE + zaux*valE(1:3,2)
+!       ! write(*,*) "getf: curlE= ",zL
+! !     ...apply the transformation matrix K to E
+!          call apply_matrixK(Mdle,Xp,valE(1:3,1),zKE)
+! !     ...compute the constant iωμ    
+!          zaux = ZI*OMEGA*MU
+! !     ...add 2nd and 3rd terms            
+!          ZL(1:3) = ZL(1:3) - ZI*zKE + zaux*valE(1:3,2)
 !
 !  ...........................................
 !  ...KNOWN EXACT SOLUTION, HOMOGENEOUS RHS...

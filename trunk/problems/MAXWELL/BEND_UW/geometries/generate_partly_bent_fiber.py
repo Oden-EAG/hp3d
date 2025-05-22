@@ -62,14 +62,30 @@ def print_hexa(type,ndom,p1,p2,p3,p4,p5,p6,p7,p8,nh,nro=0,nri=0):
 # and spanning angle in radians (start angle assumed 0)
 r_core = 0.5;
 r_prism = 0.5*r_core;
-r_inner_clad = 10.0*r_core;
-r_outer_clad = 20.0*r_core;
-R = 2600.0*r_core;
+r_inner_clad = 5.0;
+r_outer_clad = 6.25;
 
-keff=1.100582; # for mode LP01 and usual data
+
+# R = 1300.0;
+# keff=2.17635449786844E+02-2.17455000000000E+02;
+# f = open("fiber_R1300_4wl_lp01","w+")
+
+# R = 1300.0;
+# keff=2.17505405635569E+02-2.17455000000000E+02;
+# f = open("fiber_R1300_4wl_lp02","w+")
+
+# R = 2600.0;
+# keff=2.17635449786844E+02-2.17455000000000E+02;
+# f = open("fiber_R2600_4wl_lp01","w+")
+
+R = 2600.0;
+keff=2.17505405635569E+02-2.1748E+02;
+f = open("fiber_R2600_4wl_lp02","w+")
+
+
 wleff=2.0*math.pi/keff;
-nwl_bent = 6;
-nwl_strt = 2;
+nwl_bent = 4;
+nwl_strt = 0;
 theta_end = nwl_bent*wleff/R;
 print("wleff=",wleff)
 print("theta_end=",theta_end)
@@ -80,7 +96,7 @@ phi1 = math.pi/4.0;
 hexlayers_core = 1; # don't include the inner prisms layer
 hexlayers_inner_clad = 1; # 
 hexlayers_outer_clad = 1; # 
-theta_subdiv = 3;
+theta_subdiv = 1;
 
 
 
@@ -88,8 +104,6 @@ dr_core = (r_core-r_prism)/hexlayers_core
 dr_inner_clad = (r_inner_clad-r_core)/max(hexlayers_inner_clad,1)
 dr_outer_clad = (r_outer_clad-r_inner_clad)/max(hexlayers_outer_clad,1)
 
-# and open geometry file
-f = open("partly_bent_fiber_test_4wl","w+")
 
 # Dimension
 f.write("3 3 NDIM,MANDIM\n")

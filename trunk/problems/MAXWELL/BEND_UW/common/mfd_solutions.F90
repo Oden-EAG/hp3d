@@ -395,7 +395,7 @@
             ! u = r**(-1)
             ! du_r = -r**(-2)
             ! d2u_r = 2.d0*r**(-3)
-            ! v = HALFWIDTH**2 - x1**2
+            ! v = RCORE**2 - x1**2
             ! dv_x1 = -2.d0*x1
             ! d2v_x1 = 2.d0
 !            
@@ -411,7 +411,7 @@
 
             ! u = ZONE; du_r = ZERO; d2u_r = ZERO
 
-            cf = 0.5d0*PI/HALFWIDTH
+            cf = 0.5d0*PI/RCORE
             v =     1.d0 ! COS(x1*cf)
             dv_x1 = 0.d0 !-SIN(x*cf)*cf
             d2v_x1 = 0.d0
@@ -472,7 +472,7 @@
          endif
 !
             cn = ZONE
-            cf = 0.5d0*PI/HALFWIDTH
+            cf = 0.5d0*PI/RCORE
             u = COS((r-RBEND) * cf)
             du_r = -SIN((r-RBEND)*cf) * cf
             d2u_r = -u * cf**2
@@ -497,23 +497,78 @@
             Grad2p(3,3) = cn * (d2u_r*dr_x3**2+du_r*d2r_x3) * v
 
       case(101)
-            kappa_core=3.8895274d0
-            kappa_clad=7.9496412d0
+            kappa_core=3.89635821866549d0
+            kappa_clad=7.94630920866814d0
             call get_LP01_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
+      case(111)
+            kappa_core=6.1295026d0
+            kappa_clad=6.3839344d0
+            call get_LP11a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+! 
+      case(121)
+            kappa_core=8.0736186d0
+            kappa_clad=3.6252404d0
+            call get_LP21a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+! 
+      case(102)
+            kappa_core=8.47166634119017d0
+            kappa_clad=2.56052861953769d0
+            call get_LP02_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+!
+      case(200)
+            kappa_core=2.55570005662253d0
+            kappa_clad=8.47312425428247d0
+            call get_step_slab_even(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+!
+      case(201)
+            kappa_core=5.06465178791433d0
+            kappa_clad=7.25773653938378d0
+            call get_step_slab_odd (Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+!
+      case(202)
+            kappa_core=7.4313660759331d0
+            kappa_clad=4.80627045154566d0
+            call get_step_slab_even(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
    end select
 !
 !
    end subroutine mfd_solutions
 !
 !------------------------------------------------------
-! subroutine get_LP01
+! subroutines to evaluate Bessel functions
 !------------------------------------------------------
+function BESSEL_dJ1(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   fval = BESSEL_J0(x) - BESSEL_J1(x)/x
+end function
+
+function BESSEL_J2(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   fval = BESSEL_JN(2, x)
+end function
+
+function BESSEL_dJ2(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessJY(x,2.d0, a,b,fval,c)
+end function
+
 function BESSEL_K0(x) result(fval)
    real(8), intent(in) :: x
    real(8) :: fval
    real(8) :: a,b,c
    call dbessIK(x,0.d0, a,fval,b,c)
+end function
+
+function BESSEL_dK0(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,0.d0, a,b,c,fval)
 end function
 
 function BESSEL_K1(x) result(fval)
@@ -523,6 +578,31 @@ function BESSEL_K1(x) result(fval)
    call dbessIK(x,1.d0, a,fval,b,c)
 end function
 
+function BESSEL_dK1(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,1.d0, a,b,c,fval)
+end function
+
+function BESSEL_K2(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,2.d0, a,fval,b,c)
+end function
+
+function BESSEL_dK2(x) result(fval)
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
+   call dbessIK(x,2.d0, a,b,c,fval)
+end function
+
+
+!------------------------------------------------------
+! subroutine get_LP01_transversal
+!------------------------------------------------------
 subroutine get_LP01_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
 !
    use commonParam
@@ -550,8 +630,8 @@ subroutine get_LP01_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
 
 !..radial coordinate
    r = sqrt(x1*x1+x2*x2)
-!  evaluate mode only on bottom face and if 0<=r<=rclad
-   if (x3.lt.GEOM_TOL .and. r.le.RCLAD) then
+!  evaluate mode only on bottom face
+   if (x3.lt.GEOM_TOL) then
 !
       if (abs(r).lt.GEOM_TOL) then
          r_x = 1.d0
@@ -575,3 +655,370 @@ subroutine get_LP01_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
    endif
 !
 end subroutine get_LP01_transversal
+!
+!------------------------------------------------------
+! subroutine get_LP11a_transversal
+!------------------------------------------------------
+subroutine get_LP11a_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam 
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8)  , intent(out) :: E, dE(3)
+!
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+   if (r .le. RCORE) then
+      ca = Ampl/BESSEL_J1(Kappa_core*RCORE)
+      E = ca*(x1/r)*BESSEL_J1(Kappa_core*r)
+      cb = ca*(((x1/r)**(2.d0))*Kappa_core*BESSEL_dJ1(Kappa_core*r)+ &
+               ((x2/r)**(2.d0))*BESSEL_J1(Kappa_core*r)/r)
+      cc = ca*(x2/r)*(x1/r)*(Kappa_core*BESSEL_dJ1(Kappa_core*r)-BESSEL_J1(Kappa_core*r)/r)
+   else
+      ca = Ampl/BESSEL_K1(Kappa_clad*RCORE)
+      E = ca*(x1/r)*BESSEL_K1(Kappa_clad*r)
+      cb = ca*(((x1/r)**(2.d0))*Kappa_clad*BESSEL_dK1(Kappa_clad*r)+ &
+               ((x2/r)**(2.d0))*BESSEL_K1(Kappa_clad*r)/r)
+      cc = ca*(x2/r)*(x1/r)*(Kappa_clad*BESSEL_dK1(Kappa_clad*r)-BESSEL_K1(Kappa_clad*r)/r)
+   endif
+!
+   dE(1) = cb
+   dE(2) = cc
+!
+   if (RCLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP11a_transversal
+!
+!------------------------------------------------------
+! subroutine get_LP11b_transversal (rotated LP11 mode)
+!------------------------------------------------------
+subroutine get_LP11b_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam 
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8) , intent(out) :: E, dE(3)
+!
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+   if (r .le. RCORE) then
+      ca = Ampl/BESSEL_J1(Kappa_core*RCORE)
+      E = ca*(x2/r)*BESSEL_J1(Kappa_core*r)
+      cb = ca*(x2/r)*(x1/r)*(Kappa_core*BESSEL_dJ1(Kappa_core*r)-BESSEL_J1(Kappa_core*r)/r)
+      cc = ca*(((x2/r)**(2.d0))*Kappa_core*BESSEL_dJ1(Kappa_core*r) + &
+               ((x1/r)**(2.d0))*BESSEL_J1(Kappa_core*r)/r)
+   else
+      ca = Ampl/BESSEL_K1(Kappa_clad*RCORE)
+      E = ca*(x2/r)*BESSEL_K1(Kappa_clad*r)
+      cb = ca*(x2/r)*(x1/r)*(Kappa_clad*BESSEL_dK1(Kappa_clad*r)-BESSEL_K1(Kappa_clad*r)/r)
+      cc = ca*(((x2/r)**(2.d0))*Kappa_clad*BESSEL_dK1(Kappa_clad*r) + &
+               ((x1/r)**(2.d0))*BESSEL_K1(Kappa_clad*r)/r)
+   endif
+!
+   dE(1) = cb
+   dE(2) = cc
+!
+   if (RCLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP11b_transversal
+!
+!------------------------------------------------------
+! subroutine get_LP02_transversal
+!------------------------------------------------------
+subroutine get_LP02_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam 
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8)  , intent(out) :: E, dE(3)
+!
+   real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
+   real(8) :: BESSEL_K0, BESSEL_K1
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
+!
+!..radial coordinate
+   r = sqrt(x1*x1+x2*x2)
+!
+   if (abs(r).lt.GEOM_TOL) then
+      r_x = 1.d0
+      r_y = 1.d0
+   else
+      r_x = x1/r
+      r_y = x2/r
+   endif
+!
+   if (r .le. RCORE) then
+      ca = Ampl/BESSEL_J0(Kappa_core*RCORE)
+      E = ca*BESSEL_J0(Kappa_core*r)
+      cb = -ca*Kappa_core*BESSEL_J1(Kappa_core*r)
+   else
+      ca = Ampl/BESSEL_K0(Kappa_clad*RCORE)
+      E = ca*BESSEL_K0(Kappa_clad*r)
+      cb = -ca*Kappa_clad*BESSEL_K1(Kappa_clad*r)
+   endif
+   dE(1) = cb*r_x
+   dE(2) = cb*r_y
+!
+   if (RCLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP02_transversal
+!
+!------------------------------------------------------
+! subroutine get_LP21a_transversal
+!------------------------------------------------------
+subroutine get_LP21a_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam 
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8)  , intent(out) :: E, dE(3)
+!
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+!
+   real(8) :: cos_t,cos_2t
+   real(8) :: sin_t,sin_2t
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+   cos_t  = x1/r
+   sin_t  = x2/r
+   cos_2t = cos_t**(2.d0) - sin_t**(2.d0)
+   sin_2t = 2 * sin_t * cos_t
+!
+   if (r .le. RCORE) then
+      ca = Ampl/BESSEL_J2(Kappa_core*RCORE)
+      E = ca*cos_2t*BESSEL_J2(Kappa_core*r)
+      cb = ca*(cos_t*cos_2t*Kappa_core*BESSEL_dJ2(Kappa_core*r) + &
+               2.d0*sin_t*sin_2t*BESSEL_J2(Kappa_core*r)/r)
+      cc = ca*(sin_t*cos_2t*Kappa_core*BESSEL_dJ2(Kappa_core*r) - &
+               2.d0*sin_2t*cos_t*BESSEL_J2(Kappa_core*r)/r)
+   else
+      ca = Ampl/BESSEL_K2(Kappa_clad*RCORE)
+      E = ca*cos_2t*BESSEL_K2(Kappa_clad*r)
+      cb = ca*(cos_t*cos_2t*Kappa_clad*BESSEL_dK2(Kappa_clad*r) + &
+               2.d0*sin_t*sin_2t*BESSEL_K2(Kappa_clad*r)/r)
+      cc = ca*(sin_t*cos_2t*Kappa_clad*BESSEL_dK2(Kappa_clad*r) - &
+      2.d0*sin_2t*cos_t*BESSEL_K2(Kappa_clad*r)/r)
+   endif
+!
+   dE(1) = cb
+   dE(2) = cc
+!
+   if (RCLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP21a_transversal
+
+!------------------------------------------------------
+! subroutine get_LP21b_transversal (rotated LP21 mode)
+!------------------------------------------------------
+subroutine get_LP21b_transversal(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam 
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8) , intent(out) :: E, dE(3)
+!
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+!
+   real(8) :: cos_t,cos_2t
+   real(8) :: sin_t,sin_2t
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2) - RBEND; x3 = Xp(3)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+   cos_t  = x1/r
+   sin_t  = x2/r
+   cos_2t = cos_t**(2.d0) - sin_t**(2.d0)
+   sin_2t = 2 * sin_t * cos_t
+!
+   if (r .le. RCORE) then
+      ca = Ampl/BESSEL_J2(Kappa_core*RCORE)
+      E = ca*sin_2t*BESSEL_J2(Kappa_core*r)
+      cb = ca*(cos_t*sin_2t*Kappa_core*BESSEL_dJ2(Kappa_core*r) - &
+               2.d0*sin_t*cos_2t*BESSEL_J2(Kappa_core*r)/r)
+      cc = ca*(sin_t*sin_2t*Kappa_core*BESSEL_dJ2(Kappa_core*r) + &
+               2.d0*cos_2t*cos_t*BESSEL_J2(Kappa_core*r)/r)
+   else
+      ca = Ampl/BESSEL_K2(Kappa_clad*RCORE)
+      E = ca*sin_2t*BESSEL_K2(Kappa_clad*r)
+      cb = ca*(cos_t*cos_2t*Kappa_clad*BESSEL_dK2(Kappa_clad*r) - &
+               2.d0*sin_t*cos_2t*BESSEL_K2(Kappa_clad*r)/r)
+      cc = ca*(sin_t*sin_2t*Kappa_clad*BESSEL_dK2(Kappa_clad*r) + &
+               2.d0*cos_2t*cos_t*BESSEL_K2(Kappa_clad*r)/r)
+   endif
+!
+   dE(1) = cb
+   dE(2) = cc
+!
+   if (RCLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP21b_transversal
+
+
+!------------------------------------------------------
+!
+!------------------------------------------------------
+!
+subroutine get_step_slab_even(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam, only: ZERO,RBEND,RCORE
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8)  , intent(out) :: E, dE(3)
+!
+   real(8) :: X2
+!
+!..shift the slab center in y axis
+   x2 = Xp(2) - RBEND
+!..initialize gradient
+   dE = ZERO
+
+   if (abs(x2).le.RCORE) then
+      E    = complex( Ampl*cos(Kappa_core*x2),0.d0)
+      dE(2)= complex(-Ampl*Kappa_core*sin(Kappa_core*x2),0.d0)
+   endif
+   if (x2.lt.-RCORE) then
+      E    = complex( Ampl*cos(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE)),0.d0)
+      dE(2)= complex( Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE)),0.d0)
+   endif
+   if (x2.gt. RCORE) then
+      E    = complex( Ampl*cos(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+      dE(2)= complex(-Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+   endif
+end subroutine
+
+
+
+!------------------------------------------------------
+!
+!------------------------------------------------------
+!
+subroutine get_step_slab_odd(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
+!
+   use commonParam, only: ZERO,RBEND,RCORE
+!
+   implicit none
+!
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: Ampl, Kappa_core, Kappa_clad
+   complex(8)  , intent(out) :: E, dE(3)
+!
+   real(8) :: x2
+!
+!------------------------------------------------------
+!
+!..shift the slab center in y axis
+   x2 = Xp(2) - RBEND
+!..initialize gradient
+   dE = ZERO
+
+   if (abs(x2).le.RCORE) then
+      E    = complex(Ampl*sin(Kappa_core*x2),0.d0)
+      dE(2)= complex(Ampl*Kappa_core*cos(Kappa_core*x2),0.d0)
+   endif
+   if (x2.lt.-RCORE) then
+      E    = complex(-Ampl*sin(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE)),0.d0)
+      dE(2)= complex(-Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE)),0.d0)
+   endif
+   if (x2.gt. RCORE) then
+      E    = complex( Ampl*sin(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+      dE(2)= complex(-Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+   endif
+end subroutine

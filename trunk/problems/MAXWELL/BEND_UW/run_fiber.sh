@@ -23,13 +23,13 @@ dir_output='../outputs/'
 vis_level=2
 
 # MPI Procs
-nproc=1
+nproc=4
 
 # OMP THREADS
 nthreads=1
 
 # Set polynomial order p
-p=6
+p=4
 
 # Set enriched order (p+dp)
 dp=1
@@ -42,9 +42,9 @@ imax=3
 maxnods=123456
 
 # export KMP_STACKSIZE=24M   # p=3
-# export KMP_STACKSIZE=32M   # p=4
+export KMP_STACKSIZE=32M   # p=4
 # export KMP_STACKSIZE=48M   # p=5
-export KMP_STACKSIZE=64M   # p=6
+# export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
 
@@ -54,7 +54,7 @@ export KMP_INIT_AT_FORK=FALSE
 # component number for manufactured solution
 comp=1
 # solution number
-isol=200
+isol=102
 # DPG test norm scaling
 alpha=100.0
 # vacuum permeability
@@ -76,62 +76,63 @@ rbend=1300.0
 # coordinate bounds
 thup=0.1553118594095
 thlo=0.0
-rup=1305.0
-rlo=1295.0
-xup=0.5
-xlo=-0.5
-rhoup=0.0
+rup=1306.26
+rlo=1293.75
+xup=-6.25
+xlo=6.25
+rhoup=6.25
 rholo=0.0
 # pml proportions
 pmlthup=0.25
 pmlthlo=0.0
-pmlrup=0.1125
-pmlrlo=0.1125
+pmlrup=0.0
+pmlrlo=0.0
 pmlxup=0.0
 pmlxlo=0.0
 pmlrhoup=0.0
 pmlrholo=0.0
 # flags for toroidal pml and slab guide geometry
-torpml=0
-slab=1
+torpml=1
+slab=0
 # fiber radii (or slab halfwidths)
 rcore=0.5
 rclad=5.0
-rcoat=5.0
+rcoat=6.25
 # refractive indices
 ncore=1.4512
 nclad=1.45
-ncoat=1.45
+ncoat=1.38
 # coating attenuation coefficient (ratio/[unit length] NOT in dB...)
-attncoat=0.0
+attncoat=1.75456984086146E-07
 # set BC flag -> 0: dirichlet, 2: impedance via penalty term, 3: impedance via elimination
 ibc=0
 
-
 # mode, bending radius, max theta, prefix for paraview and mesh file
-isol=200
+isol=101
 rbend=1300.0
-thup=0.09650921614394552
-file_geometry='./geometries/bentstepslab_R1300_4wl_m00'
-pref='stepslab_R1300_4wl_m00'
+thup=0.10713716101510534
+pref='fiber_R1300_4wl_lp01'
+file_geometry='./geometries/fiber_R1300_4wl_lp01'
 
-# isol=202
+# isol=102
 # rbend=1300.0
-# thup=0.21861514818081262
-# file_geometry='./geometries/bentstepslab_R1300_4wl_m02'
-# pref='stepslab_R1300_4wl_m02'
+# thup=0.3835459596931083
+# pref='fiber_R1300_4wl_lp02'
+# file_geometry='./geometries/fiber_R1300_4wl_lp02'
 
-# isol=200
+# isol=101
 # rbend=2600.0
-# thup=0.04825460807197276
-# file_geometry='./geometries/bentstepslab_R2600_4wl_m00'
-# pref='stepslab_R2600_4wl_m00'
+# thup=0.05356858050755267
+# pref='fiber_R2600_4wl_lp01'
+# file_geometry='./geometries/fiber_R2600_4wl_lp01'
 
-# isol=202
+# isol=102
 # rbend=2600.0
-# thup=0.15238724408876186
-# file_geometry='./geometries/bentstepslab_R2600_4wl_m02'
-# pref='stepslab_R2600_4wl_m02'
+# thup=0.3804840429151485
+# pref='fiber_R2600_4wl_lp02'
+# file_geometry='./geometries/fiber_R2600_4wl_lp02'
+
+# pref='newtest'
 
 ctrl='control/control'
 #
