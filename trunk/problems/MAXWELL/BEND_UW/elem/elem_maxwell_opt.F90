@@ -440,14 +440,25 @@ subroutine elem_bend_env_maxwell_opt(Mdle,                      &
             do i = 1,j
                ioff = 2*(i-1)
                ! (F,F), (G,G)
-               gram(ioff+1,joff+1) = gram_FF(i,j)
-               gram(ioff+2,joff+2) = gram_GG(i,j)
+               gram(ioff+1,joff+1) = gram(ioff+1,joff+1) + gram_FF(i,j)
+               gram(ioff+2,joff+2) = gram(ioff+2,joff+2) + gram_GG(i,j)
                ! (F,G), (G,F)
                gram(ioff+1,joff+2) = gram_FG(i,j)
                gram(ioff+2,joff+1) = conjg(gram_FG(j,i))
             enddo
          enddo
          deallocate(gram_FF,gram_GG,gram_FG)
+
+
+         if (Mdle.eq.133) then
+            write(*,*) 'elem_maxwell_opt: Gram for Mdle=',Mdle
+            do i=1,10
+               write(*,6001) (gram(i,l),l=i,10)
+            enddo
+            6001 format(20e13.5)
+         endif
+         
+
          call ZPOTRF('U',NrTest,gram,NrTest,info)
          if (info.ne.0) then
             write(*,*) 'elem_maxwell_opt: ZPOTRF: Mdle,info = ',Mdle,info,'. stop.'
@@ -580,14 +591,14 @@ subroutine elem_bend_env_maxwell_opt(Mdle,                      &
                                              )*GAMMA*weight
                else
 !           ...accumulate for the extended stiffness matrix without IBC
-                  stiff_EEi(2*k1,2*k2-1) = stiff_EEi(2*k1,2*k2-1) &
+                  stiff_EEi(2*k1-1,2*k2) = stiff_EEi(2*k1-1,2*k2) &
                                          + (  E1(1)*rntimesE(1) &
                                             + E1(2)*rntimesE(2) &
                                             + E1(3)*rntimesE(3) &
                                                )*weight
 !           ...end if for impedance BC
                endif
-               stiff_EEi(2*k1-1,2*k2) = stiff_EEi(2*k1-1,2*k2) &
+               stiff_EEi(2*k1,2*k2-1) = stiff_EEi(2*k1,2*k2-1) &
                                       + (  E1(1)*rntimesE(1) &
                                          + E1(2)*rntimesE(2) &
                                          + E1(3)*rntimesE(3) &
@@ -625,6 +636,7 @@ subroutine elem_bend_env_maxwell_opt(Mdle,                      &
 !
    deallocate(stiff_EEi,stiff_EQ)
 
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       do i = 1,NrdofEE
          write(*,*)   'i=',i
@@ -642,6 +654,7 @@ subroutine elem_bend_env_maxwell_opt(Mdle,                      &
       write(*,124) bload_E(1:i1)
       call pause
    endif
+#endif
 !
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]

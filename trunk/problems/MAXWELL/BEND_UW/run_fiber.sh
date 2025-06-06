@@ -156,6 +156,17 @@ args+=" -rcore ${rcore} -rclad ${rclad} -rcoat ${rcoat}"
 args+=" -ncore ${ncore} -nclad ${nclad} -ncoat ${ncoat} -attncoat ${attncoat}"
 args+=" -ibc ${ibc}"
 args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
-args+=" -nthreads ${nthreads}"
 
-mpirun -np ${nproc} ./bending ${args}
+### RUNNING ON PERSONAL LAPTOP
+# Set MPI Procs and OpenMP threads
+nproc=4
+nthreads=1
+mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
+###
+
+# ### RUNNING ON TACC'S FRONTERA'S IKL NODE (TACC)
+# # Set MPI Procs and OpenMP threads
+# nproc=32
+# nthreads=56
+# ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+# ###

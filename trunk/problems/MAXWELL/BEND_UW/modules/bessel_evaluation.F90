@@ -232,16 +232,16 @@
       x   = log(R)
       dx = x - x_0
 !
-      zc = complex(0._wp,0._wp)
+      zc = (0._wp,0._wp)
       zc(0) = Zc0
       zc(1) = zc1
       zloc = zc(0) + zc(1)*dx
       Zdbess  = zc(1)
-      Zd2bess = complex(0._wp,0._wp)
+      Zd2bess = (0._wp,0._wp)
       zdloc_prev = 1._wp
       n=0
       do 
-        zsum  = complex(0._wp,0._wp)
+        zsum  = (0._wp,0._wp)
         do j=0,n
           zsum = zsum + Rfact(n-j)*zc(j)
         enddo
@@ -291,8 +291,8 @@
       complex(wp) :: zbess10,zdbess10,zd2bess10,zbess01,zdbess01,zd2bess01, &
                      zone,zero
 !
-      zone = complex(1._wp,0._wp)
-      zero = complex(0._wp,0._wp)
+      zone = (1._wp,0._wp)
+      zero = (0._wp,0._wp)
 !
 !  ...evaluate the solution at Reval
       call Bessel(ZLAMBDA_MODE,zone,zero,Wavenum,R0,Reval, zbess10,zdbess10,zd2bess10)
@@ -324,8 +324,8 @@
       complex(wp) :: z1,z2,zbess10,zdbess10,zd2bess10,zbess01,zdbess01,zd2bess01, &
                      zdet,zone,zero,zv,zv1,zvoid
 !
-      zone = complex(1._wp,0._wp)
-      zero = complex(0._wp,0._wp)
+      zone = (1._wp,0._wp)
+      zero = (0._wp,0._wp)
 !     
       r = R0 - Ra
       call Bessel(zlambda,zone,zero,Wavenum,R0,r, zbess10,zdbess10,zvoid)

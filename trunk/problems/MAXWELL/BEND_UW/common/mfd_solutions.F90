@@ -424,7 +424,11 @@
             d2th_x3   = -x2*2.d0*r*dr_x3/r**4
 
             znu = sqrt(ZLAMBDA_MODE)-ENVELOPEK*RBEND
+            ! write(*,*) 'mfd_solutions: sqrt(ZLAMBDA_MODE)/RBEND=',sqrt(ZLAMBDA_MODE)/RBEND
+            ! write(*,*) 'mfd_solutions: ENVELOPEK=',ENVELOPEK
             ! write(*,*) 'mfd_solutions: znu=',znu
+            ! write(*,*) 'mfd_solutions: OMEGA=',OMEGA
+            ! call pause
             w = exp(-ZI*znu*th)
             dw_th = -ZI*znu*w
             d2w_th = -znu**2*w
@@ -971,16 +975,16 @@ subroutine get_step_slab_even(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
    dE = ZERO
 
    if (abs(x2).le.RCORE) then
-      E    = complex( Ampl*cos(Kappa_core*x2),0.d0)
-      dE(2)= complex(-Ampl*Kappa_core*sin(Kappa_core*x2),0.d0)
+      E    =  Ampl*cos(Kappa_core*x2)
+      dE(2)= -Ampl*Kappa_core*sin(Kappa_core*x2)
    endif
    if (x2.lt.-RCORE) then
-      E    = complex( Ampl*cos(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE)),0.d0)
-      dE(2)= complex( Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE)),0.d0)
+      E    =  Ampl*cos(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE))
+      dE(2)=  Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE))
    endif
    if (x2.gt. RCORE) then
-      E    = complex( Ampl*cos(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE)),0.d0)
-      dE(2)= complex(-Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+      E    =  Ampl*cos(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE))
+      dE(2)= -Ampl*cos(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE))
    endif
 end subroutine
 

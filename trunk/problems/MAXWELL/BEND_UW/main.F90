@@ -112,12 +112,18 @@ program main
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' IBCFLAG                  = ', IBCFLAG
    write(*,9020) ' ALPHA_NORM               = ', ALPHA_NORM
+   write(*,9021) ' RBEND                    = ', RBEND 
+   write(*,9021) ' OMEGA                    = ', OMEGA 
+   write(*,9021) ' THUP                     = ', THUP
+   write(*,9021) ' ENVELOPEK                = ', ENVELOPEK
+
    write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
  9000 format(A,F13.6)
  9001 format(A,F13.3)
  9010 format(A,I3)
  9015 format(A,A)
  9020 format(A,ES13.2)
+ 9021 format(A,ES22.15)
 !
 #if HP3D_USE_OPENMP
    !$OMP parallel
@@ -252,6 +258,8 @@ subroutine master_main()
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
       write(*,*) 'Anisotropic (logitudinal) h-refine.....23'
+      write(*,*) 'Anisotropic (transversal) h-refine.....24'
+      write(*,*) 'Adaptive isotropic h-refine............25'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -321,7 +329,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,23)
+         case(20,21,23,24,25)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -487,7 +495,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,23)
+         case(20,21,23,24,25)
             call exec_case(idec)
 !
 !     ...MPI Routines

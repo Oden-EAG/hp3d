@@ -73,4 +73,9 @@ subroutine initialize
 !..generate mesh and read physics file
    call hp3gen(trim(FILE_PHYS))
 !
+!  assign elimination imp bc nickname on the corresponding initial mesh faces
+   if (IBCFLAG .eq. 3) then
+      call propagate_flag(2,3)
+   endif
+!
  end subroutine initialize

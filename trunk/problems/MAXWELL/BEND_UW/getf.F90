@@ -190,7 +190,7 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
       Imp_val = ZERO
 !
    select case(NEXACT)
-      case(0)
+      case(1,2)
          call exact(X,Mdle, zvalH,zdvalH,zd2valH, &
                             zvalE,zdvalE,zd2valE, &
                             zvalV,zdvalV,zd2valV, &
@@ -204,29 +204,29 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
          Imp_val = rntimesH - rn2timesE
 !
-!     ...for Gauss beam problem, window the solution near corner
-         if (ISOL.eq.5) then
-            Imp_val = Imp_val*exp((-x(1)**6-x(2)**6-x(3)**6)*1000)
-         endif
+! !     ...for Gauss beam problem, window the solution near corner
+!          if (ISOL.eq.5) then
+!             Imp_val = Imp_val*exp((-x(1)**6-x(2)**6-x(3)**6)*1000)
+!          endif
+! !
+! !  ...exact solution known manufactured solution
+!       case(2)
+!          call exact(X,Mdle, zvalH,zdvalH,zd2valH, &
+!                             zvalE,zdvalE,zd2valE, &
+!                             zvalV,zdvalV,zd2valV, &
+!                             zvalQ,zdvalQ,zd2valQ)
+! !
+! !     ...n x E
+!          call zcross_product(Rn,zvalE(1:3,1), rntimesE)
+! !     ...n x (n x E)
+!          call zcross_product(Rn,rntimesE, rn2timesE)
+! !     ...n x H
+!          call zcross_product(Rn,zvalE(1:3,2), rntimesH)
+! !
+! !     ...g = n x H - gamma * n x (n x E)
+!          Imp_val = rntimesH - GAMMA*rn2timesE
 !
-!  ...exact solution known manufactured solution
-      case(1)
-         call exact(X,Mdle, zvalH,zdvalH,zd2valH, &
-                            zvalE,zdvalE,zd2valE, &
-                            zvalV,zdvalV,zd2valV, &
-                            zvalQ,zdvalQ,zd2valQ)
-!
-!     ...n x E
-         call zcross_product(Rn,zvalE(1:3,1), rntimesE)
-!     ...n x (n x E)
-         call zcross_product(Rn,rntimesE, rn2timesE)
-!     ...n x H
-         call zcross_product(Rn,zvalE(1:3,2), rntimesH)
-!
-!     ...g = n x H - gamma * n x (n x E)
-         Imp_val = rntimesH - GAMMA*rn2timesE
-!
-      case(2)
+      case(0)
          continue
 !  ...exact solution unknown
       case default

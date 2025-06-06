@@ -195,9 +195,9 @@
       if (SLAB_GUIDE.eq.1) then
          select case(ndom)
          case(1)
-            Zrefr = cmplx(REFRCORE,0.0,8)
+            Zrefr = cmplx(REFRCORE,0.d0,8)
          case(2,3)
-            Zrefr = cmplx(REFRCLAD,0.0,8)
+            Zrefr = cmplx(REFRCLAD,0.d0,8)
          case(4,5)
             Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
          case default
@@ -206,9 +206,9 @@
       else
          select case(ndom)
          case(1,2)
-            Zrefr = cmplx(REFRCORE,0.0,8)
+            Zrefr = cmplx(REFRCORE,0.d0,8)
          case(3)
-            Zrefr = cmplx(REFRCLAD,0.0,8)
+            Zrefr = cmplx(REFRCLAD,0.d0,8)
          case(4)
             Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
          case default
@@ -358,13 +358,14 @@
 !  S       Real, original physical coordinate
 !  Stra    Real, value of S at which the transition to PML begins
 !  Sbnd    Real, minimum/maximum value of S at the boundary where PML lies
+!  Wnum    Real, estimated wavenumber in direction of incidence for PML
 !  OUTPUTS
 !  Zsst    Complex, stretched
-   subroutine get_pml_stretch(S,Stra,Sbnd,Zsst,Zdsst,Zd2sst)
+   subroutine get_pml_stretch(S,Stra,Sbnd,Wnum,Zsst,Zdsst,Zd2sst)
 
       use commonParam, only: OMEGA
       implicit none
-      real(8), intent(in) :: S,Sbnd,Stra
+      real(8), intent(in) :: S,Sbnd,Stra,Wnum
       complex(8),intent(out) :: Zsst,Zdsst,Zd2sst
 
       real(8) :: c,pn,f,df,d2f,spml,sdif
@@ -383,7 +384,7 @@
       endif
 
       n = 2       !!! NEEDS TO BE AT LEAST 2 !!!
-      c = 30.d0 /(OMEGA* spml**n)
+      c = 30.d0 /(Wnum* spml**n)
       f   = c*sdif**n
       df  = c*sdif**(n-1) * n
       d2f = c*sdif**(n-2) * (n*(n-1))
@@ -471,7 +472,7 @@
       real(8),   intent(in) :: Xp(3)
       complex(8),intent(out):: Zxpst(3),Zdxpst(3),Zd2xpst(3)
 
-      real(8) :: s, stra, sbnd
+      real(8) :: s, stra, sbnd,wnum
       integer :: ic,flags(8)
 
       Zxpst = cmplx(Xp,0.d0,8)
@@ -494,7 +495,8 @@
          s = atan2(Xp(3),Xp(2))
          stra = (1.d0-PMLTHUP )*THUP +PMLTHUP *THLO
          sbnd = THUP
-         call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK
+         call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
       endif
       ! coordinate TH, lower bound
       if (flags(1).eq.0 .and. flags(2).eq.1) then
@@ -502,7 +504,8 @@
          s = atan2(Xp(3),Xp(2))
          stra = (1.d0-PMLTHLO )*THUP +PMLTHUP *THUP
          sbnd = THUP
-         call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK
+         call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
       endif
       !  Now, PML for the transversal geometry
       if (TOROIDAL_PML.eq.0) then
@@ -512,7 +515,8 @@
             s = sqrt(Xp(2)**2+Xp(3)**2)
             stra = (1.d0-PMLRUP )*RUP +PMLRUP *RLO
             sbnd = RUP
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
          ! coordinate R, lower bound
          if (flags(3).eq.0 .and. flags(4).eq.1) then
@@ -520,7 +524,8 @@
             s = sqrt(Xp(2)**2+Xp(3)**2)
             stra = (1.d0-PMLRLO )*RLO +PMLRLO *RUP
             sbnd = RLO
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
          ! coordinate X, upper bound
          if (flags(5).eq.1 .and. flags(6).eq.0) then
@@ -528,7 +533,8 @@
             s = Xp(1)
             stra = (1.d0-PMLXUP )*XUP +PMLXUP *XLO
             sbnd = XUP
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
          ! coordinate X, lower bound
          if (flags(5).eq.0 .and. flags(6).eq.1) then
@@ -536,7 +542,8 @@
             s = Xp(1)
             stra = (1.d0-PMLXLO )*XLO +PMLXLO *XUP
             sbnd = XLO
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
       else
          ic = 2
@@ -545,13 +552,15 @@
          if (flags(7).eq.1 .and. flags(8).eq.0) then
             stra = (1.d0-PMLRHOUP )*XUP +PMLRHOUP *RHOLO
             sbnd = RHOUP
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
          ! coordinate RHO, lower bound
          if (flags(7).eq.0 .and. flags(8).eq.1) then
             stra = (1.d0-PMLRHOLO )*XLO +PMLRHOLO *RHOUP
             sbnd = RHOLO
-            call get_pml_stretch(s,stra,sbnd,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
 
       endif

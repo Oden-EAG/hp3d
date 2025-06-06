@@ -27,7 +27,7 @@
       integer :: i,mdle,kref
       real(8) :: res
 !
-      integer :: src,count,ierr,refs
+      integer :: src,count,ierr,refs,nstop
 !
 !----------------------------------------------------------------------
 !
@@ -118,14 +118,14 @@
             call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
             do i=1,refs
                if (SLAB_GUIDE.eq.1) then  
-                  write(*,*) 'global yz h-refinement...'
+                  if (RANK .eq. ROOT) write(*,*) 'global yz h-refinement...'
                   call global_href_aniso_bric(0,1,1)
                else
-                  write(*,*) 'global isotropic h-refinement...'
+                  if (RANK .eq. ROOT) write(*,*) 'global isotropic h-refinement...'
                   call global_href
                endif
                if (IBCFLAG .eq. 3) then
-                  call propagate_flag(3,3)
+                  call propagate_flag(2,3)
                endif
             enddo
             call update_gdof
@@ -133,7 +133,7 @@
 !
 !     ...single uniform p-refinement
          case(21)
-            write(*,*) 'global p-refinement...'
+            if (RANK .eq. ROOT) write(*,*) 'global p-refinement...'
             call global_pref
             call update_gdof
             call update_Ddof
@@ -147,19 +147,63 @@
             endif
             count = 1; src = ROOT
             call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-            write(*,*) 'global anisotropic h-refinement...'
+            if (RANK .eq. ROOT) write(*,*) 'global anisotropic h-refinement...'
             do i=1,refs
                call global_href_aniso(0,1)
-               write(*,*) '.....after global_href_aniso'
+               if (RANK .eq. ROOT) write(*,*) '.....after global_href_aniso'
                if (IBCFLAG .eq. 3) then
-                  call propagate_flag(3,3)
-                  ! call propagate_flag(5,3)
+                  call propagate_flag(2,3)
                endif
             enddo
-            ! call global_href_aniso(0,1)
-            ! call global_href_aniso_bric(0,0,1)
             call update_gdof
             call update_Ddof
+!
+!
+!     ...anisotropic h-refinements (radial)
+         case(24)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Select number of refinements:'
+               read(*,*) refs
+            endif
+            count = 1; src = ROOT
+            call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            if (RANK .eq. ROOT) write(*,*) 'global anisotropic h-refinement...'
+            do i=1,refs
+               if (SLAB_GUIDE.eq.1) then  
+                   call global_href_aniso_bric(0,1,0)
+               else 
+                  call global_href_aniso(1,0)
+               endif
+               if (RANK .eq. ROOT) write(*,*) '.....after global_href_aniso'
+               if (IBCFLAG .eq. 3) then
+                  call propagate_flag(2,3)
+               endif
+            enddo
+            call update_gdof
+            call update_Ddof
+!
+!
+!     ...Adaptive isotropic h-refine
+         case(25)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Select number of refinements:'
+               read(*,*) refs
+            endif
+            count = 1; src = ROOT
+            call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            if (RANK .eq. ROOT) write(*,*) 'Adaptive isotropic h-refinement...'
+            do i=1,refs
+               if (RANK .eq. ROOT) write(*,*) '.....before refine_DPG'
+               call refine_DPG(IADAPTIVE,1,0.25d0,nstop)
+               if (RANK .eq. ROOT) write(*,*) '.....after refine_DPG'
+               if (IBCFLAG .eq. 3) then
+                  call propagate_flag(2,3)
+               endif
+               if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (MPI) solver...'
+               call par_mumps_sc('H')
+            enddo
+            if (RANK .eq. ROOT) write(*,*) 'Computing error/residual with current mesh'
+            call refine_DPG(0,1,2.d0,nstop)
 !
 !
 !     ...distribute mesh
@@ -188,32 +232,32 @@
 !
 !     ...solve problem with par_nested (nested MPI MUMPS)
          case(40)
-            write(*,*) 'calling nested MUMPS (MPI) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling nested MUMPS (MPI) solver...'
             call par_nested('H')
 !
 !     ...solve problem with par_mumps_sc (MPI MUMPS)
          case(41)
-            write(*,*) 'calling MUMPS (MPI) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (MPI) solver...'
             call par_mumps_sc('H')
 !
 !     ...solve problem with mumps_sc (OpenMP MUMPS)
          case(42)
-            write(*,*) 'calling MUMPS (OpenMP) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (OpenMP) solver...'
             call mumps_sc('H')
 !
 !     ...solve problem with pardiso_sc (OpenMP Pardiso)
          case(43)
-            write(*,*) 'calling Pardiso (OpenMP) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling Pardiso (OpenMP) solver...'
             call pardiso_sc('H')
 !
 !     ...solve problem with Frontal solver (sequential)
          case(44)
-            write(*,*) 'calling Frontal (Seq) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling Frontal (Seq) solver...'
             call solve1(1)
 !
 !     ...solve problem with PETSc solver (MPI)
          case(45)
-            write(*,*) 'calling PETSc (MPI) solver...'
+            if (RANK .eq. ROOT) write(*,*) 'calling PETSc (MPI) solver...'
             call petsc_solve('H')
 !
 !     ...compute error for problem with known solution

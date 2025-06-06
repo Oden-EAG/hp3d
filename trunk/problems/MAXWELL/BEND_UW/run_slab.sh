@@ -22,14 +22,8 @@
 dir_output='../outputs/'
 vis_level=2
 
-# MPI Procs
-nproc=1
-
-# OMP THREADS
-nthreads=1
-
 # Set polynomial order p
-p=6
+p=4
 
 # Set enriched order (p+dp)
 dp=1
@@ -42,9 +36,9 @@ imax=3
 maxnods=123456
 
 # export KMP_STACKSIZE=24M   # p=3
-# export KMP_STACKSIZE=32M   # p=4
+export KMP_STACKSIZE=32M   # p=4
 # export KMP_STACKSIZE=48M   # p=5
-export KMP_STACKSIZE=64M   # p=6
+# export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
 
@@ -56,7 +50,7 @@ comp=1
 # solution number
 isol=200
 # DPG test norm scaling
-alpha=100.0
+alpha=0.01
 # vacuum permeability
 mu=7.91582400800000E-01
 # vacuum permittivity
@@ -109,11 +103,11 @@ ibc=0
 
 
 # mode, bending radius, max theta, prefix for paraview and mesh file
-isol=200
-rbend=1300.0
-thup=0.09650921614394552
-file_geometry='./geometries/bentstepslab_R1300_4wl_m00'
-pref='stepslab_R1300_4wl_m00'
+# isol=200
+# rbend=1300.0
+# thup=0.09650921614394552
+# file_geometry='./geometries/bentstepslab_R1300_4wl_m00'
+# pref='stepslab_R1300_4wl_m00'
 
 # isol=202
 # rbend=1300.0
@@ -132,6 +126,18 @@ pref='stepslab_R1300_4wl_m00'
 # thup=0.15238724408876186
 # file_geometry='./geometries/bentstepslab_R2600_4wl_m02'
 # pref='stepslab_R2600_4wl_m02'
+
+isol=15
+rbend=1300.0
+file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG0p5'
+k=1.4765E2 # with k0 = 149.993333460866, mode 2: nu = 149.86045924807476 * 1300
+pmlthup=0.5
+ibc=0
+thup=0.008726646259971648 # 0.5 degrees
+pref='bsqwg_imp'
+ncore=1.0
+nclad=1.0
+ncoat=1.0
 
 ctrl='control/control'
 #
@@ -155,6 +161,17 @@ args+=" -rcore ${rcore} -rclad ${rclad} -rcoat ${rcoat}"
 args+=" -ncore ${ncore} -nclad ${nclad} -ncoat ${ncoat} -attncoat ${attncoat}"
 args+=" -ibc ${ibc}"
 args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
-args+=" -nthreads ${nthreads}"
 
-mpirun -np ${nproc} ./bending ${args}
+### RUNNING ON PERSONAL LAPTOP
+# Set MPI Procs and OpenMP threads
+nproc=4
+nthreads=1
+mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
+###
+
+# ### RUNNING ON TACC'S FRONTERA'S IKL NODE (TACC)
+# # Set MPI Procs and OpenMP threads
+# nproc=32
+# nthreads=56
+# ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+# ###

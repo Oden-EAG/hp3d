@@ -401,8 +401,8 @@
                do i = 1,j
                   ioff = 2*(i-1)
                   ! (F,F), (G,G)
-                  gram(ioff+1,joff+1) = gram_FF(i,j)
-                  gram(ioff+2,joff+2) = gram_GG(i,j)
+                  gram(ioff+1,joff+1) = gram(ioff+1,joff+1) + gram_FF(i,j)
+                  gram(ioff+2,joff+2) = gram(ioff+2,joff+2) + gram_GG(i,j)
                   ! (F,G), (G,F)
                   gram(ioff+1,joff+2) = gram_FG(i,j)
                   gram(ioff+2,joff+1) = conjg(gram_FG(j,i))

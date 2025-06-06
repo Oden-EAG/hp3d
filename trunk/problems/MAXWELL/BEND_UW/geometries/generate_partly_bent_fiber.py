@@ -78,14 +78,17 @@ r_outer_clad = 6.25;
 # keff=2.17635449786844E+02-2.17455000000000E+02;
 # f = open("fiber_R2600_4wl_lp01","w+")
 
-R = 2600.0;
-keff=2.17505405635569E+02-2.1748E+02;
-f = open("fiber_R2600_4wl_lp02","w+")
+# R = 2600.0;
+# keff=2.17505405635569E+02-2.1748E+02;
+# f = open("fiber_R2600_4wl_lp02","w+")
 
+R = 1300.0;
+keff=2.17505405635569E+02-2.1748000000000E+02;
+f = open("straightfiber_2wl_lp02","w+")
 
 wleff=2.0*math.pi/keff;
-nwl_bent = 4;
-nwl_strt = 0;
+nwl_bent = 0;
+nwl_strt = 2;
 theta_end = nwl_bent*wleff/R;
 print("wleff=",wleff)
 print("theta_end=",theta_end)
@@ -96,7 +99,7 @@ phi1 = math.pi/4.0;
 hexlayers_core = 1; # don't include the inner prisms layer
 hexlayers_inner_clad = 1; # 
 hexlayers_outer_clad = 1; # 
-theta_subdiv = 1;
+theta_subdiv = 0;
 
 
 
@@ -139,7 +142,7 @@ ci = np.zeros(theta_subdiv+1,dtype=int)
 
 for div in range(theta_subdiv+1):
 	if nwl_strt>0:
-		if div==0:
+		if div==0 or theta_subdiv==1 :
 			th = 0
 		else:
 			th = (div-1)*theta_end/(theta_subdiv-1)
@@ -188,7 +191,7 @@ for div in range(theta_subdiv+1):
 # points in cross section's axis  
 for div in range(theta_subdiv+1):
 	if nwl_strt>0:
-		if div==0:
+		if div==0 or theta_subdiv==1 :
 			th = 0
 		else:
 			th = (div-1)*theta_end/(theta_subdiv-1)

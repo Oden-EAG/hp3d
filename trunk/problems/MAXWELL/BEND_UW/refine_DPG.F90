@@ -234,6 +234,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !..mark elements for adaptive refinement
    if (Irefine .eq. IADAPTIVE) then
       nr_elem_ref = 0
+! ...set strategy
+      refine_strategy = 1
       if (refine_strategy .eq. 1) then
 !
 !     Strategy 1 (greedy strategy)
@@ -305,13 +307,13 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !        ...set potential h-ref
             select case(ntype)
                case(MDLB)
-                  kref = 111     ! iso
-                  !kref = 110    ! radial
-                  !kref = 10     ! refining in r
-                  !kref = 100    ! refining in theta
+                  if (SLAB_GUIDE.eq.1) then 
+                     kref = 011     ! iso in yz
+                  else 
+                     kref = 111     ! iso
+                  endif
                case(MDLP)
                   kref = 11      ! iso
-                  !kref = 10     ! radial
                case(MDLN,MDLD)
                   call get_isoref(mdle, kref)
                case default
@@ -494,7 +496,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !                              FINALIZE
 !-----------------------------------------------------------------------
 !
-   if (IBCFLAG .eq. 3) call propagate_flag(3,3)
+   if (IBCFLAG .eq. 3) call propagate_flag(2,3)
 !
 end subroutine refine_DPG
 

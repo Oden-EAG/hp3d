@@ -622,6 +622,8 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
    stiff_ALL(1:i1,j1+j2+1)    = bload_E(1:i1)
 !
    deallocate(stiff_EE_T,stiff_EQ_T)
+
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       do i = 1,NrdofEE
          write(*,*)   'i=',i
@@ -650,6 +652,15 @@ subroutine elem_bend_env_maxwell(Mdle,                      &
       write(*,124) bload_E(1:i1)
       call pause
    endif
+
+   if (Mdle.eq.133) then
+      write(*,*) 'elem_maxwell: Gram for Mdle=',Mdle
+      do i=1,10
+         write(*,6001) (gramP(ij_upper_to_packed(i,l)),l=i,10)
+      enddo
+      6001 format(20e13.5)
+   endif
+#endif
 !
 
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)

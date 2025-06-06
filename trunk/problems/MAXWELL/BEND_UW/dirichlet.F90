@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
    subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-      use control,         only : NEXACT
+      use control,         only : NEXACT, GEOM_TOL
       use commonParam
       use parameters,      only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
 !
@@ -67,7 +67,7 @@
 !     ...exact solution UNKNOWN: solving homogeneous equation
          case(0)
 !
-            if (ISOL.gt.100) then
+            if ((ISOL.gt.100 .or. ISOL.eq.15) .and. X(3).lt.GEOM_TOL) then
 !           ...use the exact solution to determine Dirichlet data
 !           ...get Electric field component
                call mfd_solutions(X, E,dE,d2E)

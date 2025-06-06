@@ -78,7 +78,7 @@ BilQua              rectangle 1
 0   1 2 3 4
 
 BilQua              rectangle 2
-0   5 6 7 8
+2   5 6 7 8
 
 CylRec              rectangle 3
 0   1 2 6 5

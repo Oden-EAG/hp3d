@@ -67,24 +67,26 @@ subroutine set_initial_mesh(Nelem_order)
    flag = 1 ! Dirichlet BC flag
    call set_bcond(bdom,attr,comp,flag)
 !
-!..boundary domain "1" (BC depends on IBCFLAG)
-   bdom = 1 ! set on all exterior faces with boundary domain "1"
-   if (IBCFLAG.eq.2 .or. IBCFLAG.eq.3) then
-!  ...impedance BC on H-trace
-      comp = 2       ! H-trace
-      flag = IBCFLAG ! impedance BC flag
-   else
-!  ...Dirichlet BC on E-trace
+   if (SLAB_GUIDE.eq.1) then
+!   ..boundary domain "1"
+      bdom=1
+!   ..Dirichlet BC on E-trace
       comp = 2 ! H-trace
       flag = 1 ! Dirichlet BC flag
+      call set_bcond(bdom,attr,comp,flag)
+!    
+!   ..boundary domain "2" (Outgoing boundary)
+      bdom = 2 ! set on all exterior faces with boundary domain "2"
+      if (IBCFLAG.eq.2 .or. IBCFLAG.eq.3) then
+!     ...impedance BC on H-trace
+         comp = 2       ! H-trace
+         flag = IBCFLAG ! impedance BC flag
+      else
+!     ...Dirichlet BC on E-trace
+         comp = 2 ! H-trace
+         flag = 1 ! Dirichlet BC flag
+      endif
+      call set_bcond(bdom,attr,comp,flag)
    endif
-   call set_bcond(bdom,attr,comp,flag)
-! 
-!..boundary domain "2" (Outgoing boundary)
-   bdom = 2 ! set on all exterior faces with boundary domain "2"
-   comp = 2 ! H-trace
-   flag = 2 ! Dirichlet BC flag
-   call set_bcond(bdom,attr,comp,flag)
-
 !
 end subroutine set_initial_mesh
