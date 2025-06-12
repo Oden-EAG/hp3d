@@ -22,14 +22,8 @@
 dir_output='../outputs/'
 vis_level=2
 
-# MPI Procs
-nproc=4
-
-# OMP THREADS
-nthreads=1
-
 # Set polynomial order p
-p=4
+p=6
 
 # Set enriched order (p+dp)
 dp=1
@@ -39,12 +33,12 @@ job=0
 imax=3
 
 # max NODES
-maxnods=123456
+maxnods=10000000
 
 # export KMP_STACKSIZE=24M   # p=3
-export KMP_STACKSIZE=32M   # p=4
+# export KMP_STACKSIZE=32M   # p=4
 # export KMP_STACKSIZE=48M   # p=5
-# export KMP_STACKSIZE=64M   # p=6
+export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
 
@@ -76,20 +70,20 @@ rbend=1300.0
 # coordinate bounds
 thup=0.1553118594095
 thlo=0.0
-rup=1306.26
+rup=1306.25
 rlo=1293.75
 xup=-6.25
 xlo=6.25
 rhoup=6.25
 rholo=0.0
 # pml proportions
-pmlthup=0.25
+pmlthup=0.125
 pmlthlo=0.0
 pmlrup=0.0
 pmlrlo=0.0
 pmlxup=0.0
 pmlxlo=0.0
-pmlrhoup=0.0
+pmlrhoup=0.2
 pmlrholo=0.0
 # flags for toroidal pml and slab guide geometry
 torpml=1
@@ -122,12 +116,16 @@ file_geometry='./geometries/fiber_R1300_4wl_lp01'
 
 # isol=101
 # rbend=2600.0
+# rup=2606.25
+# rlo=2593.75
 # thup=0.05356858050755267
 # pref='fiber_R2600_4wl_lp01'
 # file_geometry='./geometries/fiber_R2600_4wl_lp01'
 
 # isol=102
 # rbend=2600.0
+# rup=2606.25
+# rlo=2593.75
 # thup=0.3804840429151485
 # pref='fiber_R2600_4wl_lp02'
 # file_geometry='./geometries/fiber_R2600_4wl_lp02'
@@ -164,7 +162,7 @@ nthreads=1
 mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
 ###
 
-# ### RUNNING ON TACC'S FRONTERA'S IKL NODE (TACC)
+# ### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
 # # Set MPI Procs and OpenMP threads
 # nproc=32
 # nthreads=56

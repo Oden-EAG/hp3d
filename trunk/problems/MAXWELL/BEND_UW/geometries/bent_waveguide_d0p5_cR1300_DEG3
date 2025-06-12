@@ -84,13 +84,13 @@ CylRec              rectangle 3
 0   1 2 6 5
 
 CylRec              rectangle 4
-1   2 3 7 6
+0   2 3 7 6
 
 CylRec              rectangle 5
 0   4 3 7 8
 
 CylRec              rectangle 6
-1   1 4 8 5
+0   1 4 8 5
 
 0 NRPRISM
 

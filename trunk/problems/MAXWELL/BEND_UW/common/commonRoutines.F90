@@ -384,7 +384,7 @@
       endif
 
       n = 2       !!! NEEDS TO BE AT LEAST 2 !!!
-      c = 30.d0 /(Wnum* spml**n)
+      c = 100.d0 /(Wnum* spml**n)
       f   = c*sdif**n
       df  = c*sdif**(n-1) * n
       d2f = c*sdif**(n-2) * (n*(n-1))
@@ -495,8 +495,9 @@
          s = atan2(Xp(3),Xp(2))
          stra = (1.d0-PMLTHUP )*THUP +PMLTHUP *THLO
          sbnd = THUP
-         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK
+         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
          call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+         ! write(*,*) 'get_stretched_coords: wnum=',wnum
       endif
       ! coordinate TH, lower bound
       if (flags(1).eq.0 .and. flags(2).eq.1) then
@@ -504,7 +505,7 @@
          s = atan2(Xp(3),Xp(2))
          stra = (1.d0-PMLTHLO )*THUP +PMLTHUP *THUP
          sbnd = THUP
-         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK
+         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
          call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
       endif
       !  Now, PML for the transversal geometry

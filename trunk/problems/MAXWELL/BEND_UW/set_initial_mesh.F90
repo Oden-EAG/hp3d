@@ -10,6 +10,7 @@ subroutine set_initial_mesh(Nelem_order)
    use data_structure3D, only: NRELIS
    use physics         , only: NR_PHYSA
    use commonParam
+   use mpi_param
 !
    implicit none
 !
@@ -66,6 +67,15 @@ subroutine set_initial_mesh(Nelem_order)
    comp = 1 ! E-trace
    flag = 1 ! Dirichlet BC flag
    call set_bcond(bdom,attr,comp,flag)
+
+   if (SLAB_GUIDE.eq.0 .and. IBCFLAG.ge.2) then 
+      if (RANK.eq.ROOT) &
+      write(*,*) 'set_initial_mesh: IBCFLAG≥2 not implemented for this geometry'
+      if (PMLTHUP.eq.0.d0) &
+      write(*,*) 'set_initial_mesh: No PML in theta but the mesh will have Dirichlet b.c.'
+
+      call pause
+   endif
 !
    if (SLAB_GUIDE.eq.1) then
 !   ..boundary domain "1"
@@ -77,7 +87,8 @@ subroutine set_initial_mesh(Nelem_order)
 !    
 !   ..boundary domain "2" (Outgoing boundary)
       bdom = 2 ! set on all exterior faces with boundary domain "2"
-      if (IBCFLAG.eq.2 .or. IBCFLAG.eq.3) then
+      ! if (IBCFLAG.eq.2 .or. IBCFLAG.eq.3) then
+      if (IBCFLAG.eq.3) then
 !     ...impedance BC on H-trace
          comp = 2       ! H-trace
          flag = IBCFLAG ! impedance BC flag
