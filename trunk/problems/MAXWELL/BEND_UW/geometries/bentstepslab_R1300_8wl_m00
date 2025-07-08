@@ -2,7 +2,7 @@
 
 0 NRSURFS
 
-1 NRDOMAIN
+3 NRDOMAIN
 
 1  ISURF_FLAG
 
@@ -150,19 +150,19 @@ BilQua              rectangle 1
 0   1 2 4 3
 
 BilQua              rectangle 2
-0   9 10 12 11
+2   9 10 12 11
 
 BilQua              rectangle 3
 0   3 4 6 5
 
 BilQua              rectangle 4
-0   11 12 14 13
+2   11 12 14 13
 
 BilQua              rectangle 5
 0   5 6 8 7
 
 BilQua              rectangle 6
-0   13 14 16 15
+2   13 14 16 15
 
 CylRec              rectangle 7
 0   1 2 10 9
@@ -177,35 +177,35 @@ CylRec              rectangle 10
 0   7 8 16 15
 
 CylRec              rectangle 11
-1   1 3 11 9
+0   1 3 11 9
 
 CylRec              rectangle 12
-1   2 4 12 10
+0   2 4 12 10
 
 CylRec              rectangle 13
-1   3 5 13 11
+0   3 5 13 11
 
 CylRec              rectangle 14
-1   4 6 14 12
+0   4 6 14 12
 
 CylRec              rectangle 15
-1   5 7 15 13
+0   5 7 15 13
 
 CylRec              rectangle 16
-1   6 8 16 14
+0   6 8 16 14
 
 0 NRPRISM
 
 3 NRHEXAS
 
 CylHex              hexa 1
-1    1 2 4 3 9 10 12 11
+2    1 2 4 3 9 10 12 11
 
 CylHex              hexa 2
 1    3 4 6 5 11 12 14 13
 
 CylHex              hexa 3
-1    5 6 8 7 13 14 16 15
+3    5 6 8 7 13 14 16 15
 
 0 NRTETRA
 

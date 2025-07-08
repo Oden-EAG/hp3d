@@ -53,7 +53,7 @@ f.write("\n")
 f.write("0 NRSURFS\n")
 f.write("\n")
 # Materials
-f.write("1 NRDOMAIN\n")
+f.write("3 NRDOMAIN\n")
 f.write("\n")
 # Boundary domains flag
 f.write("1  ISURF_FLAG\n")
@@ -206,19 +206,19 @@ f.write("BilQua              rectangle 1\n")     # bottom face
 f.write("0   1 2 4 3\n")
 f.write("\n")
 f.write("BilQua              rectangle 2\n")     # top face
-f.write("0   9 10 12 11\n")
+f.write("2   9 10 12 11\n")
 f.write("\n")
 f.write("BilQua              rectangle 3\n")     # bottom face
 f.write("0   3 4 6 5\n")
 f.write("\n")
 f.write("BilQua              rectangle 4\n")     # top face
-f.write("0   11 12 14 13\n")
+f.write("2   11 12 14 13\n")
 f.write("\n")
 f.write("BilQua              rectangle 5\n")     # bottom face
 f.write("0   5 6 8 7\n")
 f.write("\n")
 f.write("BilQua              rectangle 6\n")     # top face
-f.write("0   13 14 16 15\n")
+f.write("2   13 14 16 15\n")
 f.write("\n")
 f.write("CylRec              rectangle 7\n")
 f.write("0   1 2 10 9\n")
@@ -233,22 +233,22 @@ f.write("CylRec              rectangle 10\n")
 f.write("0   7 8 16 15\n")
 f.write("\n")
 f.write("CylRec              rectangle 11\n")     # normal to x
-f.write("1   1 3 11 9\n")
+f.write("0   1 3 11 9\n")
 f.write("\n")
 f.write("CylRec              rectangle 12\n")     # normal to x
-f.write("1   2 4 12 10\n")
+f.write("0   2 4 12 10\n")
 f.write("\n")
 f.write("CylRec              rectangle 13\n")     # normal to x
-f.write("1   3 5 13 11\n")
+f.write("0   3 5 13 11\n")
 f.write("\n")
 f.write("CylRec              rectangle 14\n")     # normal to x
-f.write("1   4 6 14 12\n")
+f.write("0   4 6 14 12\n")
 f.write("\n")
 f.write("CylRec              rectangle 15\n")     # normal to x
-f.write("1   5 7 15 13\n")
+f.write("0   5 7 15 13\n")
 f.write("\n")
 f.write("CylRec              rectangle 16\n")     # normal to x
-f.write("1   6 8 16 14\n")
+f.write("0   6 8 16 14\n")
 f.write("\n")
 # Prisms
 f.write("0 NRPRISM\n")
@@ -257,13 +257,13 @@ f.write("\n")
 f.write("3 NRHEXAS\n")
 f.write("\n")
 f.write("CylHex              hexa 1\n")
-f.write("1    1 2 4 3 9 10 12 11\n")
+f.write("2    1 2 4 3 9 10 12 11\n")
 f.write("\n")
 f.write("CylHex              hexa 2\n")
 f.write("1    3 4 6 5 11 12 14 13\n")
 f.write("\n")
 f.write("CylHex              hexa 3\n")
-f.write("1    5 6 8 7 13 14 16 15\n")
+f.write("3    5 6 8 7 13 14 16 15\n")
 f.write("\n")
 # Tetrahedra
 f.write("0 NRTETRA\n")

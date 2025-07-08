@@ -2,7 +2,7 @@
 
 0 NRSURFS
 
-1 NRDOMAIN
+3 NRDOMAIN
 
 1  ISURF_FLAG
 
@@ -199,13 +199,13 @@ CylRec              rectangle 16
 3 NRHEXAS
 
 CylHex              hexa 1
-1    1 2 4 3 9 10 12 11
+2    1 2 4 3 9 10 12 11
 
 CylHex              hexa 2
 1    3 4 6 5 11 12 14 13
 
 CylHex              hexa 3
-1    5 6 8 7 13 14 16 15
+3    5 6 8 7 13 14 16 15
 
 0 NRTETRA
 
