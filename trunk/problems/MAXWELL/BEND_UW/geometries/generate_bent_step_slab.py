@@ -220,16 +220,16 @@ f.write("\n")
 f.write("BilQua              rectangle 6\n")     # top face
 f.write("2   13 14 16 15\n")
 f.write("\n")
-f.write("CylRec              rectangle 7\n")
+f.write("CylRec              rectangle 7\n")     # inner radius boundary
 f.write("0   1 2 10 9\n")
 f.write("\n")
-f.write("CylRec              rectangle 8\n")
+f.write("CylRec              rectangle 8\n")     # left cladding-core interface
 f.write("0   3 4 12 11\n")
 f.write("\n")
-f.write("CylRec              rectangle 9\n")
+f.write("CylRec              rectangle 9\n")     # right cladding-core interface
 f.write("0   5 6 14 13\n")
 f.write("\n")
-f.write("CylRec              rectangle 10\n")
+f.write("CylRec              rectangle 10\n")     # outer radius boundary
 f.write("0   7 8 16 15\n")
 f.write("\n")
 f.write("CylRec              rectangle 11\n")     # normal to x

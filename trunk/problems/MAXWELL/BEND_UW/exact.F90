@@ -19,7 +19,7 @@
 !> @param[out] ValV   - value of the H(div) solution
 !> @param[out] DvalV  - corresponding first derivatives
 !> @param[out] D2valV - corresponding second derivatives
-!> @param[out] ValQ   - value of the H(div) solution
+!> @param[out] ValQ   - value of the L2 solution
 !> @param[out] DvalQ  - corresponding first derivatives
 !> @param[out] D2valQ - corresponding second derivatives
 !-------------------------------------------------------------------------------
@@ -70,7 +70,7 @@
       E = ZERO; dE = ZERO; d2E = ZERO
 !
 !  ...get Electric field component
-      call mfd_solutions(Xp, E,dE,d2E)
+      call mfd_solutions(Mdle,Xp, E,dE,d2E)
       ! write(*,*) 'exact: Xp, Ex=',Xp,E
 !
 !  ...E-field value

@@ -70,7 +70,7 @@
             if ((ISOL.gt.100 .or. ISOL.eq.15) .and. X(3).lt.GEOM_TOL) then
 !           ...use the exact solution to determine Dirichlet data
 !           ...get Electric field component
-               call mfd_solutions(X, E,dE,d2E)
+               call mfd_solutions(Mdle,X, E,dE,d2E)
 !
 !           ...E-field value for component 1
                ValE(1,1) = E ! E-field trace;

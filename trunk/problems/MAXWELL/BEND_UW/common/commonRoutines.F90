@@ -363,7 +363,8 @@
 !  Zsst    Complex, stretched
    subroutine get_pml_stretch(S,Stra,Sbnd,Wnum,Zsst,Zdsst,Zd2sst)
 
-      use commonParam, only: OMEGA
+      use commonParam, only: OMEGA,ZERO
+      use control, only: GEOM_TOL
       implicit none
       real(8), intent(in) :: S,Sbnd,Stra,Wnum
       complex(8),intent(out) :: Zsst,Zdsst,Zd2sst
@@ -382,16 +383,24 @@
          write(*,*) "S,Stra,Sbnd=",S,Stra,Sbnd
          stop
       endif
-
-      n = 2       !!! NEEDS TO BE AT LEAST 2 !!!
-      c = 100.d0 /(Wnum* spml**n)
-      f   = c*sdif**n
-      df  = c*sdif**(n-1) * n
-      d2f = c*sdif**(n-2) * (n*(n-1))
-      if((f.lt.0.d0).or.(df*spml.lt.0.d0)) then
-         write(*,*) ' get_pml_stretch: f,df have the wrong sign. stop.'
-         write(*,*) ' get_pml_stretch: f,df=',f,df
-         stop
+      ! the PML length may be near zero, so we force the imaginary part to be zero
+      if (abs(spml).lt.GEOM_TOL) then
+         f = ZERO
+         df = ZERO
+         d2f = ZERO
+      else
+         ! if there is an actual PML, we compute the complex path with a polynomial curve
+         !
+         n = 4       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
+         c = 800.d0 /(Wnum* spml**n)                     !                     c = 100.d0...
+         f   = c*sdif**n
+         df  = c*sdif**(n-1) * n
+         d2f = c*sdif**(n-2) * (n*(n-1))
+         if((f.lt.0.d0).or.(df*spml.lt.0.d0)) then
+            write(*,*) ' get_pml_stretch: f,df have the wrong sign. stop.'
+            write(*,*) ' get_pml_stretch: f,df=',f,df
+            stop
+         endif
       endif
       zsst   = cmplx(  S , -f  , 8)
       zdsst  = cmplx(1.d0, -df , 8)
@@ -464,6 +473,97 @@
    end subroutine
 
 
+
+
+
+   subroutine cartesian2curvilinear_real(Xcart,Xrot)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      implicit none
+      real(8), intent(in) :: Xcart(3)
+      real(8), intent(out):: Xrot(3)
+
+      ! map Xcart to curvilinear coordinates
+      if (SLAB_GUIDE.eq.1 .or. TOROIDAL_PML.eq.0) then
+         Xrot(1) = Xcart(1)
+         Xrot(2) = sqrt(Xcart(2)**2+Xcart(3)**2)
+         Xrot(3) = atan2(Xcart(3),Xcart(2))
+      else
+         Xrot(1) = atan2( Xcart(1) , sqrt(Xcart(2)**2+Xcart(3)**2)-RBEND )
+         Xrot(2) = sqrt( ( sqrt(Xcart(2)**2+Xcart(3)**2) -RBEND)**2 + Xcart(1)**2 )
+         Xrot(3) = atan2(Xcart(3),Xcart(2))
+      endif
+   end subroutine
+
+
+
+
+
+   subroutine cartesian2curvilinear_complex(Zcart,Zrot)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      implicit none
+      complex(8), intent(in) :: Zcart(3)
+      complex(8), intent(out):: Zrot(3)
+
+      ! map Zcart to curvilinear coordinates
+      if (SLAB_GUIDE.eq.1) then
+         Zrot(1) = Zcart(1)
+         Zrot(2) = sqrt(Zcart(2)**2+Zcart(3)**2)
+         Zrot(3) = atan(Zcart(3)/Zcart(2))
+      elseif(TOROIDAL_PML.eq.1) then
+         Zrot(1) = atan( Zcart(1) / (sqrt(Zcart(2)**2+Zcart(3)**2)-RBEND ) )
+         Zrot(2) = sqrt( ( sqrt(Zcart(2)**2+Zcart(3)**2) -RBEND)**2 + Zcart(1)**2 )
+         Zrot(3) = atan(Zcart(3)/Zcart(2))
+      endif
+   end subroutine
+
+
+
+
+
+   subroutine curvilinear2cartesian_real(Xrot,Xcart)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      implicit none
+      real(8), intent(in) :: Xrot(3)
+      real(8), intent(out):: Xcart(3)
+
+      ! map back to Cartesian
+      if (SLAB_GUIDE.eq.1) then
+         Xcart(1) = Xrot(1)
+         Xcart(2) = Xrot(2)*cos(Xrot(3))
+         Xcart(3) = Xrot(2)*sin(Xrot(3))
+      else
+         Xcart(1) =  Xrot(2)*sin(Xrot(1))
+         Xcart(2) = (Xrot(2)*cos(Xrot(1))+RBEND)*cos(Xrot(3))
+         Xcart(3) = (Xrot(2)*cos(Xrot(1))+RBEND)*sin(Xrot(3))
+      endif
+   end subroutine
+
+
+
+
+
+   subroutine curvilinear2cartesian_complex(Zrot,Zcart)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      implicit none
+      complex(8), intent(in) :: Zrot(3)
+      complex(8), intent(out):: Zcart(3)
+
+      ! map back to Cartesian
+      if (SLAB_GUIDE.eq.1) then
+         Zcart(1) = Zrot(1)
+         Zcart(2) = Zrot(2)*cos(Zrot(3))
+         Zcart(3) = Zrot(2)*sin(Zrot(3))
+      elseif (TOROIDAL_PML.eq.1) then
+         Zcart(1) =  Zrot(2)*sin(Zrot(1))
+         Zcart(2) = (Zrot(2)*cos(Zrot(1))+RBEND)*cos(Zrot(3))
+         Zcart(3) = (Zrot(2)*cos(Zrot(1))+RBEND)*sin(Zrot(3))
+      endif
+   end subroutine
+
+
+
+
+
    subroutine get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
 
       use commonParam
@@ -472,97 +572,114 @@
       real(8),   intent(in) :: Xp(3)
       complex(8),intent(out):: Zxpst(3),Zdxpst(3),Zd2xpst(3)
 
-      real(8) :: s, stra, sbnd,wnum
+      real(8) :: s, stra, sbnd,wnum,xrot(3)
+      complex(8) :: zrotst(3)
       integer :: ic,flags(8)
 
       Zxpst = cmplx(Xp,0.d0,8)
       Zdxpst = ZONE
       Zd2xpst = ZERO
-      !  decode the ActivPML variable
-      call decod(ActivePML,2,8,flags)
-      
-      ! write(*,*) "get_stretched_coords:    ActivePML=",ActivePML
-      ! write(*,*) "get_stretched_coords:        flags=",flags
-      ! write(*,*) "get_stretched_coords:           Xp=",Xp
-      ! write(*,*) "get_stretched_coords:          XUP=",XUP
-      ! write(*,*) "get_stretched_coords:          XLO=",XLO
-      ! call pause
 
-      !  First, PML in the longitudinal direction
-      !  coordinate TH, upper bound
-      if (flags(1).eq.1 .and. flags(2).eq.0) then
-         ic = 3
-         s = atan2(Xp(3),Xp(2))
-         stra = (1.d0-PMLTHUP )*THUP +PMLTHUP *THLO
-         sbnd = THUP
-         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
-         call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-         ! write(*,*) 'get_stretched_coords: wnum=',wnum
-      endif
-      ! coordinate TH, lower bound
-      if (flags(1).eq.0 .and. flags(2).eq.1) then
-         ic = 3
-         s = atan2(Xp(3),Xp(2))
-         stra = (1.d0-PMLTHLO )*THUP +PMLTHUP *THUP
-         sbnd = THUP
-         wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
-         call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-      endif
-      !  Now, PML for the transversal geometry
-      if (TOROIDAL_PML.eq.0) then
-         ! coordinate R, upper bound
-         if (flags(3).eq.1 .and. flags(4).eq.0) then
-            ic = 2
-            s = sqrt(Xp(2)**2+Xp(3)**2)
-            stra = (1.d0-PMLRUP )*RUP +PMLRUP *RLO
-            sbnd = RUP
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-         endif
-         ! coordinate R, lower bound
-         if (flags(3).eq.0 .and. flags(4).eq.1) then
-            ic = 2
-            s = sqrt(Xp(2)**2+Xp(3)**2)
-            stra = (1.d0-PMLRLO )*RLO +PMLRLO *RUP
-            sbnd = RLO
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-         endif
-         ! coordinate X, upper bound
-         if (flags(5).eq.1 .and. flags(6).eq.0) then
-            ic = 1
-            s = Xp(1)
-            stra = (1.d0-PMLXUP )*XUP +PMLXUP *XLO
-            sbnd = XUP
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-         endif
-         ! coordinate X, lower bound
-         if (flags(5).eq.0 .and. flags(6).eq.1) then
-            ic = 1
-            s = Xp(1)
-            stra = (1.d0-PMLXLO )*XLO +PMLXLO *XUP
-            sbnd = XLO
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
-         endif
+      if (ActivePML.eq.0) then
+         return
       else
-         ic = 2
-         s = sqrt(( sqrt(Xp(2)**2+Xp(3)**2) -RBEND)**2 + Xp(1)**2)
-         ! coordinate RHO, upper bound
-         if (flags(7).eq.1 .and. flags(8).eq.0) then
-            stra = (1.d0-PMLRHOUP )*XUP +PMLRHOUP *RHOLO
-            sbnd = RHOUP
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+         !  pass input coordinates (cartesian, real) to curvilinear coordinates
+         call cartesian2curvilinear_real(Xp,xrot)
+         !  initialize the complex-valued stretched curvilinear coordinates
+         zrotst = cmplx(xrot,0.d0,8)
+
+         !  decode the ActivePML variable
+         call decod(ActivePML,2,8,flags)
+         
+         
+         !  First, PML in the longitudinal direction
+         !  coordinate TH, upper bound
+         if (flags(1).eq.1 .and. flags(2).eq.0) then
+            ic = 3
+            s = xrot(ic)
+            stra = (1.d0-PMLTHUP )*THUP +PMLTHUP *THLO
+            sbnd = THUP
+            wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
+            call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            ! write(*,*) 'get_stretched_coords: wnum=',wnum
          endif
-         ! coordinate RHO, lower bound
-         if (flags(7).eq.0 .and. flags(8).eq.1) then
-            stra = (1.d0-PMLRHOLO )*XLO +PMLRHOLO *RHOUP
-            sbnd = RHOLO
-            wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-            call get_pml_stretch(s,stra,sbnd,wnum,Zxpst(ic),Zdxpst(ic),Zd2xpst(ic))
+         ! coordinate TH, lower bound
+         if (flags(1).eq.0 .and. flags(2).eq.1) then
+            ic = 3
+            s = xrot(ic)
+            stra = (1.d0-PMLTHLO )*THUP +PMLTHUP *THUP
+            sbnd = THUP
+            wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
+            call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
          endif
+         !  Now, PML for the transversal geometry
+         if (TOROIDAL_PML.eq.0) then
+            ! coordinate R, upper bound
+            if (flags(3).eq.1 .and. flags(4).eq.0) then
+               ic = 2
+               s = xrot(ic)
+               stra = (1.d0-PMLRUP )*RUP +PMLRUP *RLO
+               sbnd = RUP
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+            ! coordinate R, lower bound
+            if (flags(3).eq.0 .and. flags(4).eq.1) then
+               ic = 2
+               s = xrot(ic)
+               stra = (1.d0-PMLRLO )*RLO +PMLRLO *RUP
+               sbnd = RLO
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+            ! coordinate X, upper bound
+            if (flags(5).eq.1 .and. flags(6).eq.0) then
+               ic = 1
+               s = xrot(ic)
+               stra = (1.d0-PMLXUP )*XUP +PMLXUP *XLO
+               sbnd = XUP
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+            ! coordinate X, lower bound
+            if (flags(5).eq.0 .and. flags(6).eq.1) then
+               ic = 1
+               s = xrot(ic)
+               stra = (1.d0-PMLXLO )*XLO +PMLXLO *XUP
+               sbnd = XLO
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+         else
+            ic = 2
+            s = xrot(ic)
+            ! coordinate RHO, upper bound
+            if (flags(7).eq.1 .and. flags(8).eq.0) then
+               stra = (1.d0-PMLRHOUP )*XUP +PMLRHOUP *RHOLO
+               sbnd = RHOUP
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+            ! coordinate RHO, lower bound
+            if (flags(7).eq.0 .and. flags(8).eq.1) then
+               stra = (1.d0-PMLRHOLO )*XLO +PMLRHOLO *RHOUP
+               sbnd = RHOLO
+               wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
+               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            endif
+
+         endif
+
+         ! map back to Cartesian
+         call curvilinear2cartesian_complex(zrotst,Zxpst)
+
+         ! write(*,*) "get_stretched_coords:    ActivePML=",ActivePML
+         ! write(*,*) "get_stretched_coords:        flags=",flags
+         ! write(*,*) "get_stretched_coords:           Xp=",Xp
+         ! write(*,*) "get_stretched_coords:         Xrot=",xrot
+         ! write(*,*) "get_stretched_coords:       zrotst=",zrotst
+         ! call pause
+
 
       endif
 

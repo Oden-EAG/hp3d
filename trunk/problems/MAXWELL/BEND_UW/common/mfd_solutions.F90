@@ -1,7 +1,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     routine name      - maxwell_solution
+!     routine name      - mfd_solutions
 !
 !----------------------------------------------------------------------
 !
@@ -13,6 +13,7 @@
 !     arguments:
 !
 !     in:
+!           Mdle        - an element (middle node) number
 !             Xp        - a point in physical space
 !     out:
 !              p        - value of the solution pressure
@@ -21,7 +22,7 @@
 !
 !----------------------------------------------------------------------
 !
-   subroutine mfd_solutions(Xp, p,Gradp,Grad2p)
+   subroutine mfd_solutions(Mdle,Xp, p,Gradp,Grad2p)
 !
       use data_structure3D
       use commonParam
@@ -29,13 +30,14 @@
 !
       implicit none
 !
+      integer,    intent(in)  :: Mdle
       real(8),    intent(in)  :: Xp(3)
       complex(8), intent(out) :: p
       complex(8), intent(out) :: Gradp(3)
       complex(8), intent(out) :: Grad2p(3,3)
 !
 !  ...intermediate variables
-      real(8) :: w0, p0, rk, pi_mod , wavenum0
+      real(8) :: w0, p0, rk, pi_mod
       real(8) :: theta_x, theta_y
       real(8) :: rad_x, rad_y
       real(8) :: sinx, siny, cosx, cosy
@@ -68,6 +70,12 @@
       real(8) :: th,dth_x2,dth_x3,d2th_x2,d2th_x3,d2th_x2x3
 
       real(8) :: kappa_clad,kappa_core
+
+      real(8) :: wavenum0,wavenum1
+      complex(8) :: zrotst(3),zxpst(3),zdxpst(3),zd2xpst(3)
+      complex(8):: zJ(3,3),zJinv(3,3),zJdet
+      real(8) :: rQ(3,3)
+      integer :: activePML
 !
 !---------------------------------------------------------------------------------------
 !
@@ -506,13 +514,13 @@
             call get_LP01_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
       case(111)
-            kappa_core=6.1295026d0
-            kappa_clad=6.3839344d0
+            kappa_core=6.1398251268689d0
+            kappa_clad=6.37400853618783d0
             call get_LP11a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
       case(121)
-            kappa_core=8.0736186d0
-            kappa_clad=3.6252404d0
+            kappa_core=8.08596454606084d0
+            kappa_clad=3.59758457409596d0
             call get_LP21a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
       case(102)
@@ -534,6 +542,123 @@
             kappa_core=7.4313660759331d0
             kappa_clad=4.80627045154566d0
             call get_step_slab_even(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+
+!
+      case(300,301,302) ! can be called with any NEXACT
+            !
+            ! EIGENFUNCTIONS OF THE BENT STEP-INDEX SLAB WAVEGUIDE 
+            ! WITH NEUMANN BC ON THE INNER FACE, PML ON OUTER FACE
+            if (ISOL.ne.IMODE) then
+               write(*,*) 'mfd_solutions: input ISOL does not match the preloaded mode for bent 3-layer waveguide IMODE!'
+               write(*,*) '               Go to header of bessel_evaluation module and uncomment the required parameters. STOP'
+               stop
+            endif
+            !
+            if (SLAB_GUIDE.eq.0) then
+               write(*,*) 'mfd_solutions: option only available for the SLAB_GUIDE case! STOP'
+               stop
+            endif
+
+!        ...check if we're within the PML      ARE WE ASSUMING THAT THIS IS EVALUATED AT THE BOTTOM FACE?
+            call is_pml(Mdle,Xp,activePML)
+            ! if so, modify input coordinate r
+            if (activePML.ne.0) then 
+               ! get rotation matrix
+               call get_local_rotation(Mdle,Xp,activePML,rQ)
+               ! get pml stretched coordinates and derivatives
+               call get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
+               ! get PML Jacobian
+               call get_stretch_J(zdxpst,rQ,zJ,zJinv,zJdet)
+
+               call cartesian2curvilinear_complex(Zxpst,Zrotst)
+            else
+               call cartesian2curvilinear_complex(cmplx(Xp,0.d0 , 8),Zrotst)
+               zJ = cmplx(IDENTITY,0.d0 , 8)
+               zJinv = zJ
+               ZJdet = ZONE
+            endif
+
+!           ...Separable function u(r)*v(x)*w(theta)
+
+            ! FACTOR u(r)
+            ! u(r) is an eigenfunction of Bessel's equation. Its parameters 
+            ! (bessel order, linear combination coefficients) were precomputed,
+            ! and are chosen from the options in the bessel_evaluation module.
+            r = dsqrt(x2**2+x3**2)
+            dr_x2 = x2/r
+            dr_x3 = x3/r
+            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+            d2r_x2x3 = -1.d0*x2*x3/r**3
+!
+            wavenum0 = OMEGA*sqrt(EPSILON*MU)*REFRCORE
+            wavenum1 = OMEGA*sqrt(EPSILON*MU)*REFRCLAD
+
+            ! write(*,*) 'mfd_solutions: xp , r  = ',xp
+            ! write(*,*) 'mfd_solutions: activePML = ',activePML
+            ! write(*,*) 'mfd_solutions: rQ(:,3) = ',rQ(:,3)
+            ! write(*,*) 'mfd_solutions: zJdet   = ',zJdet
+            ! write(*,*) 'mfd_solutions: Zxpst   = ',zxpst
+            ! write(*,*) 'mfd_solutions: Zrotst  = ',zrotst
+
+!           complex-valued r comes from zrotst(2) (stretched rotated coordinates)
+            call bessel_stepindex_preset(wavenum0, wavenum1, RBEND, RCORE, RCLAD, Zrotst(2),    u, du_r, d2u_r)
+            ! current derivatives were computed w.r.t complex stretched coordinate \tilde{r}
+            ! pass to derivatives w.r.t physical coordinate r
+            d2u_r = d2u_r* zdxpst(2)**2 + du_r * zd2xpst(2)
+            du_r = du_r * zdxpst(2)
+
+
+            ! FACTOR v(x)
+            v =     1.d0 !
+            dv_x1 = 0.d0 !
+            d2v_x1 = 0.d0
+
+
+            ! FACTOR w(theta)
+            dth_x2    = -x3/r**2
+            dth_x3    =  x2/r**2
+            d2th_x2   =  x3*2.d0*r*dr_x2/r**4
+            d2th_x2x3 = -(r**2-x3*2.d0*r*dr_x3)/r**4
+            d2th_x3   = -x2*2.d0*r*dr_x3/r**4
+
+            znu = sqrt(ZLAMBDA_MODE)-ENVELOPEK*RBEND
+!           complex-valued r comes from zrotst(2) (stretched rotated coordinates)
+            w = exp(-ZI*znu* zrotst(3) )
+            dw_th = -ZI*znu*w
+            d2w_th = -znu**2*w
+            ! current derivatives were computed w.r.t complex stretched coordinate \tilde{\theta}
+            ! pass to derivatives w.r.t physical coordinate theta
+            d2w_th = d2w_th* zdxpst(3)**2 + dw_th * zd2xpst(3)
+            dw_th = dw_th * zdxpst(3)
+
+!     ...mfd solution for the polarized component of E
+            cn = 1.d0*ZONE
+            p = cn * u * v * w
+!     ...1st order derivatives
+            Gradp(1) = cn * u * dv_x1 * w
+            Gradp(2) = cn * (du_r*dr_x2 * v * w  +  u * v * dw_th*dth_x2 )
+            Gradp(3) = cn * (du_r*dr_x3 * v * w  +  u * v * dw_th*dth_x3 )
+!     ...second order derivatives
+            Grad2p(1,1) = cn * (u * d2v_x1 * w )
+            Grad2p(1,2) = cn * (du_r*dr_x2 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x2)
+            Grad2p(1,3) = cn * (du_r*dr_x3 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x3)
+            Grad2p(2,1) = Grad2p(1,2)
+            Grad2p(2,2) = cn * ( (d2u_r*dr_x2**2+du_r*d2r_x2) * v * w            &
+                                + 2.d0*(du_r*dr_x2 * v * dw_th*dth_x2)           &
+                                + u * v * (d2w_th*dth_x2**2+dw_th*d2th_x2) )
+            Grad2p(2,3) = cn * ( (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v * w       &
+                                + du_r*dr_x2 * v * dw_th*dth_x3                  &
+                                + du_r*dr_x3 * v * dw_th*dth_x2                  &
+                                + u * v * (dw_th*dth_x2*dth_x3+d2w_th*d2th_x2x3))
+            Grad2p(3,1) = Grad2p(1,3)
+            Grad2p(3,2) = Grad2p(2,3)
+            Grad2p(3,3) = cn * ( (d2u_r*dr_x3**2+du_r*d2r_x3) * v * w            &
+                                + 2.d0*(du_r*dr_x3 * v * dw_th*dth_x3)           &
+                                + u * v * (d2w_th*dth_x3**2+dw_th*d2th_x3) )
+
+            ! Gradp = matmul(zJ)
+
    end select
 !
 !

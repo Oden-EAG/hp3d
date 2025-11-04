@@ -81,8 +81,10 @@
             call paraview_driver
             call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
+!
 !     ...print data structure (interactive)
          case(10); call result
+!
 !
 !     ...print general data structure info
          case(11)
@@ -93,23 +95,35 @@
             write(*,112) MAXNODS,NPNODS
  112        format(' MAXNODS,NPNODS                  = ',2I10)
 !
+!
 !     ...print current partition (elems)
          case(15)
             write(*,*) 'printing current partition (elems)...'
             call print_partition
+!
 !
 !     ...print current subdomains (nodes)
          case(16)
             write(*,*) 'printing current subdomains (nodes)...'
             call print_subd
 !
+!
 !     ...print current partition coordinates
          case(17)
             write(*,*) 'printing current partition coordinates...'
             call print_coord
 !
-!     ...single uniform h-refinement
+!
+!     ...single uniform p-refinement
          case(20)
+            if (RANK .eq. ROOT) write(*,*) 'global p-refinement...'
+            call global_pref
+            call update_gdof
+            call update_Ddof
+!
+!
+!     ...single uniform h-refinement
+         case(21)
             if (RANK .eq. ROOT) then
                write(*,*) 'Select number of refinements:'
                read(*,*) refs
@@ -131,16 +145,9 @@
             call update_gdof
             call update_Ddof
 !
-!     ...single uniform p-refinement
-         case(21)
-            if (RANK .eq. ROOT) write(*,*) 'global p-refinement...'
-            call global_pref
-            call update_gdof
-            call update_Ddof
-!
 !
 !     ...anisotropic h-refinements (in z)
-         case(23)
+         case(22)
             if (RANK .eq. ROOT) then
                write(*,*) 'Select number of refinements:'
                read(*,*) refs
@@ -160,7 +167,7 @@
 !
 !
 !     ...anisotropic h-refinements (radial)
-         case(24)
+         case(23)
             if (RANK .eq. ROOT) then
                write(*,*) 'Select number of refinements:'
                read(*,*) refs
@@ -183,7 +190,30 @@
             call update_Ddof
 !
 !
-!     ...Adaptive isotropic h-refine
+!     ...Uniform isotropic h-refinements + solve + residual/error computation
+         case(24)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Select number of refinements:'
+               read(*,*) refs
+            endif
+            count = 1; src = ROOT
+            call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            if (RANK .eq. ROOT) write(*,*) 'Uniform isotropic h-refinement...'
+            do i=1,refs
+               if (RANK .eq. ROOT) write(*,*) '.....before refine_DPG'
+               call refine_DPG(IUNIFORM,1,0.25d0,nstop)
+               if (RANK .eq. ROOT) write(*,*) '.....after refine_DPG'
+               if (IBCFLAG .eq. 3) then
+                  call propagate_flag(2,3)
+               endif
+               if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (MPI) solver...'
+               call par_mumps_sc('H')
+            enddo
+            if (RANK .eq. ROOT) write(*,*) 'Computing error/residual with current mesh'
+            call refine_DPG(0,1,2.d0,nstop)
+!
+!
+!     ...Adaptive isotropic h-refinements + solve + residual/error computation
          case(25)
             if (RANK .eq. ROOT) then
                write(*,*) 'Select number of refinements:'
@@ -211,10 +241,12 @@
             write(*,*) 'distribute mesh...'
             call distr_mesh
 !
+!
 !     ...collect dofs on ROOT processor
          case(31)
             write(*,*) 'collecting dofs on ROOT...'
             call collect_dofs
+!
 !
 !     ...evaluate current partition
          case(33)
@@ -225,40 +257,48 @@
                write(*,*) 'distribute mesh first to use Zoltan...'
             endif
 !
+!
 !     ...run mesh verification routines
          case(35)
             write(*,*) 'verify distributed mesh consistency...'
             call par_verify
+!
 !
 !     ...solve problem with par_nested (nested MPI MUMPS)
          case(40)
             if (RANK .eq. ROOT) write(*,*) 'calling nested MUMPS (MPI) solver...'
             call par_nested('H')
 !
+!
 !     ...solve problem with par_mumps_sc (MPI MUMPS)
          case(41)
             if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (MPI) solver...'
             call par_mumps_sc('H')
+!
 !
 !     ...solve problem with mumps_sc (OpenMP MUMPS)
          case(42)
             if (RANK .eq. ROOT) write(*,*) 'calling MUMPS (OpenMP) solver...'
             call mumps_sc('H')
 !
+!
 !     ...solve problem with pardiso_sc (OpenMP Pardiso)
          case(43)
             if (RANK .eq. ROOT) write(*,*) 'calling Pardiso (OpenMP) solver...'
             call pardiso_sc('H')
+!
 !
 !     ...solve problem with Frontal solver (sequential)
          case(44)
             if (RANK .eq. ROOT) write(*,*) 'calling Frontal (Seq) solver...'
             call solve1(1)
 !
+!
 !     ...solve problem with PETSc solver (MPI)
          case(45)
             if (RANK .eq. ROOT) write(*,*) 'calling PETSc (MPI) solver...'
             call petsc_solve('H')
+!
 !
 !     ...compute error for problem with known solution
          case(50)
@@ -269,10 +309,12 @@
                call exact_error(flag,physNick)
             endif
 !
+!
 !     ...compute the residual
          case(51)
             write(*,*) 'computing residual...'
             call residual(res)
+!
 !
 !     ...debugging routines
          case(70)
@@ -311,6 +353,7 @@
             enddo
         100 format(/,'/////////////////////////////////////////////////////////////', &
                    /,'             ',A,I4,/)
+!
 !
          case default
             write(*,*) 'exec_case: unknown case...'

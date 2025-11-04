@@ -80,7 +80,7 @@ subroutine set_initial_mesh(Nelem_order)
    if (SLAB_GUIDE.eq.1) then
 !   ..boundary domain "1"
       bdom=1
-!   ..Dirichlet BC on E-trace
+!   ..Dirichlet BC on H-trace
       comp = 2 ! H-trace
       flag = 1 ! Dirichlet BC flag
       call set_bcond(bdom,attr,comp,flag)
@@ -93,7 +93,7 @@ subroutine set_initial_mesh(Nelem_order)
          comp = 2       ! H-trace
          flag = IBCFLAG ! impedance BC flag
       else
-!     ...Dirichlet BC on E-trace
+!     ...Dirichlet BC on H-trace
          comp = 2 ! H-trace
          flag = 1 ! Dirichlet BC flag
       endif

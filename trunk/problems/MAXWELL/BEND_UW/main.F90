@@ -254,12 +254,17 @@ subroutine master_main()
       write(*,*) 'Print current subdomains (nodes).......16'
       write(*,*) 'Print partition coordinates............17'
       write(*,*) '                                         '
-      write(*,*) '        ---- Refinements ----            '
-      write(*,*) 'Single uniform h-refinement............20'
-      write(*,*) 'Single uniform p-refinement............21'
-      write(*,*) 'Anisotropic (logitudinal) h-refine.....23'
-      write(*,*) 'Anisotropic (transversal) h-refine.....24'
-      write(*,*) 'Adaptive isotropic h-refine............25'
+      write(*,*) '        ---- P Refinements ----          '
+      write(*,*) 'Uniform p-refinement (no solve)........20'
+      write(*,*) '                                         '
+      write(*,*) '        ---- H Refinements ----          '
+      write(*,*) 'Uniform      h-refinement (no solve)...21'
+      write(*,*) 'Longitudinal h-refinement (no solve)...22'
+      write(*,*) 'Transversal  h-refinement (no solve)...23'
+      write(*,*) '                                         '
+      write(*,*) '  ---- Refinement + Solution ----        '
+      write(*,*) 'Uniform  h-ref + SOLVE + ERROR/RES.....24'
+      write(*,*) 'Adaptive h-ref + SOLVE + ERROR/RES.....25'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -329,7 +334,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,23,24,25)
+         case(20,21,22,23,24,25)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -495,7 +500,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,23,24,25)
+         case(20,21,22,23,24,25)
             call exec_case(idec)
 !
 !     ...MPI Routines

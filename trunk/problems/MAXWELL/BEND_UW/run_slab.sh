@@ -23,7 +23,7 @@ dir_output='../outputs/'
 vis_level=2
 
 # Set polynomial order p
-p=5
+p=4
 
 # Set enriched order (p+dp)
 dp=1
@@ -36,8 +36,8 @@ imax=3
 maxnods=1000000
 
 # export KMP_STACKSIZE=24M   # p=3
-# export KMP_STACKSIZE=32M   # p=4
-export KMP_STACKSIZE=48M   # p=5
+export KMP_STACKSIZE=32M   # p=4
+# export KMP_STACKSIZE=48M   # p=5
 # export KMP_STACKSIZE=64M   # p=6
 # export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
@@ -106,15 +106,17 @@ ibc=3
 # isol=200
 # rbend=1300.0
 # thup=0.0965092161439455
+# pmlthup=0.0
 # file_geometry='./geometries/bentstepslab_R1300_4wl_m00'
-# pref='stepslab_R1300_4wl_m00'
+# pref='ref_stepslab_R1300_4wl_m00'
+# ibc=0
 
-isol=202
-rbend=1300.0
-thup=0.21861514818081262
-file_geometry='./geometries/bentstepslab_R1300_4wl_m02'
-pref='stepslab_R1300_4wl_m02'
-ibc=3
+# isol=202
+# rbend=1300.0
+# thup=0.21861514818081262
+# file_geometry='./geometries/bentstepslab_R1300_4wl_m02'
+# pref='stepslab_R1300_4wl_m02'
+# ibc=3
 
 # isol=200
 # rbend=2600.0
@@ -144,6 +146,50 @@ ibc=3
 # nclad=1.0
 # ncoat=1.0
 # gamma=1.07032799231899E+00
+
+
+# cases bent slab waveguide with semianalytical solutions obtained with Bessel-Frobenius PML approach
+# isol=300
+# rbend=1300.0
+# thup=0.0965092161439455
+# pmlrlo=0.0
+# pmlthup=0.0
+# file_geometry='./geometries/verif_bentstepslab_R1300_m00'   
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif_stepslab_R1300_m00'
+# ibc=0
+
+# isol=302
+# rbend=1300.0
+# thup=0.21861514818081262
+# pmlrlo=0.0
+# file_geometry='./geometries/verif_bentstepslab_R1300_m02'   
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif_stepslab_R1300_m02'
+# ibc=0
+
+isol=300
+rbend=2600.0
+rup=2605.0
+rlo=2595.0
+thup=0.04825460807197276
+pmlrlo=0.0
+file_geometry='./geometries/verif_bentstepslab_R2600_m00'
+# the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+pref='verif_stepslab_R2600_m00'
+ibc=0
+
+# isol=302
+# rbend=2600.0
+# rup=2605.0
+# rlo=2595.0
+# thup=0.15238724408876186
+# pmlrlo=0.0
+# file_geometry='./geometries/verif_bentstepslab_R2600_m02'
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif_stepslab_R2600_m02'
+# ibc=0
+
 
 ctrl='control/control'
 #
