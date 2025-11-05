@@ -243,7 +243,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
          do iel=1,NRELES
             mdle = ELEM_ORDER(iel)
             call find_domain(mdle, i)
-            if(elem_resid(iel) > Factor * elem_resid_max) then
+            if(elem_resid(iel) .ge. Factor * elem_resid_max) then
                nr_elem_ref = nr_elem_ref + 1
                mdle_ref(nr_elem_ref) = mdle
             endif

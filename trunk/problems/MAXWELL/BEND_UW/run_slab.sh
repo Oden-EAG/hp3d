@@ -33,10 +33,10 @@ job=0
 imax=3
 
 # max NODES
-maxnods=1000000
+maxnods=10000000
 
-# export KMP_STACKSIZE=24M   # p=3
-export KMP_STACKSIZE=32M   # p=4
+export KMP_STACKSIZE=24M   # p=3
+# export KMP_STACKSIZE=32M   # p=4
 # export KMP_STACKSIZE=48M   # p=5
 # export KMP_STACKSIZE=64M   # p=6
 # export KMP_STACKSIZE=80M   # p=7
@@ -159,6 +159,16 @@ ibc=3
 # pref='verif_stepslab_R1300_m00'
 # ibc=0
 
+# isol=301
+# rbend=1300.0
+# thup=0.14757922036828128
+# pmlrlo=0.0
+# pmlthup=0.0
+# file_geometry='./geometries/verif_bentstepslab_R1300_m01'   
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif_stepslab_R1300_m01'
+# ibc=0
+
 # isol=302
 # rbend=1300.0
 # thup=0.21861514818081262
@@ -168,27 +178,38 @@ ibc=3
 # pref='verif_stepslab_R1300_m02'
 # ibc=0
 
-isol=300
-rbend=2600.0
-rup=2605.0
-rlo=2595.0
-thup=0.04825460807197276
-pmlrlo=0.0
-file_geometry='./geometries/verif_bentstepslab_R2600_m00'
-# the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-pref='verif_stepslab_R2600_m00'
-ibc=0
-
-# isol=302
+# isol=300
 # rbend=2600.0
 # rup=2605.0
 # rlo=2595.0
-# thup=0.15238724408876186
+# thup=0.04825460807197276
 # pmlrlo=0.0
-# file_geometry='./geometries/verif_bentstepslab_R2600_m02'
+# file_geometry='./geometries/verif_bentstepslab_R2600_m00'
 # # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-# pref='verif_stepslab_R2600_m02'
+# pref='verif_stepslab_R2600_m00'
 # ibc=0
+
+# isol=301
+# rbend=2600.0
+# rup=2605.0
+# rlo=2595.0
+# thup=0.07378961018414064
+# pmlrlo=0.0
+# file_geometry='./geometries/verif_bentstepslab_R2600_m01'
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif_stepslab_R2600_m01'
+# ibc=0
+
+isol=302
+rbend=2600.0
+rup=2605.0
+rlo=2595.0
+thup=0.15238724408876186
+pmlrlo=0.0
+file_geometry='./geometries/verif_bentstepslab_R2600_m02'
+# the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+pref='verif_stepslab_R2600_m02'
+ibc=0
 
 
 ctrl='control/control'
@@ -215,15 +236,15 @@ args+=" -ibc ${ibc}"
 args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
 
 ### RUNNING ON PERSONAL LAPTOP
-# Set MPI Procs and OpenMP threads
-nproc=4
-nthreads=1
-mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
-###
+# # Set MPI Procs and OpenMP threads
+# nproc=4
+# nthreads=1
+# mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
+# ###
 
 # ### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
-# # Set MPI Procs and OpenMP threads
-# nproc=32
-# nthreads=56
-# ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
-# ###
+# Set MPI Procs and OpenMP threads
+nproc=24
+nthreads=56
+ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+###

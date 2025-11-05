@@ -201,7 +201,11 @@
             if (RANK .eq. ROOT) write(*,*) 'Uniform isotropic h-refinement...'
             do i=1,refs
                if (RANK .eq. ROOT) write(*,*) '.....before refine_DPG'
-               call refine_DPG(IUNIFORM,1,0.25d0,nstop)
+               if (SLAB_GUIDE.eq.1) then  
+                  call refine_DPG(IADAPTIVE,1,0.d0,nstop)
+               else
+                  call refine_DPG(IUNIFORM,1,0.d0,nstop)
+               endif
                if (RANK .eq. ROOT) write(*,*) '.....after refine_DPG'
                if (IBCFLAG .eq. 3) then
                   call propagate_flag(2,3)

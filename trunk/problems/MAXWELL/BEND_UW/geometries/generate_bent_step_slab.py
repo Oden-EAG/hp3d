@@ -29,9 +29,17 @@ b = 5.0;
 # keff= 2.17655321571770E+02-2.17455000000000E+02;
 # f = open("bentstepslab_R2600_4wl_m00","w+")
 
+# R = 2600.0;
+# keff= 2.17543433386383E+02-2.17480E+02;
+# f = open("bentstepslab_R2600_4wl_m02","w+")
+
 R = 2600.0;
-keff= 2.17543433386383E+02-2.17480E+02;
-f = open("bentstepslab_R2600_4wl_m02","w+")
+keff= 2.17611E+02-2.17480E+02;
+f = open("verif_bentstepslab_R2600_m01","w+")
+
+# R = 1300.0;
+# keff= 2.17611E+02-2.17480E+02;
+# f = open("verif_bentstepslab_R1300_m01","w+")
 
 
 wleff=2.0*math.pi/keff;
@@ -206,22 +214,22 @@ f.write("BilQua              rectangle 1\n")     # bottom face
 f.write("0   1 2 4 3\n")
 f.write("\n")
 f.write("BilQua              rectangle 2\n")     # top face
-f.write("2   9 10 12 11\n")
+f.write("0   9 10 12 11\n")
 f.write("\n")
 f.write("BilQua              rectangle 3\n")     # bottom face
 f.write("0   3 4 6 5\n")
 f.write("\n")
 f.write("BilQua              rectangle 4\n")     # top face
-f.write("2   11 12 14 13\n")
+f.write("0   11 12 14 13\n")
 f.write("\n")
 f.write("BilQua              rectangle 5\n")     # bottom face
 f.write("0   5 6 8 7\n")
 f.write("\n")
 f.write("BilQua              rectangle 6\n")     # top face
-f.write("2   13 14 16 15\n")
+f.write("0   13 14 16 15\n")
 f.write("\n")
 f.write("CylRec              rectangle 7\n")     # inner radius boundary
-f.write("0   1 2 10 9\n")
+f.write("1   1 2 10 9\n")
 f.write("\n")
 f.write("CylRec              rectangle 8\n")     # left cladding-core interface
 f.write("0   3 4 12 11\n")
