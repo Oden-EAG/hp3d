@@ -72,264 +72,36 @@
       real(8) :: kappa_clad,kappa_core
 
       real(8) :: wavenum0,wavenum1
-      complex(8) :: zrotst(3),zxpst(3),zdxpst(3),zd2xpst(3)
+      complex(8) :: zcurv_st(3),zdcurv_st(3),zd2curv_st(3)
       complex(8):: zJ(3,3),zJinv(3,3),zJdet
-      real(8) :: rQ(3,3)
+      real(8) :: rQ(3,3), curv(3)
       integer :: activePML
 !
 !---------------------------------------------------------------------------------------
-!
+!  ...initialize outputs
+      p = ZERO; Gradp = ZERO; Grad2p = ZERO
+!  ...extract coordinates
       x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
 !
       select case (ISOL)
-!
-!  ...polynomial of order NPX*NPY*NPZ
-!     TODO: implement
+!     Constant function
       case(0)
 !
-         p = ZERO
+         p = ZONE + ZI
          Gradp = ZERO
          Grad2p = ZERO
 !
-!  ...sin solution
+!  ...affine function depending on x (normal to the bending plane yz)
       case(1)
-!
-         pi_mod = OMEGA
-         p =dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-!
-!     ...1st order derivatives
-         Gradp(1) = pi_mod*dcos(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Gradp(2) = pi_mod*dcos(x2*pi_mod)*dsin(x1*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Gradp(3) = pi_mod*dcos(x3*pi_mod)*dsin(x1*pi_mod)*dsin(x2*pi_mod)*(1.0D0,1.0D0)
-!
-!     ...2nd derivative (3,3) matrix - Hessian
-         Grad2p(1,1) = -pi_mod**2*dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(1,2) =  pi_mod**2*dcos(x1*pi_mod)*dcos(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(1,3) =  pi_mod**2*dcos(x1*pi_mod)*dcos(x3*pi_mod)*dsin(x2*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(2,1) =  pi_mod**2*dcos(x1*pi_mod)*dcos(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(2,2) = -pi_mod**2*dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(2,3) =  pi_mod**2*dcos(x2*pi_mod)*dcos(x3*pi_mod)*dsin(x1*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(3,1) =  pi_mod**2*dcos(x1*pi_mod)*dcos(x3*pi_mod)*dsin(x2*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(3,2) =  pi_mod**2*dcos(x2*pi_mod)*dcos(x3*pi_mod)*dsin(x1*pi_mod)*(1.0D0,1.0D0)
-         Grad2p(3,3) = -pi_mod**2*dsin(x1*pi_mod)*dsin(x2*pi_mod)*dsin(x3*pi_mod)*(1.0D0,1.0D0)
-!
-!  ...polynomial solution vanishing on the boundary
-      case(2)
-!
-         cn=1.D2*ZONE;     !  cn=1.D2*(ZONE+ZIMG);
-!     ...displacement
-         p = -cn*x1*x2*x3*(x1-1.0D0)*(x2-1.0D0)*(x3-1.0D0)
-!
-!     ...1st order derivatives
-         Gradp(1) =-cn*x2*x3*(x1*2.0D0-1.0D0)*(x2-1.0D0)*(x3-1.0D0)
-         Gradp(2) =-cn*x1*x3*(x2*2.0D0-1.0D0)*(x1-1.0D0)*(x3-1.0D0)
-         Gradp(3) =-cn*x1*x2*(x3*2.0D0-1.0D0)*(x1-1.0D0)*(x2-1.0D0)
-!     ...2nd derivative (3,3) matrix - hessian
-         Grad2p(1,1) =cn*x2*x3*(x2-1.0D0)*(x3-1.0D0)*(-2.0D0)
-         Grad2p(1,2) =-cn*x3*(x1*2.0D0-1.0D0)*(x2*2.0D0-1.0D0)*(x3-1.0D0)
-         Grad2p(1,3) =-cn*x2*(x1*2.0D0-1.0D0)*(x3*2.0D0-1.0D0)*(x2-1.0D0)
-         Grad2p(2,1) =-cn*x3*(x1*2.0D0-1.0D0)*(x2*2.0D0-1.0D0)*(x3-1.0D0)
-         Grad2p(2,2) =cn*x1*x3*(x1-1.0D0)*(x3-1.0D0)*(-2.0D0)
-         Grad2p(2,3) =-cn*x1*(x2*2.0D0-1.0D0)*(x3*2.0D0-1.0D0)*(x1-1.0D0)
-         Grad2p(3,1) =-cn*x2*(x1*2.0D0-1.0D0)*(x3*2.0D0-1.0D0)*(x2-1.0D0)
-         Grad2p(3,2) =-cn*x1*(x2*2.0D0-1.0D0)*(x3*2.0D0-1.0D0)*(x1-1.0D0)
-         Grad2p(3,3) =cn*x1*x2*(x1-1.0D0)*(x2-1.0D0)*(-2.0D0)
-!
-!  ...plane wave
-      case(3)
-!
-         zf_x = exp(-ZIMG*OMEGA*x1)
-         zf_y = exp(-ZIMG*OMEGA*x2)
-         zf_z = exp(-ZIMG*OMEGA*x3)
-!
-!     ...first order derivatives
-         dzf_x = -ZIMG*OMEGA*zf_x
-         dzf_y = -ZIMG*OMEGA*zf_y
-         dzf_z = -ZIMG*OMEGA*zf_z
-!
-!     ...second order derivatives
-         ddzf_x = -OMEGA**2*zf_x
-         ddzf_y = -OMEGA**2*zf_y
-         ddzf_z = -OMEGA**2*zf_z
-!
-         p = zf_x*zf_y*zf_z
-
-!     ...1st order derivatives
-         Gradp(1) = dzf_x*zf_y*zf_z
-         Gradp(2) = zf_x*dzf_y*zf_z
-         Gradp(3) = zf_x*zf_y*dzf_z
-!
-         Grad2p(1,1) = ddzf_x*zf_y*zf_z
-         Grad2p(1,2) = dzf_x*dzf_y*zf_z
-         Grad2p(1,3) = dzf_x*zf_y*dzf_z
-         Grad2p(2,1) = dzf_x*dzf_y*zf_z
-         Grad2p(2,2) = zf_x*ddzf_y*zf_z
-         Grad2p(2,3) = zf_x*dzf_y*dzf_z
-         Grad2p(3,1) = dzf_x*zf_y*dzf_z
-         Grad2p(3,2) = zf_x*dzf_y*dzf_z
-         Grad2p(3,3) = zf_x*zf_y*ddzf_z
-!
-!  ...point source
-      case(4)
-!
-!     ...shift origin
-         xshift = x1 + 0.1d0; yshift = x2 + 0.1d0; zshift = x3 + 0.1d0
-         r = dsqrt(xshift**2 + yshift**2 + zshift**2)
-         r_x = xshift/r ; r_y = yshift/r ;   r_z = zshift/r
-!
-         r_xx = 1.d0/r*(1.d0-r_x**2)
-         r_xy = -r_x/r*r_y
-         r_xz = -r_x/r*r_z
-         r_yx = r_xy
-         r_yy = 1.d0/r*(1.d0-r_y**2)
-         r_yz = -r_y/r*r_z
-         r_zx = r_xz
-         r_zy = r_yz
-         r_zz = 1.d0/r*(1.d0-r_z**2)
-!
-         alpha = -1.d0/(4.d0*PI)
-!
-         p = alpha*exp(ZIMG*OMEGA*r)/r
-!
-         Gradp(1)    = -r_x*(-ZIMG*OMEGA+1.d0/r) * p
-         Gradp(2)    = -r_y*(-ZIMG*OMEGA+1.d0/r) * p
-         Gradp(3)    = -r_z*(-ZIMG*OMEGA+1.d0/r) * p
-!
-         Grad2p(1,1) = (r_x**2/r**2-r_xx*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_x*(-ZIMG*OMEGA+1.d0/r)*Gradp(1)
-         Grad2p(1,2) = (r_x*r_y/r**2-r_xy*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_x*(-ZIMG*OMEGA+1.d0/r)*Gradp(2)
-         Grad2p(1,3) = (r_x*r_z/r**2-r_xz*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_x*(-ZIMG*OMEGA+1.d0/r)*Gradp(3)
-         Grad2p(2,1) = Grad2p(1,2)
-         Grad2p(2,2) = (r_y**2/r**2-r_yy*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_y*(-ZIMG*OMEGA+1.d0/r)*Gradp(2)
-         Grad2p(2,3) = (r_y*r_z/r**2-r_yz*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_y*(-ZIMG*OMEGA+1.d0/r)*Gradp(3)
-         Grad2p(3,1) = Grad2p(1,3)
-         Grad2p(3,2) = Grad2p(2,3)
-         Grad2p(3,3) = (r_z**2/r**2-r_zz*(-ZIMG*OMEGA+1.D0/r))*p   &
-                     -  r_z*(-ZIMG*OMEGA+1.d0/r)*Gradp(3)
-!
-!  ...Gaussian beam
-      case(5)
-!
-!     ...wavenumber
-         rk = OMEGA
-!     ...shift the origin
-         xshift = x1 + 0.02d0; yshift = x2 + 0.02d0; zshift = x3 + 0.02d0
-         theta_x = 35.d0; theta_y=-45.d0;
-         rad_x = theta_x*pi/180.d0;  rad_y = theta_y*pi/180.d0;
-!
-         sinx=sin(rad_x); cosx = cos(rad_x);
-         siny=sin(rad_y); cosy = cos(rad_y);
-!
-         Rx(1,1:3) = (/1.d0, 0.d0,  0.d0/)
-         Rx(2,1:3) = (/0.d0, cosx, -sinx/)
-         Rx(3,1:3) = (/0.d0, sinx,  cosx/)
-!
-         Ry(1,1:3) = (/cosy , 0.0d0, siny/)
-         Ry(2,1:3) = (/0.0d0, 1.0d0, 0.0d0/)
-         Ry(3,1:3) = (/-siny, 0.0d0, cosy/)
-
-!     ...initialize rotation matrix R
-         Rxy = 0.d0
-!
-         call DGEMM('N','N',3,3,3,1.0d0,Rx,3,Ry,3,0.0d0,Rxy,3)
-!
-!     ...new coordinates after rotation
-         x = Rxy(1,1)*xshift+Rxy(1,2)*yshift+Rxy(1,3)*zshift
-         y = Rxy(2,1)*xshift+Rxy(2,2)*yshift+Rxy(2,3)*zshift
-         z = Rxy(3,1)*xshift+Rxy(3,2)*yshift+Rxy(3,3)*zshift
-!
-!     ...change of variable derivatives
-         dxdxs = Rxy(1,1) ; dxdys = Rxy(1,2) ; dxdzs = Rxy(1,3)
-         dydxs = Rxy(2,1) ; dydys = Rxy(2,2) ; dydzs = Rxy(2,3)
-         dzdxs = Rxy(3,1) ; dzdys = Rxy(3,2) ; dzdzs = Rxy(3,3)
-!
-!     ...beam waist radius
-         w0 = 0.05d0
-!
-         r = dsqrt(x**2+y**2)
-!     ...first derivatives (only dependence on x and y)
-         r_x = x/r ; r_y = y/r
-!     ...second derivatives (only dependence on x and y)
-         r_xx = (1.d0-r_x**2)/r ; r_xy = -r_y*r_x/r
-         r_yx = r_xy;             r_yy =  (1.d0-r_y**2)/r
-!
-!     ...pressure
-!
-         p0 = 1.0d0*(2.0d0/pi/w0**2)**0.25;
-         p  = p0*exp(-ZIMG*OMEGA*z)*exp(-r**2/w0**2)
-!
-!     ...derivatives with respect to x,y,z
-         p_x = (-2.d0/w0**2)* x*p
-         p_y = (-2.d0/w0**2)* y*p
-         p_z = (-ZIMG*OMEGA)* p
-!     ...second derivatives with respect to x,y,z
-         p_xx = (-2.d0/w0**2)*(p+x*p_x)
-         p_xy = (-2.d0/w0**2)* x*p_y
-         p_xz = (-2.d0/w0**2)* x*p_z
-         p_yx = p_xy
-         p_yy = (-2.d0/w0**2)*(p+y*p_y)
-         p_yz = (-2.d0/w0**2)* y*p_z
-         p_zx = p_xz
-         p_zy = p_yz
-         p_zz = (-ZIMG*OMEGA)* p_z
-!
-!     ...derivatives with respect to xshift,yshift,zshift
-         Gradp(1) = p_x*dxdxs + p_y*dydxs + p_z*dzdxs
-         Gradp(2) = p_x*dxdys + p_y*dydys + p_z*dzdys
-         Gradp(3) = p_x*dxdzs + p_y*dydzs + p_z*dzdzs
-!     ...second derivatives  with respect to xshift,yshift,zshift
-         Grad2p(1,1) = (p_xx*dxdxs + p_yx*dydxs + p_zx*dzdxs)*dxdxs    &
-                     + (p_xy*dxdxs + p_yy*dydxs + p_zy*dzdxs)*dydxs    &
-                     + (p_xz*dxdxs + p_yz*dydxs + p_zz*dzdxs)*dzdxs
-
-         Grad2p(1,2) = (p_xx*dxdxs + p_yx*dydxs + p_zx*dzdxs)*dxdys    &
-                     + (p_xy*dxdxs + p_yy*dydxs + p_zy*dzdxs)*dydys    &
-                     + (p_xz*dxdxs + p_yz*dydxs + p_zz*dzdxs)*dzdys
-
-         Grad2p(1,3) = (p_xx*dxdxs + p_yx*dydxs + p_zx*dzdxs)*dxdzs    &
-                     + (p_xy*dxdxs + p_yy*dydxs + p_zy*dzdxs)*dydzs    &
-                     + (p_xz*dxdxs + p_yz*dydxs + p_zz*dzdxs)*dzdzs
-
-         Grad2p(2,1) = (p_xx*dxdys + p_yx*dydys + p_zx*dzdys)*dxdxs    &
-                     + (p_xy*dxdys + p_yy*dydys + p_zy*dzdys)*dydxs    &
-                     + (p_xz*dxdys + p_yz*dydys + p_zz*dzdys)*dzdxs
-
-         Grad2p(2,2) = (p_xx*dxdys + p_yx*dydys + p_zx*dzdys)*dxdys    &
-                     + (p_xy*dxdys + p_yy*dydys + p_zy*dzdys)*dydys    &
-                     + (p_xz*dxdys + p_yz*dydys + p_zz*dzdys)*dzdys
-
-         Grad2p(2,3) = (p_xx*dxdys + p_yx*dydys + p_zx*dzdys)*dxdzs    &
-                     + (p_xy*dxdys + p_yy*dydys + p_zy*dzdys)*dydzs    &
-                     + (p_xz*dxdys + p_yz*dydys + p_zz*dzdys)*dzdzs
-
-         Grad2p(3,1) = (p_xx*dxdzs + p_yx*dydzs + p_zx*dzdzs)*dxdxs    &
-                     + (p_xy*dxdzs + p_yy*dydzs + p_zy*dzdzs)*dydxs    &
-                     + (p_xz*dxdzs + p_yz*dydzs + p_zz*dzdzs)*dzdxs
-
-         Grad2p(3,2) = (p_xx*dxdzs + p_yx*dydzs + p_zx*dzdzs)*dxdys    &
-                     + (p_xy*dxdzs + p_yy*dydzs + p_zy*dzdzs)*dydys    &
-                     + (p_xz*dxdzs + p_yz*dydzs + p_zz*dzdzs)*dzdys
-
-         Grad2p(3,3) = (p_xx*dxdzs + p_yx*dydzs + p_zx*dzdzs)*dxdzs    &
-                     + (p_xy*dxdzs + p_yy*dydzs + p_zy*dzdzs)*dydzs    &
-                     + (p_xz*dxdzs + p_yz*dydzs + p_zz*dzdzs)*dzdzs
-!
-!
-!  ...affine function depending on x
-      case(10)
-         cn = 1.d0*ZONE
-         a = 0.d0;    b =1.d0
+         cn = cmplx(0.5d0,0.d0)
+         a = 1.d0;    b =1.d0
          p = cn*(a*x1+b)
 !     ...1st order derivatives
          Gradp(1) = cn*a
 !     ...second order derivatives are all zero
 !
-!  ...quadratic bubble depending on x
-      case(11)
+!  ...quadratic bubble depending on x (normal to the bending plane yz)
+      case(2)
          cn = 1.d0*ZONE
          p = cn*(x1-x1**2)
 !     ...1st order derivatives
@@ -338,7 +110,7 @@
          Grad2p(1,1) = cn*(-2.d0)
 !
 !  ...polynomial depending on r^2 = y^2+z^2
-      case(12)
+      case(3)
          cn = 1.d0*ZONE
          p = cn*(x2**2 + x3**2 - RBEND**2)
 !     ...1st order derivatives
@@ -349,26 +121,26 @@
          Grad2p(3,3) = cn*2.d0
 !
 !  ...linear w.r.t   r = sqrt(y^2+z^2)
-      case(13)
-            r = dsqrt(x2**2+x3**2)
-            dr_x2 = x2/r
-            dr_x3 = x3/r
-            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
-            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
-            d2r_x2x3 = -1.d0*x2*x3/r**3
+      case(4)
+         r = dsqrt(x2**2+x3**2)
+         dr_x2 = x2/r
+         dr_x3 = x3/r
+         d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+         d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+         d2r_x2x3 = -1.d0*x2*x3/r**3
 !
-            cn = 1.d0*ZONE
-            p = cn*r
+         cn = 1.d0*ZONE
+         p = cn*r
 !     ...1st order derivatives
-            Gradp(2) = cn*dr_x2
-            Gradp(3) = cn*dr_x3
+         Gradp(2) = cn*dr_x2
+         Gradp(3) = cn*dr_x3
 !     ...second order derivatives
-            Grad2p(2,2) = cn*d2r_x2
-            Grad2p(3,2) = cn*d2r_x2x3
-            Grad2p(2,3) = Grad2p(3,2)
-            Grad2p(3,3) = cn*d2r_x3
+         Grad2p(2,2) = cn*d2r_x2
+         Grad2p(3,2) = cn*d2r_x2x3
+         Grad2p(2,3) = Grad2p(3,2)
+         Grad2p(3,3) = cn*d2r_x3
 !  ...rational function depending on r = sqrt(y^2+z^2)
-      case(14)
+      case(5)
             r = dsqrt(x2**2+x3**2)
             dr_x2 = 2.d0*x2/r
             dr_x3 = 2.d0*x3/r
@@ -388,85 +160,10 @@
             Grad2p(2,2) = cn*(d2u_r*dr_x2**2+du_r*d2r_x2)
             Grad2p(3,2) = cn*(d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3)
             Grad2p(2,3) = Grad2p(3,2)
-            Grad2p(3,3) = cn*(d2u_r*dr_x3**2+du_r*d2r_x3)
-!            
-!  ...Separable function u(r)*v(x)*w(theta)
-      case(15)
-            r = dsqrt(x2**2+x3**2)
-            dr_x2 = x2/r
-            dr_x3 = x3/r
-            d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
-            d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
-            d2r_x2x3 = -1.d0*x2*x3/r**3
-!
-            ! cn = RBEND*ZONE
-            ! u = r**(-1)
-            ! du_r = -r**(-2)
-            ! d2u_r = 2.d0*r**(-3)
-            ! v = RCORE**2 - x1**2
-            ! dv_x1 = -2.d0*x1
-            ! d2v_x1 = 2.d0
-!            
-            ! call real_eval_aaa(r - RBEND,u,du_r)
-
-            wavenum0 = OMEGA*sqrt(EPSILON*MU)
-!        ...u(r) is an eigenfunction of Bessel's equation with appropriate b.c.s
-            call bessel_preset(wavenum0, RBEND, r,    u, du_r, d2u_r)
-            ! 
-            ! write (*,*) 'mfd_solutions: local wavenum0=',wavenum0
-            ! call pause
-            ! write(*,*) 'mfd_solutions: u,du_r,d2u_r=',u,du_r,d2u_r
-
-            ! u = ZONE; du_r = ZERO; d2u_r = ZERO
-
-            cf = 0.5d0*PI/RCORE
-            v =     1.d0 ! COS(x1*cf)
-            dv_x1 = 0.d0 !-SIN(x*cf)*cf
-            d2v_x1 = 0.d0
-
-            th = atan2(x3,x2)
-            dth_x2    = -x3/r**2
-            dth_x3    =  x2/r**2
-            d2th_x2   =  x3*2.d0*r*dr_x2/r**4
-            d2th_x2x3 = -(r**2-x3*2.d0*r*dr_x3)/r**4
-            d2th_x3   = -x2*2.d0*r*dr_x3/r**4
-
-            znu = sqrt(ZLAMBDA_MODE)-ENVELOPEK*RBEND
-            ! write(*,*) 'mfd_solutions: sqrt(ZLAMBDA_MODE)/RBEND=',sqrt(ZLAMBDA_MODE)/RBEND
-            ! write(*,*) 'mfd_solutions: ENVELOPEK=',ENVELOPEK
-            ! write(*,*) 'mfd_solutions: znu=',znu
-            ! write(*,*) 'mfd_solutions: OMEGA=',OMEGA
-            ! call pause
-            w = exp(-ZI*znu*th)
-            dw_th = -ZI*znu*w
-            d2w_th = -znu**2*w
-!     ...mfd solution for the polarized component of E
-            cn = 1.d0*ZONE
-            p = cn * u * v * w
-!     ...1st order derivatives
-            Gradp(1) = cn * u * dv_x1 * w
-            Gradp(2) = cn * (du_r*dr_x2 * v * w  +  u * v * dw_th*dth_x2 )
-            Gradp(3) = cn * (du_r*dr_x3 * v * w  +  u * v * dw_th*dth_x3 )
-!     ...second order derivatives
-            Grad2p(1,1) = cn * (u * d2v_x1 * w )
-            Grad2p(1,2) = cn * (du_r*dr_x2 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x2)
-            Grad2p(1,3) = cn * (du_r*dr_x3 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x3)
-            Grad2p(2,1) = Grad2p(1,2)
-            Grad2p(2,2) = cn * ( (d2u_r*dr_x2**2+du_r*d2r_x2) * v * w            &
-                                + 2.d0*(du_r*dr_x2 * v * dw_th*dth_x2)           &
-                                + u * v * (d2w_th*dth_x2**2+dw_th*d2th_x2) )
-            Grad2p(2,3) = cn * ( (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v * w       &
-                                + du_r*dr_x2 * v * dw_th*dth_x3                  &
-                                + du_r*dr_x3 * v * dw_th*dth_x2                  &
-                                + u * v * (dw_th*dth_x2*dth_x3+d2w_th*d2th_x2x3))
-            Grad2p(3,1) = Grad2p(1,3)
-            Grad2p(3,2) = Grad2p(2,3)
-            Grad2p(3,3) = cn * ( (d2u_r*dr_x3**2+du_r*d2r_x3) * v * w            &
-                                + 2.d0*(du_r*dr_x3 * v * dw_th*dth_x3)           &
-                                + u * v * (d2w_th*dth_x3**2+dw_th*d2th_x3) )
+            Grad2p(3,3) = cn*(d2u_r*dr_x3**2+du_r*d2r_x3)      
 !
 !  ...Function for partly bent waveguide
-      case(16)
+      case(6)
          if (x3.ge.0.d0) then
             r = dsqrt(x2**2+x3**2)
             dr_x2 = x2/r
@@ -483,76 +180,175 @@
             d2r_x2x3 = 0.d0
          endif
 !
-            cn = ZONE
-            cf = 0.5d0*PI/RCORE
-            u = COS((r-RBEND) * cf)
-            du_r = -SIN((r-RBEND)*cf) * cf
-            d2u_r = -u * cf**2
-            v = 1.d0
-            dv_x1 = 0.d0
-            d2v_x1 = 0.d0
+         cn = ZONE
+         cf = 0.5d0*PI/RCORE
+         u = COS((r-RBEND) * cf)
+         du_r = -SIN((r-RBEND)*cf) * cf
+         d2u_r = -u * cf**2
+         v = 1.d0
+         dv_x1 = 0.d0
+         d2v_x1 = 0.d0
 ! 
-            p = cn * u * v
+         p = cn * u * v
 !     ...1st order derivatives
-            Gradp(1) = cn * u * dv_x1
-            Gradp(2) = cn * du_r*dr_x2 * v
-            Gradp(3) = cn * du_r*dr_x3 * v
+         Gradp(1) = cn * u * dv_x1
+         Gradp(2) = cn * du_r*dr_x2 * v
+         Gradp(3) = cn * du_r*dr_x3 * v
 !     ...second order derivatives
-            Grad2p(1,1) = cn * u * d2v_x1
-            Grad2p(1,2) = cn * du_r*dr_x2 * dv_x1
-            Grad2p(1,3) = cn * du_r*dr_x3 * dv_x1
-            Grad2p(2,1) = Grad2p(1,2)
-            Grad2p(2,2) = cn * (d2u_r*dr_x2**2+du_r*d2r_x2) * v
-            Grad2p(2,3) = cn * (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v
-            Grad2p(3,1) = Grad2p(1,3)
-            Grad2p(3,2) = Grad2p(2,3)
-            Grad2p(3,3) = cn * (d2u_r*dr_x3**2+du_r*d2r_x3) * v
+         Grad2p(1,1) = cn * u * d2v_x1
+         Grad2p(1,2) = cn * du_r*dr_x2 * dv_x1
+         Grad2p(1,3) = cn * du_r*dr_x3 * dv_x1
+         Grad2p(2,1) = Grad2p(1,2)
+         Grad2p(2,2) = cn * (d2u_r*dr_x2**2+du_r*d2r_x2) * v
+         Grad2p(2,3) = cn * (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v
+         Grad2p(3,1) = Grad2p(1,3)
+         Grad2p(3,2) = Grad2p(2,3)
+         Grad2p(3,3) = cn * (d2u_r*dr_x3**2+du_r*d2r_x3) * v
+!
+!  ...Separable function u(r)*v(x)*w(theta), which is a mode of a bent vacuum waveguide with PEC walls: 11-14
+!     available for RBEND = 1300 ONLY
+      case(11,12,13,14)
+         r = dsqrt(x2**2+x3**2)
+         dr_x2 = x2/r
+         dr_x3 = x3/r
+         d2r_x2 = 1.d0/r-1.d0*x2**2/r**3
+         d2r_x3 = 1.d0/r-1.d0*x3**2/r**3
+         d2r_x2x3 = -1.d0*x2*x3/r**3
+!            
+!         ...factor u(r) evaluated with the AAA interpolation of preset Bessel functions
+         ! call real_eval_aaa(r - RBEND,u,du_r)
+!
+!        ...factor u(r) evaluated with direct computation of preset Bessel function
+         wavenum0 = OMEGA*sqrt(EPSILON*MU)
+!        ...u(r) is an eigenfunction of Bessel's equation with appropriate b.c.s
+         call bessel_preset(wavenum0, RBEND, r,    u, du_r, d2u_r)
+         ! 
+         ! write (*,*) 'mfd_solutions: local wavenum0=',wavenum0
+         ! call pause
+         ! write(*,*) 'mfd_solutions: u,du_r,d2u_r=',u,du_r,d2u_r
 
-      case(101)
+         ! u = ZONE; du_r = ZERO; d2u_r = ZERO
+
+         cf = 0.5d0*PI/RCORE
+         v =     1.d0 ! COS(x1*cf)
+         dv_x1 = 0.d0 !-SIN(x*cf)*cf
+         d2v_x1 = 0.d0
+
+
+!        ...check if we're within the PML      ARE WE ASSUMING THAT THIS IS EVALUATED AT THE BOTTOM FACE?
+         call is_pml(Mdle,Xp,activePML)
+         ! if so, modify input coordinate r
+         if (activePML.ne.0) then 
+            ! get rotation matrix
+            call get_local_rotation(Mdle,Xp,activePML,rQ)
+            ! get pml stretched coordinates and derivatives
+            call get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
+            ! get PML Jacobian
+            call get_stretch_J(zdcurv_st,rQ,zJ,zJinv,zJdet)
+         else
+            call cartesian2curvilinear_real(Xp,curv)
+            zcurv_st = cmplx(curv,0.d0 , 8)
+            zJ = cmplx(IDENTITY,0.d0 , 8)
+            zJinv = zJ
+            ZJdet = ZONE
+         endif
+
+         ! FACTOR w(theta)
+         dth_x2    = -x3/r**2
+         dth_x3    =  x2/r**2
+         d2th_x2   =  x3*2.d0*r*dr_x2/r**4
+         d2th_x2x3 = -(r**2-x3*2.d0*r*dr_x3)/r**4
+         d2th_x3   = -x2*2.d0*r*dr_x3/r**4
+
+         znu = sqrt(ZLAMBDA_MODE_DP)-ENVELOPEK*RBEND
+!        complex-valued theta comes from zcurv_st(3) (stretched curvilinear coordinates)
+         w = exp(-ZI*znu* zcurv_st(3) )
+         dw_th = -ZI*znu*w
+         d2w_th = -znu**2*w
+         ! current derivatives were computed w.r.t complex stretched coordinate \tilde{\theta}
+         ! pass to derivatives w.r.t physical coordinate theta
+         d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
+         dw_th = dw_th * zdcurv_st(3)
+
+!     ...mfd solution for the polarized component of E
+         cn = 1.d0*ZONE
+         p = cn * u * v * w
+!     ...1st order derivatives
+         Gradp(1) = cn * u * dv_x1 * w
+         Gradp(2) = cn * (du_r*dr_x2 * v * w  +  u * v * dw_th*dth_x2 )
+         Gradp(3) = cn * (du_r*dr_x3 * v * w  +  u * v * dw_th*dth_x3 )
+!     ...second order derivatives
+         Grad2p(1,1) = cn * (u * d2v_x1 * w )
+         Grad2p(1,2) = cn * (du_r*dr_x2 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x2)
+         Grad2p(1,3) = cn * (du_r*dr_x3 * dv_x1 * w  +  u * dv_x1 * dw_th*dth_x3)
+         Grad2p(2,1) = Grad2p(1,2)
+         Grad2p(2,2) = cn * ( (d2u_r*dr_x2**2+du_r*d2r_x2) * v * w            &
+                              + 2.d0*(du_r*dr_x2 * v * dw_th*dth_x2)           &
+                              + u * v * (d2w_th*dth_x2**2+dw_th*d2th_x2) )
+         Grad2p(2,3) = cn * ( (d2u_r*dr_x2*dr_x3+du_r*d2r_x2x3) * v * w       &
+                              + du_r*dr_x2 * v * dw_th*dth_x3                  &
+                              + du_r*dr_x3 * v * dw_th*dth_x2                  &
+                              + u * v * (dw_th*dth_x2*dth_x3+d2w_th*d2th_x2x3))
+         Grad2p(3,1) = Grad2p(1,3)
+         Grad2p(3,2) = Grad2p(2,3)
+         Grad2p(3,3) = cn * ( (d2u_r*dr_x3**2+du_r*d2r_x3) * v * w            &
+                              + 2.d0*(du_r*dr_x3 * v * dw_th*dth_x3)           &
+                              + u * v * (d2w_th*dth_x3**2+dw_th*d2th_x3) )
+!
+!     Propagating modes of straight step-index fiber: 101,111,1110,121,1210,102.   TO BE EVALUATED ONLY AT THE BOTTOM FACE (x3=0)
+      case(101) ! LP01 mode
             kappa_core=3.89635821866549d0
             kappa_clad=7.94630920866814d0
             call get_LP01_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
-      case(111)
+      case(111) ! LP11a mode
             kappa_core=6.1398251268689d0
             kappa_clad=6.37400853618783d0
-            call get_LP11a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+            call get_LP11a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)! 
+      case(1110) ! LP11b mode
+            kappa_core=6.1398251268689d0
+            kappa_clad=6.37400853618783d0
+            call get_LP11b_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
-      case(121)
+      case(121) ! LP21a mode
             kappa_core=8.08596454606084d0
             kappa_clad=3.59758457409596d0
             call get_LP21a_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+      case(1210) ! LP21b mode
+            kappa_core=8.08596454606084d0
+            kappa_clad=3.59758457409596d0
+            call get_LP21b_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 ! 
-      case(102)
+      case(102) ! LP02 mode
             kappa_core=8.47166634119017d0
             kappa_clad=2.56052861953769d0
             call get_LP02_transversal(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
 !
-      case(200)
+!     Straight Step-index slab waveguide modes: 200-202
+      case(200) ! first even mode
             kappa_core=2.55570005662253d0
             kappa_clad=8.47312425428247d0
-            call get_step_slab_even(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+            call get_step_slab_even(Xp,1.d0,kappa_core,kappa_clad, p,Gradp)
 !
-      case(201)
+      case(201) ! first odd mode
             kappa_core=5.06465178791433d0
             kappa_clad=7.25773653938378d0
-            call get_step_slab_odd (Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
+            call get_step_slab_odd (Xp,1.d0,kappa_core,kappa_clad, p,Gradp)
 !
-      case(202)
+      case(202) ! second even mode
             kappa_core=7.4313660759331d0
             kappa_clad=4.80627045154566d0
-            call get_step_slab_even(Xp,E_AMPL,kappa_core,kappa_clad, p,Gradp)
-
+            call get_step_slab_even(Xp,1.d0,kappa_core,kappa_clad, p,Gradp)
 !
-      case(300,301,302) ! can be called with any NEXACT
+!     Bent Step-index slab waveguide modes with radiation condition: 300-302. TO BE EVALUATED ONLY AT THE BOTTOM FACE (x3=0)
+      case(300,301,302) ! can be called with any NEXACT.
             !
             ! EIGENFUNCTIONS OF THE BENT STEP-INDEX SLAB WAVEGUIDE 
             ! WITH NEUMANN BC ON THE INNER FACE, PML ON OUTER FACE
-            if (ISOL.ne.IMODE) then
-               write(*,*) 'mfd_solutions: input ISOL does not match the preloaded mode for bent 3-layer waveguide IMODE!'
-               write(*,*) '               Go to header of bessel_evaluation module and uncomment the required parameters. STOP'
-               stop
-            endif
+            !
+            ! AVAILABLE FOR RBEND = 1300 AND 2600
+            !
+            ! MAKE SURE THAT PML STRENGTH COEFFICIENT IS SET TO 400!
             !
             if (SLAB_GUIDE.eq.0) then
                write(*,*) 'mfd_solutions: option only available for the SLAB_GUIDE case! STOP'
@@ -566,13 +362,12 @@
                ! get rotation matrix
                call get_local_rotation(Mdle,Xp,activePML,rQ)
                ! get pml stretched coordinates and derivatives
-               call get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
+               call get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
                ! get PML Jacobian
-               call get_stretch_J(zdxpst,rQ,zJ,zJinv,zJdet)
-
-               call cartesian2curvilinear_complex(Zxpst,Zrotst)
+               call get_stretch_J(zdcurv_st,rQ,zJ,zJinv,zJdet)
             else
-               call cartesian2curvilinear_complex(cmplx(Xp,0.d0 , 8),Zrotst)
+               call cartesian2curvilinear_real(Xp,curv)
+               zcurv_st = cmplx(curv,0.d0 , 8)
                zJ = cmplx(IDENTITY,0.d0 , 8)
                zJinv = zJ
                ZJdet = ZONE
@@ -598,15 +393,24 @@
             ! write(*,*) 'mfd_solutions: activePML = ',activePML
             ! write(*,*) 'mfd_solutions: rQ(:,3) = ',rQ(:,3)
             ! write(*,*) 'mfd_solutions: zJdet   = ',zJdet
-            ! write(*,*) 'mfd_solutions: Zxpst   = ',zxpst
-            ! write(*,*) 'mfd_solutions: Zrotst  = ',zrotst
+            ! write(*,*) 'mfd_solutions: Zcurv_st   = ',zcurv_st
+            ! write(*,*) 'mfd_solutions: zcurv_st  = ',zcurv_st
+            ! write(*,*) 'mfd_solutions: BEFORE bessel_stepindex_preset'
+            ! write(*,*) 'mfd_solutions: Mdle, Xp=',Mdle,Xp
+            ! call pause   
 
-!           complex-valued r comes from zrotst(2) (stretched rotated coordinates)
-            call bessel_stepindex_preset(wavenum0, wavenum1, RBEND, RCORE, RCLAD, Zrotst(2),    u, du_r, d2u_r)
+!           complex-valued r comes from zcurv_st(2) (stretched rotated coordinates)
+            call bessel_stepindex_preset(wavenum0, wavenum1, RBEND, RCORE, RCLAD, zcurv_st(2),    u, du_r, d2u_r)
+
+            ! write(*,*) 'mfd_solutions: zcurv_st(2), u = ',zcurv_st(2), u
+
+            ! write(*,*) 'mfd_solutions: AFTER bessel_stepindex_preset'
+            ! call pause  
+
             ! current derivatives were computed w.r.t complex stretched coordinate \tilde{r}
             ! pass to derivatives w.r.t physical coordinate r
-            d2u_r = d2u_r* zdxpst(2)**2 + du_r * zd2xpst(2)
-            du_r = du_r * zdxpst(2)
+            d2u_r = d2u_r* zdcurv_st(2)**2 + du_r * zd2curv_st(2)
+            du_r = du_r * zdcurv_st(2)
 
 
             ! FACTOR v(x)
@@ -623,14 +427,14 @@
             d2th_x3   = -x2*2.d0*r*dr_x3/r**4
 
             znu = sqrt(ZLAMBDA_MODE)-ENVELOPEK*RBEND
-!           complex-valued r comes from zrotst(2) (stretched rotated coordinates)
-            w = exp(-ZI*znu* zrotst(3) )
+!           complex-valued theta comes from zcurv_st(3) (stretched curvilinear coordinates)
+            w = exp(-ZI*znu* zcurv_st(3) )
             dw_th = -ZI*znu*w
             d2w_th = -znu**2*w
             ! current derivatives were computed w.r.t complex stretched coordinate \tilde{\theta}
             ! pass to derivatives w.r.t physical coordinate theta
-            d2w_th = d2w_th* zdxpst(3)**2 + dw_th * zd2xpst(3)
-            dw_th = dw_th * zdxpst(3)
+            d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
+            dw_th = dw_th * zdcurv_st(3)
 
 !     ...mfd solution for the polarized component of E
             cn = 1.d0*ZONE

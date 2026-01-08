@@ -8,6 +8,7 @@ SRC_COMMON  = \
         common/mfd_solutions.F90 \
         common/bessel_fn.F90 \
         common/residual.F90 \
+        common/power.F90 \
         common/set_environment.F90
 
 SRC_UW      = \

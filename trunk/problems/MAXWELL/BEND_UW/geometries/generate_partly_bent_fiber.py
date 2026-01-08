@@ -56,23 +56,47 @@ def print_hexa(type,ndom,p1,p2,p3,p4,p5,p6,p7,p8,nh,nro=0,nri=0):
 	f.write("\n")
 
 
-
-
 # Set fiber radii, bending radius of cross section's center 
 # and spanning angle in radians (start angle assumed 0)
-r_core = 0.5;
-r_prism = 0.5*r_core;
-r_inner_clad = 5.0;
-r_outer_clad = 6.25;
+
+# domain formed by core+cladding
+r_core = 0.5; # core radius
+r_prism = 0.5*r_core; # core innermost part
+r_inner_clad = 3.75; # cladding innermost part
+r_outer_clad = 5.0; # cladding outer part (contains pml)
+suffix="pmlclad"
+
+# # domain formed by core+cladding+coating
+# r_core = 0.5; # core radius
+# r_prism = 0.5*r_core; # core innermost part
+# r_inner_clad = 5.0; # cladding
+# r_outer_clad = 5.0*4/3;# coating (contains pml)
+# suffix="pmlcoat"
+
+# # domain formed by core+cladding+coating+air
+# r_core = 5.0;   # actually, the cladding radius
+# r_prism = 0.1*r_core;   # this is the only core
+# r_inner_clad = 10.0;    # coating
+# r_outer_clad = 10.0*4/3;    # air (contains pml)
+# suffix="pmlair"
+
+keff=2.17505405635569E+02-2.17375000000000E+02;   # propag constant of straight LP02 mode minus envelope wnum that results in 4 through 8 wavelengths
+
+
+
+# R = 1300.0;
+# f = open("final_bentfiber_R1300_"+suffix,"w+")
+
+
+R = 2600.0;
+f = open("final_bentfiber_R2600_"+suffix,"w+")
+
+
 
 
 # R = 1300.0;
 # keff=2.17635449786844E+02-2.17455000000000E+02;
 # f = open("fiber_R1300_4wl_lp01","w+")
-
-# R = 1300.0;
-# keff=2.17505405635569E+02-2.17455000000000E+02;
-# f = open("fiber_R1300_4wl_lp02","w+")
 
 # R = 2600.0;
 # keff=2.17635449786844E+02-2.17455000000000E+02;
@@ -82,13 +106,13 @@ r_outer_clad = 6.25;
 # keff=2.17505405635569E+02-2.1748E+02;
 # f = open("fiber_R2600_4wl_lp02","w+")
 
-R = 1300.0;
-keff=2.17505405635569E+02-2.1748000000000E+02;
-f = open("straightfiber_2wl_lp02","w+")
+# R = 1300.0;
+# keff=2.17505405635569E+02-2.1748000000000E+02;
+# f = open("straightfiber_2wl_lp02","w+")
 
 wleff=2.0*math.pi/keff;
-nwl_bent = 0;
-nwl_strt = 2;
+nwl_bent = 4;
+nwl_strt = 0;
 theta_end = nwl_bent*wleff/R;
 print("wleff=",wleff)
 print("theta_end=",theta_end)
@@ -96,10 +120,11 @@ print("theta_end=",theta_end)
 # angle (wrt plane yz) to place first point in cross section. 
 # Typical values 0 or pi/4
 phi1 = math.pi/4.0; 
-hexlayers_core = 1; # don't include the inner prisms layer
-hexlayers_inner_clad = 1; # 
-hexlayers_outer_clad = 1; # 
-theta_subdiv = 0;
+
+theta_subdiv = 1;
+hexlayers_core = 1;
+hexlayers_inner_clad = 1;
+hexlayers_outer_clad = 1;
 
 
 

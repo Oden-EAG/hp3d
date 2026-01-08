@@ -39,14 +39,17 @@ module commonParam
    real(8) :: THUP,THLO,RUP,RLO,XUP,XLO,RHOUP,RHOLO
 !..PML proportion w.r.t upper and lower bounds of each coordinate
    real(8) :: PMLTHUP,PMLTHLO,PMLRUP,PMLRLO,PMLXUP,PMLXLO,PMLRHOUP,PMLRHOLO
-!..flag: PML for toroidal geometry rho coordinate
-   integer :: TOROIDAL_PML
+!..flag/identifier of a multi-layer toroidal domain: 
+!  0 implies no toroidal mapping, 1 for single material (core), 2 for core+cladding, 3 for core+cladding+coating, 4 for core+cladding+coating+air
+   integer :: TOROIDAL_DMN
 !..flag: slab geometry
    integer :: SLAB_GUIDE
 !  WAVEGUIDE/FIBER RADII(or halfwidths)
    real(8) :: RCORE,RCLAD,RCOAT
 !  FIBER REFRACTIVE INDICES AND ATTENUATION IN COATING
-   real(8) :: REFRCORE,REFRCLAD,REFRCOAT,ATTNCOAT
+   real(8) :: REFRCORE,REFRCLAD,REFRCOAT,REFRAIR,ATTNCOAT
+!  Elasto-optic effect flag
+   integer :: ELASTOOPTIC
 !
 !..impedance BC:
 !  GAMMA  : impedance constant

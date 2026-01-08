@@ -26,6 +26,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    use par_mesh     , only: DISTRIBUTED
    use mpi_wrapper
    use sorts        , only: qsort_duplet
+   use bessel_evaluation, only: EXACT_LOSS_EXP
 !
    implicit none
 !
@@ -38,6 +39,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    integer :: PhysNick
 !
    integer, parameter :: max_step = 50
+   integer, dimension(max_step), save :: nreles_mesh
    integer, dimension(max_step), save :: nrdof_tot_mesh
    integer, dimension(max_step), save :: nrdof_con_mesh
    real(8), dimension(max_step), save :: residual_mesh
@@ -45,6 +47,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    real(8), dimension(max_step), save :: error_mesh
    real(8), dimension(max_step), save :: rel_error_mesh
    real(8), dimension(max_step), save :: rate_error_mesh
+   real(8), dimension(max_step), save :: input_power_mesh
+   real(8), dimension(max_step), save :: final_power_mesh
+   real(8), dimension(max_step), save :: final_loss_exp_mesh
+   real(8), dimension(max_step), save :: final_loss_exp_error_mesh
 !
    real(8) :: elem_resid(NRELES)
    integer :: elem_ref_flag(NRELES)
@@ -64,6 +70,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !
    real(8) :: errorH, errorE, errorV, errorQ
    real(8) :: rnormH, rnormE, rnormV, rnormQ
+   real(8) :: tmp_loss_exp,tmp_final_power,tmp_input_power,tmp_loss_exp_error
 !
    real(8) :: resid_subd, resid_tot, elem_resid_max
    real(8) :: error_tot,  rnorm_tot
@@ -96,6 +103,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    irefineold=Irefine
 !
 !..get dof count from solver
+   nreles_mesh(istep)    = NRELES
    nrdof_tot_mesh(istep) = NRDOF_TOT
    nrdof_con_mesh(istep) = NRDOF_CON
    if (NRDOF_TOT .eq. 0) then
@@ -182,6 +190,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
  1010 format(' elem_residual  : ',f12.5,'  seconds')
    endif
 !
+!..compute final loss exponent fo this mesh
+   call get_power(4,.false.,-1,tmp_input_power,tmp_final_power,tmp_loss_exp)
+   tmp_loss_exp_error = abs( tmp_loss_exp - EXACT_LOSS_EXP )
+
    if (RANK .ne. ROOT) goto 70
 !
 !..update and display convergence history
@@ -190,6 +202,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
       error_mesh(istep)     = sqrt(error_tot)
       rel_error_mesh(istep) = sqrt(error_tot/rnorm_tot)
    endif
+   input_power_mesh(istep) = tmp_input_power
+   final_power_mesh(istep) = tmp_final_power
+   final_loss_exp_mesh(istep) = tmp_loss_exp
+   final_loss_exp_error_mesh(istep) = tmp_loss_exp_error
 !
 !..compute decrease rate for the residual and error
    select case(istep)
@@ -212,19 +228,23 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    write(*,*) 'HISTORY OF REFINEMENTS'
    if (NEXACT.eq.0) write(*,7005)
    if (NEXACT.gt.0) write(*,7006)
- 7005  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  ',/)
- 7006  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  |', &
-              ' field error  |','rel field error|','   error rate ',/)
+ 7005  format(' mesh |','     nreles |','  nrdof_tot |','  nrdof_con |','    residual   |',' residual rate |', &
+              '   input_power  |','   final_power  |',' final_loss_exp |',' loss_exp_error '/)
+ 7006  format(' mesh |','     nreles |','  nrdof_tot |','  nrdof_con |','    residual   |',' residual rate |', &
+              ' field error  |','rel field error|', '   error rate  |'                                         &
+              '   input_power  |','   final_power  |',' final_loss_exp |',' loss_exp_error '/)
 !
    do i=1,istep
       if (NEXACT.eq.0) then
-         write(*,7003) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i)
- 7003    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2)
+         write(*,7003) i,nreles_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i),         &
+                       input_power_mesh(i),final_power_mesh(i),final_loss_exp_mesh(i),final_loss_exp_error_mesh(i)
+ 7003    format(2x,i2,'  | ',3(i10,' | '),es12.5,'  |      ',f7.2,4('  |  ',es12.5))
       else
-         write(*,7004) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
-                       error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
- 7004    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2,'          ', &
-                2(' | ',es12.5),'  |',f7.2)
+         write(*,7004) i,nreles_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i),         &
+                       error_mesh(i),rel_error_mesh(i),rate_error_mesh(i),                                         &
+                       input_power_mesh(i),final_power_mesh(i),final_loss_exp_mesh(i),final_loss_exp_error_mesh(i)
+ 7004    format(2x,i2,'  | ',3(i10,' | '),es12.5,'  |       ',f7.2, &
+                2(' | ',es12.5),'  |      ',f7.2,3('  |  ',es12.5))
       endif
       if (i .eq. istep) write(*,*)
    enddo
@@ -309,11 +329,14 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
                case(MDLB)
                   if (SLAB_GUIDE.eq.1) then 
                      kref = 011     ! iso in yz
+                     ! kref = 010     ! only in y
                   else 
                      kref = 111     ! iso
+                     ! kref = 110     ! only in x and y
                   endif
                case(MDLP)
                   kref = 11      ! iso
+                  ! kref = 10      ! only in xy
                case(MDLN,MDLD)
                   call get_isoref(mdle, kref)
                case default

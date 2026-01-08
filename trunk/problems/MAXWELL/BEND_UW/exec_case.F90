@@ -9,7 +9,7 @@
       use par_mesh
       use paraview      , only: VLEVEL,paraview_select_attr, &
                                 SECOND_ORDER_VIS,VIS_VTU
-      use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
+      use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval,zoltan_w_set_lb
       use mpi_wrapper
 !
       implicit none
@@ -25,9 +25,9 @@
       character(len=2) :: vis_level
 !
       integer :: i,mdle,kref
-      real(8) :: res
+      real(8) :: res, void
 !
-      integer :: src,count,ierr,refs,nstop
+      integer :: lb, src,count,ierr,refs,nstop, numPts
 !
 !----------------------------------------------------------------------
 !
@@ -225,8 +225,16 @@
             endif
             count = 1; src = ROOT
             call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-            if (RANK .eq. ROOT) write(*,*) 'Adaptive isotropic h-refinement...'
+            if (RANK .eq. ROOT) write(*,*) '..... There will be ',refs,' adaptive isotropic h-refinements'
             do i=1,refs
+               if (RANK .eq. ROOT) write(*,*) '.....Next refinement i=',i
+               if (RANK .eq. ROOT) write(*,*) '.....redistributing mesh'
+               lb = 6 ! this load balancing corresponds to the Graph option
+               count = 1; src = ROOT
+               call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+               call zoltan_w_set_lb(lb)
+               call distr_mesh
+
                if (RANK .eq. ROOT) write(*,*) '.....before refine_DPG'
                call refine_DPG(IADAPTIVE,1,0.25d0,nstop)
                if (RANK .eq. ROOT) write(*,*) '.....after refine_DPG'
@@ -299,9 +307,9 @@
 !
 !
 !     ...solve problem with PETSc solver (MPI)
-         case(45)
-            if (RANK .eq. ROOT) write(*,*) 'calling PETSc (MPI) solver...'
-            call petsc_solve('H')
+         ! case(45)
+         !    if (RANK .eq. ROOT) write(*,*) 'calling PETSc (MPI) solver...'
+         !    call petsc_solve('H')
 !
 !
 !     ...compute error for problem with known solution
@@ -319,6 +327,37 @@
             write(*,*) 'computing residual...'
             call residual(res)
 !
+!     ...compute power flow through cross-section
+         case(60)
+            if (RANK .eq. ROOT) then
+               write(*,*) 'Computing power..'
+               write(*,*) 'Choose number sample points: 0 = default'
+               read(*,*) numPts
+            endif
+            count = 1; src = ROOT
+            call MPI_BCAST (numPts,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            call get_power(numPts,.false.,-1,void,void,void)
+!
+!     ...compute projections onto waveguide modes from traces
+         case(61)
+            if (SLAB_GUIDE.ne.1) then
+               if (RANK .eq. ROOT) then
+                  write(*,*) 'exec_case: Mode projections only implemented for SLAB_GUIDE case.'
+                  write(*,*) '           Returning...'
+               endif
+               
+            else
+               if (RANK .eq. ROOT) then
+                  write(*,*) 'Computing projections..'
+                  write(*,*) 'Choose number sample points: 0 = default'
+                  read(*,*) numPts
+               endif
+               count = 1; src = ROOT
+               call MPI_BCAST (numPts,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+               call get_power(numPts,.true.,-1,void,void,void)
+
+            endif
+
 !
 !     ...debugging routines
          case(70)

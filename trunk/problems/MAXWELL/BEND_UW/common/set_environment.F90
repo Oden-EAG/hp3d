@@ -125,7 +125,7 @@ subroutine set_environment_maxwell
    call get_option_real('-pmlrholo','PMLRHOLO', 0.d0, PMLRHOLO)
 !
 !..Set PML flag in toroidal geometry (radial direction of bent fiber's cross section)
-   call get_option_int('-torpml' , 'TOROIDAL_PML', 0 , TOROIDAL_PML)
+   call get_option_int('-tordmn' , 'TOROIDAL_DMN', 0 , TOROIDAL_DMN)
 !
 !..Set flag for slab waveguide geometry
    call get_option_int('-slab' , 'SLAB_GUIDE', 0 , SLAB_GUIDE)
@@ -135,13 +135,17 @@ subroutine set_environment_maxwell
    call get_option_real('-rclad' , 'RCLAD', 5.0d0, RCLAD)
    call get_option_real('-rcoat' , 'RCOAT', 10.d0, RCOAT)
 !
-!..Set real part of refractive indices of core, cladding, coating: REFRCORE, REFRCLAD, REFRCOAT
+!..Set real part of refractive indices of core, cladding, coating: REFRCORE, REFRCLAD, REFRCOAT, REFRAIR
    call get_option_real('-ncore' , 'REFRCORE', 1.4512d0, REFRCORE)
    call get_option_real('-nclad' , 'REFRCLAD', 1.45d0, REFRCLAD)
    call get_option_real('-ncoat' , 'REFRCOAT', 1.38d0, REFRCOAT)
+   call get_option_real('-nair' , 'REFRAIR', 1.00026897d0, REFRAIR)
 !
 !..Set COATING attenuation in ratio per unit length
    call get_option_real('-attncoat' , 'ATTNCOAT', log(10.d0)*0.003d0*25.4d-6, ATTNCOAT)
+!
+!..Set ELASTOOPTIC flag
+   call get_option_int('-elast' , 'ELASTOOPTIC', 0 , ELASTOOPTIC)
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)

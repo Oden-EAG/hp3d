@@ -33,6 +33,7 @@ maxw
 pois
 uwLaser
 hose
+bending
 
 # Mesh files
 fiber_prism_*
@@ -74,3 +75,10 @@ test_mpi
 *.xmf
 *.vtu
 *.pvd
+*.pvsm
+
+# Other outputs
+*.pdf
+*.ps
+*.eps
+*.csv

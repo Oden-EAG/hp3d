@@ -67,7 +67,7 @@
 !     ...exact solution UNKNOWN: solving homogeneous equation
          case(0)
 !
-            if ((ISOL.gt.100 .or. ISOL.eq.15) .and. X(3).lt.GEOM_TOL) then
+            if (ISOL.gt.10 .and. X(3).lt.GEOM_TOL) then
 !           ...use the exact solution to determine Dirichlet data
 !           ...get Electric field component
                call mfd_solutions(Mdle,X, E,dE,d2E)
@@ -87,8 +87,22 @@
 !     ...exact solution KNOWN
          case(1,2)
 !        ...use the exact solution to determine Dirichlet data
-            call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
+            if (ISOL.le.10) then
+               call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
                             ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
+
+            else if (X(3).lt.GEOM_TOL) then
+               call mfd_solutions(Mdle,X, E,dE,d2E)
+!
+!           ...E-field value for component 1
+               ValE(1,1) = E ! E-field trace;
+!
+!           ...E-field 1st order derivatives for component 1
+               DvalE(1,1,1:3) = dE(1:3)
+!
+!           ...E-field 2nd order derivatives for component 1
+               D2valE(1,1,1:3,1:3) = d2E(1:3,1:3)    
+            endif
 !
          case default
             write(*,1000) NEXACT
@@ -100,8 +114,8 @@
 !
 #if HP3D_DEBUG
       if (iprint == 1) then
-         write(*,1001)X(1:3),ValH(1:MAXEQNH)
- 1001    format(' dirichlet: X,ValH = ',3(e12.5,2x),2x,10(e12.5,2x))
+         write(*,1001)X(1:3),ValE(:,1:MAXEQNE)
+ 1001    format(' dirichlet: X,ValE = ',3(e12.5,2x),2x,10(3e12.5,2x))
       endif
 #endif
 !

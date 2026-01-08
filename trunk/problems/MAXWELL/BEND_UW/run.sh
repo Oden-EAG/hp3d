@@ -92,7 +92,7 @@ pmlxlo=0.0
 pmlrhoup=0.0
 pmlrholo=0.0
 # flags for toroidal pml and slab guide geometry
-torpml=0
+tordmn=0
 slab=1
 # fiber radii (or slab halfwidths)
 rcore=0.5
@@ -153,7 +153,7 @@ args+=" -pmlthup ${pmlthup} -pmlthlo ${pmlthlo}"
 args+=" -pmlrup ${pmlrup} -pmlrlo ${pmlrlo}"
 args+=" -pmlxup ${pmlxup} -pmlthlo ${pmlxlo}"
 args+=" -pmlrhoup ${pmlrhoup} -pmlrholo ${pmlrholo}"
-args+=" -torpml ${torpml} -slab ${slab}" 
+args+=" -tordmn ${tordmn} -slab ${slab}" 
 args+=" -rcore ${rcore} -rclad ${rclad} -rcoat ${rcoat}"
 args+=" -ncore ${ncore} -nclad ${nclad} -ncoat ${ncoat} -attncoat ${attncoat}"
 args+=" -ibc ${ibc}"

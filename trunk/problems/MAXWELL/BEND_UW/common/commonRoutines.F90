@@ -1,6 +1,6 @@
 !
 #include "typedefs.h"
-!
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Propagate flag from father to son nodes; used to correctly
 !!             inherit impedance BCs
@@ -109,10 +109,12 @@
       call reset_visit
 !
    end subroutine propagate_flag
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Determines local permittivity tensor epsilon
 !!
@@ -125,7 +127,7 @@
 !------------------------------------------------------------------------------
    subroutine get_local_epsilon(Mdle,Xp,Zeps)
 !
-      use commonParam, only: EPSILON, ZERO, ZONE
+      use commonParam, only: EPSILON, ZERO, ZONE, ELASTOOPTIC 
 !
       implicit none
 !
@@ -133,26 +135,47 @@
       real(8),    intent(in)  :: Xp(3)
       complex(8), intent(out) :: Zeps(3,3)
 !
-      integer :: i
-      complex(8) :: zrefr
+      integer    :: i
+      complex(8) :: zrefr_orig, zrefr_corr(3)
+      real(8)    :: qcyl(3,3), r
 !
 !------------------------------------------------------------------------------
 !
 !  ...get refractive index of element's subdomain
-      call get_refrac(Mdle,zrefr)
+      call get_refrac(Mdle,zrefr_orig)
 !  ...set permittivity to identity for now.
       Zeps = ZERO
-      do i=1,3
-         Zeps(i,i) = zrefr**2 * EPSILON
-      enddo
+!
+!  ...if elasto-optic effect is active, compute corrected refractive index tensor
+      if (ELASTOOPTIC.eq.1) then
+!     ...get radial coordinate 
+         r = sqrt(Xp(2)**2 + Xp(3)**2)
+!     ...get cylindrical rotation matrix Qcyl
+         call get_cylindrical_rotation(Mdle,Xp,qcyl)
+!     ...get elasto-optical corrected refractive index
+         call get_elastoopical_correction(r,zrefr_orig,zrefr_corr)
+         do i=1,3
+            Zeps(i,i) = zrefr_corr(i)**2 * EPSILON
+         enddo
+!     ... Eps = Qcyl^T * Eps_cyl * Qcyl
+         Zeps = matmul(Zeps,qcyl)
+         Zeps = matmul(transpose(qcyl),Zeps)
+!
+!  ...else, no elasto-optic effect
+      else
+         do i=1,3
+            Zeps(i,i) = zrefr_orig**2 * EPSILON
+         enddo
+      endif
 !
    end subroutine get_local_epsilon
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_local_mu(Mdle,Xp,Zmu)
 !
       use commonParam, only: MU, ZERO
@@ -174,16 +197,17 @@
       enddo
 !
    end subroutine get_local_mu
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
 
 
-
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_refrac(Mdle,Zrefr)
-      use commonParam, only: SLAB_GUIDE, ZONE, OMEGA, EPSILON, MU, REFRCORE, REFRCLAD, REFRCOAT,ATTNCOAT
+      use commonParam, only: SLAB_GUIDE, TOROIDAL_DMN, ZONE, OMEGA, EPSILON, MU, REFRCORE, REFRCLAD, REFRCOAT,ATTNCOAT, REFRAIR
       implicit none
 !
       integer,    intent(in) :: Mdle
@@ -191,6 +215,10 @@
 !
       integer :: ndom
 !
+
+      ! initialize
+      Zrefr = ZONE
+
       call find_domain(Mdle, ndom)
       if (SLAB_GUIDE.eq.1) then
          select case(ndom)
@@ -200,34 +228,81 @@
             Zrefr = cmplx(REFRCLAD,0.d0,8)
          case(4,5)
             Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
-         case default
-            Zrefr = ZONE
          end select
       else
-         select case(ndom)
-         case(1,2)
-            Zrefr = cmplx(REFRCORE,0.d0,8)
+         select case(TOROIDAL_DMN)
+         case(1)
+            Zrefr = Zrefr = cmplx(REFRCORE,0.d0,8)
+         case(2)
+            select case(ndom)
+            case(1,2)
+                  Zrefr = cmplx(REFRCORE,0.d0,8)
+            case(3,4)
+                  Zrefr = cmplx(REFRCLAD,0.d0,8)
+            end select
          case(3)
-            Zrefr = cmplx(REFRCLAD,0.d0,8)
+            select case(ndom)
+            case(1,2)
+                  Zrefr = cmplx(REFRCORE,0.d0,8)
+            case(3)
+                  Zrefr = cmplx(REFRCLAD,0.d0,8)
+            case(4)
+                  Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
+            end select
          case(4)
-            Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
-         case default
-            Zrefr = ZONE
+            select case(ndom)
+            case(1)
+                  Zrefr = cmplx(REFRCORE,0.d0,8)
+            case(2)
+                  Zrefr = cmplx(REFRCLAD,0.d0,8)
+            case(3)
+                  Zrefr = cmplx(REFRCOAT,-ATTNCOAT*sqrt(MU*EPSILON)/(2.d0*OMEGA),8)
+            case(4)
+                  Zrefr = cmplx(REFRAIR,0.d0,8)
+            end select
          end select
       endif
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
 
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+   subroutine get_elastoopical_correction( R, Zrefr_orig, Zrefr_corr )
+      use commonParam, only: RBEND
+      implicit none
+!
+      real(8),    intent(in)  :: R
+      complex(8), intent(in)  :: Zrefr_orig
+      complex(8), intent(out) :: Zrefr_corr(3)
+!  ...material parameters for fused silica glass
+      real(8) :: poisson, p_11, p_12
+!
+!  ...Poisson's ratio
+      poisson = 0.164d0
+!  ...Pockel's constants, also called elasto-optical or strain-optic coefficients
+      p_11 = 0.132d0; p_12 = 0.247d0
+!
+!  ...Elasto-optical correction for the bent waveguide's refractive index
+      Zrefr_corr(1) = Zrefr_orig -  ( p_12  - poisson * ( p_11 + p_12 ) ) * (R-RBEND) / RBEND  * Zrefr_orig**3 / 2.d0
+      Zrefr_corr(2) = Zrefr_orig -  ( p_12  - poisson * ( p_11 + p_12 ) ) * (R-RBEND) / RBEND  * Zrefr_orig**3 / 2.d0
+      Zrefr_corr(3) = Zrefr_orig -  ( p_11  - poisson *   2.d0 * p_12   ) * (R-RBEND) / RBEND  * Zrefr_orig**3 / 2.d0
+!
+   end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_local_rotation(Mdle,Xp,ActivePML,RQ)
 !
-      use commonParam, only: TOROIDAL_PML
+      use commonParam, only: TOROIDAL_DMN
       implicit none
 !
       integer, intent(in)  :: Mdle,ActivePML
@@ -247,7 +322,7 @@
       !  get rotation to cylindrical basis RQ <-- Qcyl
       call get_cylindrical_rotation(Mdle,Xp,RQ)
       !  check if a PML for toroidal geometry is set, and if Xp lies there
-      if (TOROIDAL_PML.eq.1 .and.(flags(7).eq.1 .or. flags(8).eq.1)) then 
+      if (TOROIDAL_DMN.gt.0 .and.(flags(7).eq.1 .or. flags(8).eq.1)) then 
          !  get rotation from cylindrical to toroidal basis
          call get_toroidal_rotation(Mdle,Xp,Qtor)
          !  update the full rotation RQ <-- Qtor @ Qcyl
@@ -255,11 +330,13 @@
       endif
 !
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_cylindrical_rotation(Mdle,Xp,RQ)
 !
       implicit none
@@ -281,8 +358,13 @@
       RQ(3,3) = RQ(2,2)
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
+
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_toroidal_rotation(Mdle,Xp,RQ)
 !
       use commonParam, only: RBEND
@@ -307,52 +389,13 @@
       RQ(3,3) = 1.d0
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-   ! subroutine get_pml_theta(Mdle,Xp,Zthst,Zdthst,Zd2thst)
-
-   !    use commonParam, only: THETAEND,PMLPROP,OMEGA
-   !    implicit none
-   !    integer, intent(in) :: Mdle
-   !    real(8), intent(in) :: Xp(3)
-   !    complex(8),intent(out) :: Zthst,Zdthst,Zd2thst
-
-   !    real(8) :: c,pn,f,df,d2f,th,th_pml,th_trn,th_dif
-   !    integer :: n
-
-   !    th = atan2(Xp(3),Xp(2))
-
-   !    th_pml = THETAEND*PMLPROP
-   !    th_trn = THETAEND - th_pml
-   !    th_dif = Th - th_trn
-
-   !    if (Th.gt.THETAEND.or.th_dif.lt.0.d0) then
-   !       write(*,*) ' get_pml_theta: theta>THETAEND or theta<th_trn'
-   !       write(*,*) ' theta,th_trn,THETAEND = ',Th,th_trn,THETAEND
-   !       write(*,*) ' stop'
-   !       stop
-   !    endif
-
-   !    n = 3       !!! NEEDS TO BE AT LEAST 2 !!!
-   !    c = 10.d0 /(OMEGA* th_pml**n)
-   !    f   = c*th_dif**n
-   !    df  = c*th_dif**(n-1) * n
-   !    d2f = c*th_dif**(n-2) * (n*(n-1))
-   !    if((f.le.0.d0).or.(df.le.0.d0).or.(d2f.le.0)) then
-   !       write(*,*) ' get_pml_theta: f, df,d2f are negative. stop.'
-   !       stop
-   !    endif
-   !    zthst   = cmplx( Th , -f  , 8)
-   !    zdthst  = cmplx(1.d0, -df , 8)
-   !    zd2thst = cmplx(0.d0, -d2f, 8)
-
-   ! end subroutine
-
-
-
-!===========================================================================
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !  SUROUTINE TO COMPUTE COMPLEX-STRETCHED COORDINATE FOR UNIAXIAL PML
 !  INPUTS
 !  S       Real, original physical coordinate
@@ -391,8 +434,8 @@
       else
          ! if there is an actual PML, we compute the complex path with a polynomial curve
          !
-         n = 4       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
-         c = 800.d0 /(Wnum* spml**n)                     !                     c = 100.d0...
+         n = 3       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
+         c = 200.d0 /(Wnum* spml**n)                     !                     c = 100.d0...
          f   = c*sdif**n
          df  = c*sdif**(n-1) * n
          d2f = c*sdif**(n-2) * (n*(n-1))
@@ -407,10 +450,13 @@
       zd2sst = cmplx(0.d0, -d2f, 8)
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine get_stretch_J(Zdsst,RQ,ZJ,ZJinv,ZJdet)
 
       implicit none 
@@ -437,11 +483,13 @@
       ZJdet = Zdsst(1)*Zdsst(2)*Zdsst(3)
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine is_pml(Mdle,Xp,ActivePML)
       use commonParam
       implicit none 
@@ -452,54 +500,60 @@
       real(8) :: th,x,r,rho
 
       ActivePML = 0
-      !  First, PML in the longitudinal direction
+      !  First, PML in the bent longitudinal direction
       th = atan2(Xp(3),Xp(2))
-      if (th .gt.(1.d0-PMLTHUP )*THUP +PMLTHUP *THLO ) ActivePML = ActivePML + 2**7
-      if (th .lt.(1.d0-PMLTHLO )*THLO +PMLTHLO *THUP ) ActivePML = ActivePML + 2**6
+      if (th .gt.(1.d0-PMLTHUP )*THUP +PMLTHUP *THLO ) ActivePML = ActivePML + 2**7  !!! PML for the upper theta boundary, very important
+      if (th .lt.(1.d0-PMLTHLO )*THLO +PMLTHLO *THUP ) ActivePML = ActivePML + 2**6  !!! PML for the lower theta boundary - not very useful, but for code generality
       !  Now, PML for the transversal geometry
-      if (TOROIDAL_PML.eq.0) then
-         r = sqrt(Xp(2)**2+Xp(3)**2)
-         x = Xp(1)
-         if (r  .gt.(1.d0-PMLRUP  )*RUP  +PMLRUP  *RLO  ) ActivePML = ActivePML + 2**5
-         if (r  .lt.(1.d0-PMLRLO  )*RLO  +PMLRLO  *RUP  ) ActivePML = ActivePML + 2**4
-         if (x  .gt.(1.d0-PMLXUP  )*XUP  +PMLXUP  *XLO  ) ActivePML = ActivePML + 2**3
-         if (x  .lt.(1.d0-PMLXLO  )*XLO  +PMLXLO  *XUP  ) ActivePML = ActivePML + 2**2
+      r = sqrt(Xp(2)**2+Xp(3)**2)
+      x = Xp(1)
+      if (TOROIDAL_DMN.eq.0) then         
+         if (r  .gt.(1.d0-PMLRUP  )*RUP  +PMLRUP  *RLO  ) ActivePML = ActivePML + 2**5 !!! PML for the upper radial boundary, very important for the slab geometry
+         if (r  .lt.(1.d0-PMLRLO  )*RLO  +PMLRLO  *RUP  ) ActivePML = ActivePML + 2**4 !!! PML for the lower radial boundary, not very useful, but for code generality
+         if (x  .gt.(1.d0-PMLXUP  )*XUP  +PMLXUP  *XLO  ) ActivePML = ActivePML + 2**3 !!! PML for the upper x boundary, it might be useful in some cases
+         if (x  .lt.(1.d0-PMLXLO  )*XLO  +PMLXLO  *XUP  ) ActivePML = ActivePML + 2**2 !!! PML for the lower x boundary, it might be useful in some cases
       else
          rho = sqrt((r-RBEND)**2+x**2)
-         if (rho.gt.(1.d0-PMLRHOUP)*RHOUP+PMLRHOUP*RHOLO) ActivePML = ActivePML + 2**1
-         if (rho.lt.(1.d0-PMLRHOLO)*RHOLO+PMLRHOLO*RHOUP) ActivePML = ActivePML + 2**0
+         if (rho.gt.(1.d0-PMLRHOUP)*RHOUP+PMLRHOUP*RHOLO) ActivePML = ActivePML + 2**1 !!! PML for the circular cross-section boundary, very important for the toroidal geometry
+         if (rho.lt.(1.d0-PMLRHOLO)*RHOLO+PMLRHOLO*RHOUP) ActivePML = ActivePML + 2**0 !!! This one actually makes no sense (a PML in the interior of the fiber). In the meantime, we keep it for code generality, but always with PMLRHOLO=0.0
       endif
+
+      ! write(*,*) 'is_pml: Mdle,Xp,ActivePML=',Mdle,Xp,ActivePML
 !
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
-   subroutine cartesian2curvilinear_real(Xcart,Xrot)
-      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+   subroutine cartesian2curvilinear_real(Xcart,Xcurv)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_DMN,RBEND
       implicit none
       real(8), intent(in) :: Xcart(3)
-      real(8), intent(out):: Xrot(3)
+      real(8), intent(out):: Xcurv(3)
 
       ! map Xcart to curvilinear coordinates
-      if (SLAB_GUIDE.eq.1 .or. TOROIDAL_PML.eq.0) then
-         Xrot(1) = Xcart(1)
-         Xrot(2) = sqrt(Xcart(2)**2+Xcart(3)**2)
-         Xrot(3) = atan2(Xcart(3),Xcart(2))
+      if (SLAB_GUIDE.eq.1 .or. TOROIDAL_DMN.eq.0) then
+         Xcurv(1) = Xcart(1)
+         Xcurv(2) = sqrt(Xcart(2)**2+Xcart(3)**2)
+         Xcurv(3) = atan2(Xcart(3),Xcart(2))
       else
-         Xrot(1) = atan2( Xcart(1) , sqrt(Xcart(2)**2+Xcart(3)**2)-RBEND )
-         Xrot(2) = sqrt( ( sqrt(Xcart(2)**2+Xcart(3)**2) -RBEND)**2 + Xcart(1)**2 )
-         Xrot(3) = atan2(Xcart(3),Xcart(2))
+         Xcurv(1) = atan2( Xcart(1) , sqrt(Xcart(2)**2+Xcart(3)**2)-RBEND )
+         Xcurv(2) = sqrt( ( sqrt(Xcart(2)**2+Xcart(3)**2) -RBEND)**2 + Xcart(1)**2 )
+         Xcurv(3) = atan2(Xcart(3),Xcart(2))
       endif
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine cartesian2curvilinear_complex(Zcart,Zrot)
-      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_DMN,RBEND
       implicit none
       complex(8), intent(in) :: Zcart(3)
       complex(8), intent(out):: Zrot(3)
@@ -509,41 +563,45 @@
          Zrot(1) = Zcart(1)
          Zrot(2) = sqrt(Zcart(2)**2+Zcart(3)**2)
          Zrot(3) = atan(Zcart(3)/Zcart(2))
-      elseif(TOROIDAL_PML.eq.1) then
+      elseif(TOROIDAL_DMN.gt.0) then
          Zrot(1) = atan( Zcart(1) / (sqrt(Zcart(2)**2+Zcart(3)**2)-RBEND ) )
          Zrot(2) = sqrt( ( sqrt(Zcart(2)**2+Zcart(3)**2) -RBEND)**2 + Zcart(1)**2 )
          Zrot(3) = atan(Zcart(3)/Zcart(2))
       endif
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
-   subroutine curvilinear2cartesian_real(Xrot,Xcart)
-      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+   subroutine curvilinear2cartesian_real(Xcurv,Xcart)
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_DMN,RBEND
       implicit none
-      real(8), intent(in) :: Xrot(3)
+      real(8), intent(in) :: Xcurv(3)
       real(8), intent(out):: Xcart(3)
 
       ! map back to Cartesian
       if (SLAB_GUIDE.eq.1) then
-         Xcart(1) = Xrot(1)
-         Xcart(2) = Xrot(2)*cos(Xrot(3))
-         Xcart(3) = Xrot(2)*sin(Xrot(3))
+         Xcart(1) = Xcurv(1)
+         Xcart(2) = Xcurv(2)*cos(Xcurv(3))
+         Xcart(3) = Xcurv(2)*sin(Xcurv(3))
       else
-         Xcart(1) =  Xrot(2)*sin(Xrot(1))
-         Xcart(2) = (Xrot(2)*cos(Xrot(1))+RBEND)*cos(Xrot(3))
-         Xcart(3) = (Xrot(2)*cos(Xrot(1))+RBEND)*sin(Xrot(3))
+         Xcart(1) =  Xcurv(2)*sin(Xcurv(1))
+         Xcart(2) = (Xcurv(2)*cos(Xcurv(1))+RBEND)*cos(Xcurv(3))
+         Xcart(3) = (Xcurv(2)*cos(Xcurv(1))+RBEND)*sin(Xcurv(3))
       endif
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
    subroutine curvilinear2cartesian_complex(Zrot,Zcart)
-      use commonParam, only: SLAB_GUIDE,TOROIDAL_PML,RBEND
+      use commonParam, only: SLAB_GUIDE,TOROIDAL_DMN,RBEND
       implicit none
       complex(8), intent(in) :: Zrot(3)
       complex(8), intent(out):: Zcart(3)
@@ -553,40 +611,42 @@
          Zcart(1) = Zrot(1)
          Zcart(2) = Zrot(2)*cos(Zrot(3))
          Zcart(3) = Zrot(2)*sin(Zrot(3))
-      elseif (TOROIDAL_PML.eq.1) then
+      elseif (TOROIDAL_DMN.gt.0) then
          Zcart(1) =  Zrot(2)*sin(Zrot(1))
          Zcart(2) = (Zrot(2)*cos(Zrot(1))+RBEND)*cos(Zrot(3))
          Zcart(3) = (Zrot(2)*cos(Zrot(1))+RBEND)*sin(Zrot(3))
       endif
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
-
-
-   subroutine get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
-
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
+   subroutine get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
+!  We return stretched curvilinear coordinates Zcurv_st
+!  and its derivatives w.r.t physical curvilinear coordinates 
       use commonParam
       implicit none
       integer,   intent(in) :: Mdle, ActivePML
       real(8),   intent(in) :: Xp(3)
-      complex(8),intent(out):: Zxpst(3),Zdxpst(3),Zd2xpst(3)
+      complex(8),intent(out):: Zcurv_st(3),Zdcurv_st(3),Zd2curv_st(3)
 
-      real(8) :: s, stra, sbnd,wnum,xrot(3)
-      complex(8) :: zrotst(3)
+      real(8) :: s, stra, sbnd, wnum, curv(3)
       integer :: ic,flags(8)
 
-      Zxpst = cmplx(Xp,0.d0,8)
-      Zdxpst = ZONE
-      Zd2xpst = ZERO
+      Zcurv_st = cmplx(Xp,0.d0,8)
+      Zdcurv_st = ZONE
+      Zd2curv_st = ZERO
 
       if (ActivePML.eq.0) then
          return
       else
          !  pass input coordinates (cartesian, real) to curvilinear coordinates
-         call cartesian2curvilinear_real(Xp,xrot)
+         call cartesian2curvilinear_real(Xp,curv)
          !  initialize the complex-valued stretched curvilinear coordinates
-         zrotst = cmplx(xrot,0.d0,8)
+         Zcurv_st = cmplx(curv,0.d0,8)
 
          !  decode the ActivePML variable
          call decod(ActivePML,2,8,flags)
@@ -596,97 +656,98 @@
          !  coordinate TH, upper bound
          if (flags(1).eq.1 .and. flags(2).eq.0) then
             ic = 3
-            s = xrot(ic)
+            s = curv(ic)
             stra = (1.d0-PMLTHUP )*THUP +PMLTHUP *THLO
             sbnd = THUP
-            wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
-            call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            wnum = (REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK)*RBEND
+            call get_pml_stretch(s,stra,sbnd, wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             ! write(*,*) 'get_stretched_coords: wnum=',wnum
          endif
          ! coordinate TH, lower bound
          if (flags(1).eq.0 .and. flags(2).eq.1) then
             ic = 3
-            s = xrot(ic)
-            stra = (1.d0-PMLTHLO )*THUP +PMLTHUP *THUP
-            sbnd = THUP
-            wnum = REFRCORE*OMEGA*sqrt(EPSILON*MU) ! - ENVELOPEK
-            call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+            s = curv(ic)
+            stra = (1.d0-PMLTHLO )*THLO +PMLTHLO *THUP
+            sbnd = THLO
+            wnum = (REFRCORE*OMEGA*sqrt(EPSILON*MU) - ENVELOPEK)*RBEND
+            call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
          endif
          !  Now, PML for the transversal geometry
-         if (TOROIDAL_PML.eq.0) then
+         if (TOROIDAL_DMN.eq.0) then
             ! coordinate R, upper bound
             if (flags(3).eq.1 .and. flags(4).eq.0) then
                ic = 2
-               s = xrot(ic)
+               s = curv(ic)
                stra = (1.d0-PMLRUP )*RUP +PMLRUP *RLO
                sbnd = RUP
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
             ! coordinate R, lower bound
             if (flags(3).eq.0 .and. flags(4).eq.1) then
                ic = 2
-               s = xrot(ic)
+               s = curv(ic)
                stra = (1.d0-PMLRLO )*RLO +PMLRLO *RUP
                sbnd = RLO
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
             ! coordinate X, upper bound
             if (flags(5).eq.1 .and. flags(6).eq.0) then
                ic = 1
-               s = xrot(ic)
+               s = curv(ic)
                stra = (1.d0-PMLXUP )*XUP +PMLXUP *XLO
                sbnd = XUP
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
             ! coordinate X, lower bound
             if (flags(5).eq.0 .and. flags(6).eq.1) then
                ic = 1
-               s = xrot(ic)
+               s = curv(ic)
                stra = (1.d0-PMLXLO )*XLO +PMLXLO *XUP
                sbnd = XLO
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
          else
             ic = 2
-            s = xrot(ic)
+            s = curv(ic)
             ! coordinate RHO, upper bound
             if (flags(7).eq.1 .and. flags(8).eq.0) then
-               stra = (1.d0-PMLRHOUP )*XUP +PMLRHOUP *RHOLO
+               stra = (1.d0-PMLRHOUP )*RHOUP +PMLRHOUP *RHOLO
                sbnd = RHOUP
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
             ! coordinate RHO, lower bound
             if (flags(7).eq.0 .and. flags(8).eq.1) then
-               stra = (1.d0-PMLRHOLO )*XLO +PMLRHOLO *RHOUP
+               stra = (1.d0-PMLRHOLO )*RHOLO +PMLRHOLO *RHOUP
                sbnd = RHOLO
                wnum = REFRCOAT*OMEGA*sqrt(EPSILON*MU)
-               call get_pml_stretch(s,stra,sbnd,wnum,zrotst(ic),Zdxpst(ic),Zd2xpst(ic))
+               call get_pml_stretch(s,stra,sbnd,wnum,Zcurv_st(ic),Zdcurv_st(ic),Zd2curv_st(ic))
             endif
 
          endif
-
-         ! map back to Cartesian
-         call curvilinear2cartesian_complex(zrotst,Zxpst)
+            
 
          ! write(*,*) "get_stretched_coords:    ActivePML=",ActivePML
          ! write(*,*) "get_stretched_coords:        flags=",flags
          ! write(*,*) "get_stretched_coords:           Xp=",Xp
-         ! write(*,*) "get_stretched_coords:         Xrot=",xrot
-         ! write(*,*) "get_stretched_coords:       zrotst=",zrotst
+         ! write(*,*) "get_stretched_coords:         curv=",curv
+         ! write(*,*) "get_stretched_coords:     Zcurv_st=",Zcurv_st
          ! call pause
 
 
       endif
 
    end subroutine
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns transformation matrix K arisen due to envelope ansatz 
 !!             exp(-ikR\theta)E
@@ -743,8 +804,12 @@
       endif
 !
    end subroutine get_matrixK
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !
 !
+!
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns transformation matrix K.K^T arisen due to envelope ansatz 
 !!             exp(-ikR\theta)E
@@ -788,8 +853,12 @@
       RKKT(3,3) =  z**2 * rr
 !
    end subroutine get_matrixKKT
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !
 !
+!
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns complex-valued vector K.E, where K is the transformation  
 !!             matrix arisen due to the envelope ansatz   exp(-ikR\theta)*E
@@ -864,9 +933,12 @@
 #endif
 !
    end subroutine apply_matrixK
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !
 !
 !
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns complex-valued vector K*E, where K is the transformation  
 !!             matrix arisen due to the envelope ansatz   exp(-ikR\theta)*E
@@ -919,7 +991,12 @@
       ZDKE(3,:) = drr(:)*          z*ZE(1)   + rr*( z*ZDE(1,:)+e_z*ZE(1) )
 !
    end subroutine get_gradKE
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
+
+
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns output of adjoint operator A^* on a pair of
 !!             complex-valued H(curl) vectors [F ; G]
@@ -945,7 +1022,7 @@
       complex(8), intent(out):: Astar1(3),Astar2(3)
 !
       complex(8):: ziKTF(3),ziKTG(3),zeps(3,3),zmu(3,3)
-      complex(8):: zxpst(3),zdxpst(3),zd2xpst(3)
+      complex(8):: Zcurv_st(3),zdcurv_st(3),zd2curv_st(3)
       complex(8):: zJ(3,3),zJinv(3,3),zJdet,zKpmlT(3,3)
       real(8) :: rQ(3,3),rK(3,3)
       integer :: activePML
@@ -967,9 +1044,9 @@
          ! get rotation matrix
          call get_local_rotation(Mdle,Xp,activePML,rQ)
          ! get pml stretched coordinates and derivatives
-         call get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
+         call get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
          ! get PML Jacobian
-         call get_stretch_J(zdxpst,rQ,zJ,zJinv,zJdet)
+         call get_stretch_J(zdcurv_st,rQ,zJ,zJinv,zJdet)
          ! modify tensors eps and mu (these are 3x3 matrices, matmul perhaps suffices)
          !       |J| Jinv @ eps @ Jinv^T
          zeps = zJdet*matmul(zJinv,matmul(zeps,transpose(zJinv)))
@@ -992,7 +1069,12 @@
       Astar2 =  conjg(ZI*OMEGA*matmul(transpose(zmu), G)) + CF - conjg(ziKTF)
 !      
    end subroutine get_Astar
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
+
+
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns output of adjoint operator A^* on multiple pairs of
 !!             real-valued H(curl) test functions [F ; 0] and [0 ; F]
@@ -1022,7 +1104,7 @@
 !
       real(8) :: rKF(3,NE),rK(3,3)
       complex(8):: ziKTF(3,NE),zeps(3,3),zmu(3,3),zKpmlT(3,3)
-      complex(8):: zxpst(3),zdxpst(3),zd2xpst(3),zJ(3,3),zJinv(3,3),zJdet
+      complex(8):: Zcurv_st(3),zdcurv_st(3),zd2curv_st(3),zJ(3,3),zJinv(3,3),zJdet
       real(8) :: rQ(3,3)
       integer :: activePML
 !
@@ -1039,9 +1121,9 @@
          ! get rotation matrix
          call get_local_rotation(Mdle,Xp,activePML,rQ)
          ! get pml stretched coordinates and derivatives
-         call get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
+         call get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
          ! get PML Jacobian
-         call get_stretch_J(zdxpst,rQ,zJ,zJinv,zJdet)
+         call get_stretch_J(zdcurv_st,rQ,zJ,zJinv,zJdet)
          ! modify tensors eps and mu (these are 3x3 matrices, matmul perhaps suffices)
          !       |J| Jinv @ eps @ Jinv^T
          zeps = zJdet*matmul(zJinv,matmul(zeps,transpose(zJinv)))
@@ -1080,9 +1162,12 @@
       AstarG2 = conjg(ZI*OMEGA*AstarG2)
 !      
    end subroutine get_Astar_multiple
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 
 
+!------------------------------------------------------------------------------
 !------------------------------------------------------------------------------
 !> @brief      Returns output of direct operator A on a pair of
 !!             complex-valued H(curl) vectors [E ; H]
@@ -1108,7 +1193,7 @@
       complex(8), intent(out):: A1(3),A2(3)
 !
       complex(8):: ziKE(3),ziKH(3),zeps(3,3),zmu(3,3)
-      complex(8):: zxpst(3),zdxpst(3),zd2xpst(3)
+      complex(8):: Zcurv_st(3),zdcurv_st(3),zd2curv_st(3)
       complex(8):: zJ(3,3),zJinv(3,3),zJdet,zKpml(3,3)
       real(8) :: rQ(3,3),rK(3,3)
       integer :: activePML
@@ -1130,9 +1215,9 @@
          ! get rotation matrix
          call get_local_rotation(Mdle,Xp,activePML,rQ)
          ! get pml stretched coordinates and derivatives
-         call get_stretched_coords(Mdle,Xp,ActivePML,Zxpst,Zdxpst,Zd2xpst)
+         call get_stretched_coords(Mdle,Xp,ActivePML,Zcurv_st,Zdcurv_st,Zd2curv_st)
          ! get PML Jacobian
-         call get_stretch_J(zdxpst,rQ,zJ,zJinv,zJdet)
+         call get_stretch_J(zdcurv_st,rQ,zJ,zJinv,zJdet)
          ! modify tensors eps and mu (these are 3x3 matrices, matmul perhaps suffices)
          !       |J| Jinv @ eps @ Jinv^T
          zeps = zJdet*matmul(zJinv,matmul(zeps,transpose(zJinv)))
@@ -1155,3 +1240,5 @@
       A2 =  ZI*OMEGA*matmul(zmu, H) + CE - ziKE
 !      
    end subroutine get_A
+   !------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------

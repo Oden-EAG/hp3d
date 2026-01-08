@@ -115,6 +115,9 @@ program main
    write(*,9021) ' RBEND                    = ', RBEND 
    write(*,9021) ' OMEGA                    = ', OMEGA 
    write(*,9021) ' THUP                     = ', THUP
+   write(*,9021) ' RLO                      = ', RLO
+   write(*,9021) ' RUP                      = ', RUP
+   write(*,9021) ' RHOUP                    = ', RHOUP
    write(*,9021) ' ENVELOPEK                = ', ENVELOPEK
 
    write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
@@ -278,11 +281,15 @@ subroutine master_main()
       write(*,*) 'MUMPS (OpenMP).........................42'
       write(*,*) 'Pardiso (OpenMP).......................43'
       write(*,*) 'Frontal (Seq)..........................44'
-      write(*,*) 'PETSc (MPI)............................45'
+      ! write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
       write(*,*) 'Compute residual.......................51'
+      write(*,*) '                                         '
+      write(*,*) '    ---- Power and projections ----      '
+      write(*,*) 'Compute power losses from traces.......60'
+      write(*,*) 'Compute mode projections from traces...61'
       write(*,*) '                                         '
       write(*,*) '          ---- Debugging ----            '
       write(*,*) 'Refine a single element................70'
@@ -362,11 +369,11 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44,45,46)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
-!     ...Error and Residual
-         case(50,51)
+!     ...Error, Residual and Power/Projections
+         case(50,51,60,61)
             call exec_case(idec)
 !
 !     ...Debugging routines
@@ -517,11 +524,11 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44,45,46)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
-!     ...Error and Residual
-         case(50,51)
+!     ...Error, Residual and Power/Projections
+         case(50,51,60,61)
             call exec_case(idec)
 !
 !     ...Debugging routines

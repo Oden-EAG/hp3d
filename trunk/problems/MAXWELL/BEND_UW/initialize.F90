@@ -13,6 +13,7 @@ subroutine initialize
    use data_structure3D
    use refinements
    use frsolmod
+   use bessel_evaluation, only: initialize_bessel_mode_parameters
 !
    implicit none
 !
@@ -69,6 +70,9 @@ subroutine initialize
 !
 !..Overwrite MAXNODS if specified by user input via argument list
    if (MAXNODS_USER .gt. 0) MAXNODS = MAXNODS_USER
+!
+!..initialize Bessel mode parameters for manufactured solutions / boundary conditions / mode projection computations
+   call initialize_bessel_mode_parameters(ISOL,RBEND)
 !
 !..generate mesh and read physics file
    call hp3gen(trim(FILE_PHYS))
