@@ -9,6 +9,7 @@ SRC_COMMON  = \
         common/bessel_fn.F90 \
         common/residual.F90 \
         common/power.F90 \
+        common/element_L2_error_no_PML.F90 \
         common/set_environment.F90
 
 SRC_UW      = \

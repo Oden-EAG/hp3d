@@ -315,16 +315,16 @@
 !     ...compute error for problem with known solution
          case(50)
             if (NEXACT .eq. 0) then
-               write(*,*) 'NEXACT=0. Returning...'
+               if (RANK .eq. ROOT) write(*,*) 'NEXACT=0. Returning...'
             else
-               write(*,*) 'computing error...'
+               if (RANK .eq. ROOT) write(*,*) 'computing error...'
                call exact_error(flag,physNick)
             endif
 !
 !
 !     ...compute the residual
          case(51)
-            write(*,*) 'computing residual...'
+            if (RANK .eq. ROOT) write(*,*) 'computing residual...'
             call residual(res)
 !
 !     ...compute power flow through cross-section

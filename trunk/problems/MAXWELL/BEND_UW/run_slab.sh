@@ -36,8 +36,8 @@ imax=3
 maxnods=1000000
 
 # export KMP_STACKSIZE=24M   # p=3
-export KMP_STACKSIZE=32M   # p=4
-# export KMP_STACKSIZE=48M   # p=5
+# export KMP_STACKSIZE=32M   # p=4
+export KMP_STACKSIZE=48M   # p=5
 # export KMP_STACKSIZE=64M   # p=6
 # export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
@@ -151,35 +151,36 @@ ibc=3
 # file_geometry='./geometries/bentstepslab_R2600_4wl_m02'
 # pref='stepslab_R2600_4wl_m02'
 
-# isol=11
+# isol=12
 # rbend=1300.0
 # file_geometry='./geometries/bent_waveguide_d0p5_cR1300_DEG3'
-# k=149.76815150765 # with k0 = 149.993333460866, mode 2: nu = 149.86045924807476 * 1300
-# pmlthup=0.25
+# k=149.1219976615 # with k0 = 149.993333460866, mode 2: nu = 149.86045924807476 * 1300
+# # pmlthup=0.0
 # pmlrlo=0.0
 # pmlrup=0.0
 # rlo=1299.5
 # rup=1300.5
 # ibc=0
 # thup=0.05235987755983 # 3 degrees             0.008726646259971648 # 0.5 degrees
-# pref='pec_r1300_p4_mode3'
+# pref='pec_r1300_p4_mode2_ibc0'
 # ncore=1.0
 # nclad=1.0
 # ncoat=1.0
-# rclad=0.5
-# rcoat=0.5
-# gamma=1.07032799231899E+00
+# nair=1.0
+# # rclad=0.5
+# # rcoat=0.5
+# # gamma=1.07032799231899E+00
 
 
-# # cases bent slab waveguide with semianalytical solutions obtained with Bessel-Frobenius PML approach
-isol=300
-rbend=1300.0
-thup=0.17043375398290803
-pmlrlo=0.0
-file_geometry='./geometries/verif_bentstepslab_R1300'   # 7.95 wavelengths of this mode for this mesh and k_env=217.43
-# the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-pref='verif5_stepslab_R1300_m00'
-ibc=0
+# cases bent slab waveguide with semianalytical solutions obtained with Bessel-Frobenius PML approach
+# isol=300
+# rbend=1300.0
+# thup=0.17043375398290803
+# pmlrlo=0.0
+# file_geometry='./geometries/verif_bentstepslab_R1300'   # 7.95 wavelengths of this mode for this mesh and k_env=217.43
+# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+# pref='verif5_stepslab_R1300_m00'
+# ibc=0
 
 # isol=301
 # rbend=1300.0
@@ -190,24 +191,28 @@ ibc=0
 # pref='verif5_stepslab_R1300_m01'
 # ibc=0
 
-# isol=302
-# rbend=1300.0
-# thup=0.17043375398290803
-# pmlrlo=0.0
-# file_geometry='./geometries/verif_bentstepslab_R1300'   # 4 wavelengths of this mode for this mesh and k_env=217.43
-# # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-# pref='verif4_stepslab_R1300_m02'
-# ibc=0
+isol=302
+rbend=1300.0
+thup=0.17043375398290803
+pmlrlo=0.0
+file_geometry='./geometries/verif_bentstepslab_R1300'   # 4 wavelengths of this mode for this mesh and k_env=217.43
+# the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
+pref='verif5_stepslab_R1300_m02'
+ibc=0
 
 # isol=300
 # rbend=2600.0
+# # k=217.662870699
+# k=0.0
 # rup=2605.0
 # rlo=2595.0
 # thup=0.08521687699145401
+# # pmlthup=0.0
+# # pmlrup=0.0
 # pmlrlo=0.0
 # file_geometry='./geometries/verif_bentstepslab_R2600'   # 7.95 wavelengths of this mode for this mesh and k_env=217.43
 # # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-# pref='verif4_stepslab_R2600_m00'
+# pref='verif5_stepslab_R2600_m00'
 # ibc=0
 
 # isol=301
@@ -218,7 +223,7 @@ ibc=0
 # pmlrlo=0.0
 # file_geometry='./geometries/verif_bentstepslab_R2600'     # 6.40 wavelengths of this mode for this mesh and k_env=217.43
 # # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-# pref='verif4_stepslab_R2600_m01'
+# pref='verif5_stepslab_R2600_m01'
 # ibc=0
 
 # isol=302
@@ -230,7 +235,7 @@ ibc=0
 # pmlrlo=0.0
 # file_geometry='./geometries/verif_bentstepslab_R2600'      # 4 wavelengths of this mode for this mesh and k_env=217.43
 # # the difference in this mesh file is only the bc flags: 1 on the inner face, 0 elsewhere
-# pref='verif3_stepslab_R2600_m02'
+# pref='verif5_stepslab_R2600_m02'
 # ibc=0
 
 
@@ -260,14 +265,14 @@ args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
 
 ### RUNNING ON PERSONAL LAPTOP
 # # Set MPI Procs and OpenMP threads
-nproc=10
-nthreads=1
-mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
+# nproc=10
+# nthreads=1
+# mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
 # ###
 
-# ### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
-# # Set MPI Procs and OpenMP threads
-# nproc=24
-# nthreads=56
-# ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
+# Set MPI Procs and OpenMP threads
+nproc=48
+nthreads=14
+ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
 ###

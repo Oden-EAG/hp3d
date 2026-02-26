@@ -332,17 +332,19 @@
         subroutine Bessel(Zlambda,Zc0,Zc1,Wavenum,R0,R, &
                           Zbess,Zdbess,Zd2bess)
           ! 
-          use iso_fortran_env, wp => real64
+          use iso_fortran_env, wp_real => real64    ! setting working precision for real variables
           ! 
           implicit none
+          integer, parameter :: wp_complex=kind((1.0_wp_real,1.0_wp_real))
+          !
           integer :: Idec
-          complex(wp), intent(in)  :: Zlambda,Zc0,Zc1
+          complex(wp_complex), intent(in)  :: Zlambda,Zc0,Zc1
           real(8),    intent(in)  :: Wavenum,R0,R
-          complex(wp), intent(out) :: Zbess,Zdbess,Zd2bess
-          complex(wp) :: zc(0:1000), zsum,zloc,zdloc,zdloc_prev,zb(0:1000)
+          complex(wp_complex), intent(out) :: Zbess,Zdbess,Zd2bess
+          complex(wp_complex) :: zc(0:1000), zsum,zloc,zdloc,zdloc_prev,zb(0:1000)
           integer :: n,j,iprint
           real(8) :: aux,x_0,x,dx
-          real(wp) :: eps = 10._wp**(-15)
+          real(wp_real) :: eps = 10._wp_real**(-16)
     !
           if (R0.le. 0.d0) then
             write(*,*) 'Bessel: R0 = ',R0
@@ -360,24 +362,24 @@
           x   = log(R)
           dx = x - x_0
     !
-          zc = (0._wp,0._wp)
+          zc = (0._wp_real,0._wp_real)
           zc(0) = Zc0
           zc(1) = zc1
           zloc = zc(0) + zc(1)*dx
           Zdbess  = zc(1)
-          Zd2bess = (0._wp,0._wp)
-          zdloc_prev = 1._wp
+          Zd2bess = (0._wp_real,0._wp_real)
+          zdloc_prev = 1._wp_real
           n=0
           do 
-            zsum  = (0._wp,0._wp)
+            zsum  = (0._wp_real,0._wp_real)
             do j=0,n
               zsum = zsum + Rfact(n-j)*zc(j)
             enddo
-            zc(n+2) = (Zlambda*zc(n) - aux*zsum)/real( (n+1)*(n+2) ,8)
+            zc(n+2) = (Zlambda*zc(n) - aux*zsum)/real( (n+1)*(n+2) ,wp_real)
             zdloc = zc(n+2)*dx**(n+2)
             zloc = zloc + zdloc
-            Zdbess  = Zdbess  + zc(n+2)*dx**(n+1) *real(n+2,8)
-            Zd2bess = Zd2bess + zc(n+2)*dx**(n)   *real((n+1)*(n+2),8)
+            Zdbess  = Zdbess  + zc(n+2)*dx**(n+1) *real(n+2,wp_real)
+            Zd2bess = Zd2bess + zc(n+2)*dx**(n)   *real((n+1)*(n+2),wp_real)
             if ((abs(zdloc).lt.eps).and.(abs(zdloc_prev).lt.eps)) exit
             n=n+1
             if (n+2.gt.1000) then
@@ -410,17 +412,19 @@
 !
         subroutine bessel_preset( Wavenum, R0, Reval, Zval, Zdval, Zd2val )
           ! 
-          use iso_fortran_env, wp => real64
+          use iso_fortran_env, wp_real => real64
           ! 
           implicit none
+          integer, parameter :: wp_complex=kind((1.0_wp_real,1.0_wp_real))
+          !
     !
           real(8), intent(in)  :: Wavenum,R0,Reval
-          complex(wp), intent(out) :: Zval,Zdval,Zd2val
-          complex(wp) :: zbess10,zdbess10,zd2bess10,zbess01,zdbess01,zd2bess01, &
+          complex(wp_real), intent(out) :: Zval,Zdval,Zd2val
+          complex(wp_complex) :: zbess10,zdbess10,zd2bess10,zbess01,zdbess01,zd2bess01, &
                          zone,zero
     !
-          zone = (1._wp,0._wp)
-          zero = (0._wp,0._wp)
+          zone = (1._wp_real,0._wp_real)
+          zero = (0._wp_real,0._wp_real)
     !
     !  ...evaluate the solution at Reval
           call Bessel(ZLAMBDA_MODE_DP,zone,zero,Wavenum,R0,Reval, zbess10,zdbess10,zd2bess10)
@@ -541,14 +545,14 @@
               zsum = zsum * 2._quad_real/(R0*(n-j)) + zc(j+1)
             enddo
 
-            zc(n+2) = (Zmu*zc(n) - aux*zsum)/real((n+1)*(n+2),16)
+            zc(n+2) = (Zmu*zc(n) - aux*zsum)/real((n+1)*(n+2),quad_real)
             zdloc = zc(n+2)*zx**(n+2)
             if (iprint.eq.3) then
               write(*,*)'Bessel_new: n, zdloc = ',n, zdloc
             endif
             zloc = zloc + zdloc
-            Zdbess = Zdbess + zc(n+2)*zx**(n+1)*(n+2._quad_real)
-            Zd2bess = Zd2bess + zc(n+2)*zx**(n)   *real((n+1)*(n+2),16)
+            Zdbess = Zdbess + zc(n+2)*zx**(n+1)*real(n+2,quad_real)
+            Zd2bess = Zd2bess + zc(n+2)*zx**(n)   *real((n+1)*(n+2),quad_real)
             if ((abs(zdloc).lt.eps).and.(abs(zdloc_prev).lt.eps)) exit
             n=n+1
             if (n+2.gt.2000) then

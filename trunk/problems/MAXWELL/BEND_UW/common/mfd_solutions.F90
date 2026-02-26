@@ -93,7 +93,7 @@
 !
 !  ...affine function depending on x (normal to the bending plane yz)
       case(1)
-         cn = cmplx(0.5d0,0.d0)
+         cn = cmplx(0.5d0,0.d0 , 8 )
          a = 1.d0;    b =1.d0
          p = cn*(a*x1+b)
 !     ...1st order derivatives
@@ -267,8 +267,10 @@
          d2w_th = -znu**2*w
          ! current derivatives were computed w.r.t complex stretched coordinate \tilde{\theta}
          ! pass to derivatives w.r.t physical coordinate theta
-         d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
-         dw_th = dw_th * zdcurv_st(3)
+         if (activePML.ne.0) then
+            d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
+            dw_th = dw_th * zdcurv_st(3)
+         endif
 
 !     ...mfd solution for the polarized component of E
          cn = 1.d0*ZONE
@@ -409,8 +411,10 @@
 
             ! current derivatives were computed w.r.t complex stretched coordinate \tilde{r}
             ! pass to derivatives w.r.t physical coordinate r
-            d2u_r = d2u_r* zdcurv_st(2)**2 + du_r * zd2curv_st(2)
-            du_r = du_r * zdcurv_st(2)
+            if (activePML.ne.0) then
+               d2u_r = d2u_r* zdcurv_st(2)**2 + du_r * zd2curv_st(2)
+               du_r = du_r * zdcurv_st(2)
+            endif
 
 
             ! FACTOR v(x)
@@ -433,8 +437,10 @@
             d2w_th = -znu**2*w
             ! current derivatives were computed w.r.t complex stretched coordinate \tilde{\theta}
             ! pass to derivatives w.r.t physical coordinate theta
-            d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
-            dw_th = dw_th * zdcurv_st(3)
+            if (activePML.ne.0) then
+               d2w_th = d2w_th* zdcurv_st(3)**2 + dw_th * zd2curv_st(3)
+               dw_th = dw_th * zdcurv_st(3)
+            endif
 
 !     ...mfd solution for the polarized component of E
             cn = 1.d0*ZONE
@@ -943,15 +949,15 @@ subroutine get_step_slab_odd(Xp,Ampl,Kappa_core,Kappa_clad, E,dE)
    dE = ZERO
 
    if (abs(x2).le.RCORE) then
-      E    = complex(Ampl*sin(Kappa_core*x2),0.d0)
-      dE(2)= complex(Ampl*Kappa_core*cos(Kappa_core*x2),0.d0)
+      E    = Ampl*sin(Kappa_core*x2)
+      dE(2)= Ampl*Kappa_core*cos(Kappa_core*x2)
    endif
    if (x2.lt.-RCORE) then
-      E    = complex(-Ampl*sin(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE)),0.d0)
-      dE(2)= complex(-Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE)),0.d0)
+      E    = -Ampl*sin(Kappa_core*RCORE)*exp(Kappa_clad*(x2+RCORE))
+      dE(2)= -Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp( Kappa_clad*(x2+RCORE))
    endif
    if (x2.gt. RCORE) then
-      E    = complex( Ampl*sin(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE)),0.d0)
-      dE(2)= complex(-Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE)),0.d0)
+      E    = Ampl*sin(Kappa_core*RCORE)*exp(-Kappa_clad*(x2-RCORE))
+      dE(2)= -Ampl*sin(Kappa_core*RCORE)*Kappa_clad*exp(-Kappa_clad*(x2-RCORE))
    endif
 end subroutine

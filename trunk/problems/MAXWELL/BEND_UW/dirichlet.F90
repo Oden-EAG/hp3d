@@ -87,7 +87,7 @@
 !     ...exact solution KNOWN
          case(1,2)
 !        ...use the exact solution to determine Dirichlet data
-            if (ISOL.le.10) then
+            if (ISOL.le.12 .or. (ISOL.le.14 .and. PMLTHUP.eq.0.d0 .and. IBCFLAG.eq.0)) then
                call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
                             ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
 

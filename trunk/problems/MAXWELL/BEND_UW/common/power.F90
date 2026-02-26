@@ -359,7 +359,7 @@ end subroutine get_power
 !       out:
 !                      - Power       : Absolute value of power at each theta-point
 !                      - DiffPower   : Diff exact to computed power (alt: Norm)
-!                                      (available if NEXACT=1)
+!                                      (available if NEXACT>0)
 !                      - CorePower   : Power in core subdomains (alt: Coef_r)
 !                      - CladPower   : Power in cladding subdomains (alt: Coef_c)
 !
@@ -635,7 +635,7 @@ subroutine compute_facePower(Mdle,Facenumber,FacePower,FaceDiffPower)
       call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                    zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
                    zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
-      if(NEXACT.eq.1) then
+      if(NEXACT.ne.0) then
          call exact(x,Mdle, ValH,DvalH,d2valH, ValE,DvalE,d2valE, &
                             ValV,DvalV,d2valV, valQ,dvalQ,d2valQ)
       endif
@@ -658,7 +658,7 @@ subroutine compute_facePower(Mdle,Facenumber,FacePower,FaceDiffPower)
       !                                   EtimesH1(2)*conjg(EtimesH1(2))+          &
       !                                   EtimesH1(3)*conjg(EtimesH1(3)) ))*weight
 !     ...if we have an exact
-      if(NEXACT.eq.1) then
+      if(NEXACT.ne.0) then
          call zz_cross_product(valE(1:3,1),conjg(valE(1:3,2)), EtimesH2)
          FaceDiffPower = FaceDiffPower   &
                         + abs(((EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3))*weight) - &

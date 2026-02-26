@@ -143,6 +143,8 @@
 !
 !  ...get refractive index of element's subdomain
       call get_refrac(Mdle,zrefr_orig)
+      ! write(*,*) "get_local_epsilon: zrefr_orig=",zrefr_orig
+
 !  ...set permittivity to identity for now.
       Zeps = ZERO
 !
@@ -167,6 +169,7 @@
             Zeps(i,i) = zrefr_orig**2 * EPSILON
          enddo
       endif
+      ! write(*,*) "get_local_epsilon: Zeps=",Zeps
 !
    end subroutine get_local_epsilon
 !------------------------------------------------------------------------------
@@ -232,7 +235,7 @@
       else
          select case(TOROIDAL_DMN)
          case(1)
-            Zrefr = Zrefr = cmplx(REFRCORE,0.d0,8)
+            Zrefr = cmplx(REFRCORE,0.d0,8)
          case(2)
             select case(ndom)
             case(1,2)
@@ -434,7 +437,7 @@
       else
          ! if there is an actual PML, we compute the complex path with a polynomial curve
          !
-         n = 3       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
+         n = 4       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
          c = 200.d0 /(Wnum* spml**n)                     !                     c = 100.d0...
          f   = c*sdif**n
          df  = c*sdif**(n-1) * n
@@ -502,20 +505,20 @@
       ActivePML = 0
       !  First, PML in the bent longitudinal direction
       th = atan2(Xp(3),Xp(2))
-      if (th .gt.(1.d0-PMLTHUP )*THUP +PMLTHUP *THLO ) ActivePML = ActivePML + 2**7  !!! PML for the upper theta boundary, very important
-      if (th .lt.(1.d0-PMLTHLO )*THLO +PMLTHLO *THUP ) ActivePML = ActivePML + 2**6  !!! PML for the lower theta boundary - not very useful, but for code generality
+      if ( PMLTHUP.gt.0.d0 .and. (th .gt.(1.d0-PMLTHUP )*THUP +PMLTHUP *THLO ) ) ActivePML = ActivePML + 2**7  !!! PML for the upper theta boundary, very important
+      if ( PMLTHLO.gt.0.d0 .and. (th .lt.(1.d0-PMLTHLO )*THLO +PMLTHLO *THUP ) ) ActivePML = ActivePML + 2**6  !!! PML for the lower theta boundary - not very useful, but for code generality
       !  Now, PML for the transversal geometry
       r = sqrt(Xp(2)**2+Xp(3)**2)
       x = Xp(1)
       if (TOROIDAL_DMN.eq.0) then         
-         if (r  .gt.(1.d0-PMLRUP  )*RUP  +PMLRUP  *RLO  ) ActivePML = ActivePML + 2**5 !!! PML for the upper radial boundary, very important for the slab geometry
-         if (r  .lt.(1.d0-PMLRLO  )*RLO  +PMLRLO  *RUP  ) ActivePML = ActivePML + 2**4 !!! PML for the lower radial boundary, not very useful, but for code generality
-         if (x  .gt.(1.d0-PMLXUP  )*XUP  +PMLXUP  *XLO  ) ActivePML = ActivePML + 2**3 !!! PML for the upper x boundary, it might be useful in some cases
-         if (x  .lt.(1.d0-PMLXLO  )*XLO  +PMLXLO  *XUP  ) ActivePML = ActivePML + 2**2 !!! PML for the lower x boundary, it might be useful in some cases
+         if ( PMLRUP.gt.0.d0 .and. (r  .gt.(1.d0-PMLRUP  )*RUP  +PMLRUP  *RLO  ) ) ActivePML = ActivePML + 2**5 !!! PML for the upper radial boundary, very important for the slab geometry
+         if ( PMLRLO.gt.0.d0 .and. (r  .lt.(1.d0-PMLRLO  )*RLO  +PMLRLO  *RUP  ) ) ActivePML = ActivePML + 2**4 !!! PML for the lower radial boundary, not very useful, but for code generality
+         if ( PMLXUP.gt.0.d0 .and. (x  .gt.(1.d0-PMLXUP  )*XUP  +PMLXUP  *XLO  ) ) ActivePML = ActivePML + 2**3 !!! PML for the upper x boundary, it might be useful in some cases
+         if ( PMLXLO.gt.0.d0 .and. (x  .lt.(1.d0-PMLXLO  )*XLO  +PMLXLO  *XUP  ) ) ActivePML = ActivePML + 2**2 !!! PML for the lower x boundary, it might be useful in some cases
       else
          rho = sqrt((r-RBEND)**2+x**2)
-         if (rho.gt.(1.d0-PMLRHOUP)*RHOUP+PMLRHOUP*RHOLO) ActivePML = ActivePML + 2**1 !!! PML for the circular cross-section boundary, very important for the toroidal geometry
-         if (rho.lt.(1.d0-PMLRHOLO)*RHOLO+PMLRHOLO*RHOUP) ActivePML = ActivePML + 2**0 !!! This one actually makes no sense (a PML in the interior of the fiber). In the meantime, we keep it for code generality, but always with PMLRHOLO=0.0
+         if ( PMLRHOUP.gt.0.d0 .and. (rho.gt.(1.d0-PMLRHOUP)*RHOUP+PMLRHOUP*RHOLO) ) ActivePML = ActivePML + 2**1 !!! PML for the circular cross-section boundary, very important for the toroidal geometry
+         if ( PMLRHOLO.gt.0.d0 .and. (rho.lt.(1.d0-PMLRHOLO)*RHOLO+PMLRHOLO*RHOUP) ) ActivePML = ActivePML + 2**0 !!! This one actually makes no sense (a PML in the interior of the fiber). In the meantime, we keep it for code generality, but always with PMLRHOLO=0.0
       endif
 
       ! write(*,*) 'is_pml: Mdle,Xp,ActivePML=',Mdle,Xp,ActivePML
@@ -1225,7 +1228,7 @@
          zmu  = zJdet*matmul(zJinv,matmul(zmu, transpose(zJinv)))
          ! modify operator K to include effects of stretched coords. Jacobian
          !       Kpml = Jinv @ K @ Jinv^T 
-         zKpml = matmul(zJinv,matmul(-rK,transpose(zJinv)))
+         zKpml = matmul(zJinv,matmul( rK,transpose(zJinv)))                        !!!!!! fixed sign of rK
          !
          ! ziKE(:,:) = ZERO
          !  get term     i . |J| . Kpml @ E
@@ -1236,8 +1239,10 @@
       endif
 !  ...compute 1st vector of output A
       A1 = -ZI*OMEGA*matmul(zeps,E) + CH - ziKH
+      ! A1 = -ZI*OMEGA*matmul(zeps,E)
 !  ...compute 2nd vector of output A
       A2 =  ZI*OMEGA*matmul(zmu, H) + CE - ziKE
+      ! A2 =  ZI*OMEGA*matmul(zmu, H) 
 !      
    end subroutine get_A
    !------------------------------------------------------------------------------

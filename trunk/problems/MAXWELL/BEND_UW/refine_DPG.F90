@@ -140,29 +140,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
       resid_subd = resid_subd + elem_resid(iel)
       if (elem_resid(iel) > elem_resid_max) elem_resid_max = elem_resid(iel)
 !
-      if (NEXACT.ge.1) then
-         call element_error(mdle,Nflag, errorH,errorE,errorV,errorQ,  &
-                                        rnormH,rnormE,rnormV,rnormQ)
-         select case(PhysNick)
-            case(1)
-               error_subd = error_subd + errorQ
-               rnorm_subd = rnorm_subd + rnormQ
-            case(10)
-               error_subd = error_subd + errorV
-               rnorm_subd = rnorm_subd + rnormV
-            case(100)
-               error_subd = error_subd + errorE
-               rnorm_subd = rnorm_subd + rnormE
-            case(1000)
-               error_subd = error_subd + errorH
-               rnorm_subd = rnorm_subd + rnormH
-            case(1001)
-               error_subd = error_subd + errorH + errorQ
-               rnorm_subd = rnorm_subd + rnormH + rnormQ
-            case default
-               error_subd = error_subd + errorH + errorE + errorV + errorQ
-               rnorm_subd = rnorm_subd + rnormH + rnormE + rnormV + rnormQ
-         end select
+      if (NEXACT.ge.1 .and. PhysNick.eq.1) then
+         call element_L2_error_no_PML(mdle,Nflag,errorQ,rnormQ)
+         error_subd = error_subd + errorQ
+         rnorm_subd = rnorm_subd + rnormQ
       endif
    enddo
 !$OMP END PARALLEL DO
@@ -200,7 +181,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    residual_mesh(istep) = sqrt(resid_tot)
    if (NEXACT.ge.1) then
       error_mesh(istep)     = sqrt(error_tot)
-      rel_error_mesh(istep) = sqrt(error_tot/rnorm_tot)
+      rel_error_mesh(istep) = sqrt(error_tot)/sqrt(rnorm_tot)
    endif
    input_power_mesh(istep) = tmp_input_power
    final_power_mesh(istep) = tmp_final_power
@@ -231,7 +212,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
  7005  format(' mesh |','     nreles |','  nrdof_tot |','  nrdof_con |','    residual   |',' residual rate |', &
               '   input_power  |','   final_power  |',' final_loss_exp |',' loss_exp_error '/)
  7006  format(' mesh |','     nreles |','  nrdof_tot |','  nrdof_con |','    residual   |',' residual rate |', &
-              ' field error  |','rel field error|', '   error rate  |'                                         &
+              'L2error_noPML |',' rel. L2error |', '   error rate  |'                                         &
               '   input_power  |','   final_power  |',' final_loss_exp |',' loss_exp_error '/)
 !
    do i=1,istep
@@ -244,7 +225,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
                        error_mesh(i),rel_error_mesh(i),rate_error_mesh(i),                                         &
                        input_power_mesh(i),final_power_mesh(i),final_loss_exp_mesh(i),final_loss_exp_error_mesh(i)
  7004    format(2x,i2,'  | ',3(i10,' | '),es12.5,'  |       ',f7.2, &
-                2(' | ',es12.5),'  |      ',f7.2,3('  |  ',es12.5))
+                2(' | ',es12.5),'  |      ',f7.2,4('  |  ',es12.5))
       endif
       if (i .eq. istep) write(*,*)
    enddo
