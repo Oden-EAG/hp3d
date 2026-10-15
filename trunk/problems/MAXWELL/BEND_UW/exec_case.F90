@@ -228,12 +228,12 @@
             if (RANK .eq. ROOT) write(*,*) '..... There will be ',refs,' adaptive isotropic h-refinements'
             do i=1,refs
                if (RANK .eq. ROOT) write(*,*) '.....Next refinement i=',i
-               if (RANK .eq. ROOT) write(*,*) '.....redistributing mesh'
-               lb = 6 ! this load balancing corresponds to the Graph option
-               count = 1; src = ROOT
-               call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-               call zoltan_w_set_lb(lb)
-               call distr_mesh
+                  if (RANK .eq. ROOT) write(*,*) '.....redistributing mesh'
+                  lb = 6 ! this load balancing corresponds to the Graph option
+                  count = 1; src = ROOT
+                  call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+                  call zoltan_w_set_lb(lb)
+                  call distr_mesh
 
                if (RANK .eq. ROOT) write(*,*) '.....before refine_DPG'
                call refine_DPG(IADAPTIVE,1,0.25d0,nstop)
@@ -250,29 +250,29 @@
 !
 !     ...distribute mesh
          case(30)
-            write(*,*) 'distribute mesh...'
+            if (RANK .eq. ROOT) write(*,*) 'distribute mesh...'
             call distr_mesh
 !
 !
 !     ...collect dofs on ROOT processor
          case(31)
-            write(*,*) 'collecting dofs on ROOT...'
+            if (RANK .eq. ROOT) write(*,*) 'collecting dofs on ROOT...'
             call collect_dofs
 !
 !
 !     ...evaluate current partition
          case(33)
             if (DISTRIBUTED) then
-               write(*,*) 'evaluating current partition...'
+               if (RANK .eq. ROOT) write(*,*) 'evaluating current partition...'
                call zoltan_w_eval
             else
-               write(*,*) 'distribute mesh first to use Zoltan...'
+               if (RANK .eq. ROOT) write(*,*) 'distribute mesh first to use Zoltan...'
             endif
 !
 !
 !     ...run mesh verification routines
          case(35)
-            write(*,*) 'verify distributed mesh consistency...'
+            if (RANK .eq. ROOT) write(*,*) 'verify distributed mesh consistency...'
             call par_verify
 !
 !

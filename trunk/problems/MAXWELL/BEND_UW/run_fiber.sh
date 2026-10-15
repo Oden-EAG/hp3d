@@ -20,10 +20,10 @@
 
 # paraview parameters
 dir_output='../outputs/'
-vis_level=2
+vis_level=3
 
 # Set polynomial order p
-p=3
+p=4
 
 # Set enriched order (p+dp)
 dp=1
@@ -35,9 +35,9 @@ imax=3
 # max NODES
 maxnods=10000000
 
-export KMP_STACKSIZE=24M   # p=3
+# export KMP_STACKSIZE=24M   # p=3
 # export KMP_STACKSIZE=32M   # p=4
-# export KMP_STACKSIZE=48M   # p=5
+export KMP_STACKSIZE=48M   # p=5
 # export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
@@ -50,7 +50,7 @@ comp=1
 # solution number
 isol=102
 # DPG test norm scaling
-alpha=0.01
+alpha=10.0
 # vacuum permeability
 mu=7.91582400800000E-01
 # vacuum permittivity
@@ -104,28 +104,28 @@ elast=0
 # set BC flag -> 0: dirichlet, 2: impedance via penalty term, 3: impedance via elimination
 ibc=0
 
-# # mode, bending radius, max theta, prefix for paraview and mesh file
-isol=101 # options: 101, 111, 1110, 121, 1210, 102
-rbend=1300.0
-tordmn=2
-rhoup=5.0
-rup=1305.0
-rlo=1295.0
-thup=0.148251858778119
-elast=0
-file_geometry='./geometries/final_bentfiber_R1300_pmlclad'
-pref='final3_bentfiber_R1300_pmlclad_lp01_elast0' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
-
+# # # mode, bending radius, max theta, prefix for paraview and mesh file
 # isol=101 # options: 101, 111, 1110, 121, 1210, 102
+# rbend=1300.0
+# tordmn=2
+# rhoup=5.0
+# rup=1305.0
+# rlo=1295.0
+# thup=0.148251858778119
+# elast=1
+# file_geometry='./geometries/final_bentfiber_R1300_pmlclad'
+# pref='final3_bentfiber_R1300_pmlclad_lp01_elast1' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
+
+# isol=102 # options: 101, 111, 1110, 121, 1210, 102
 # rbend=1300.0
 # tordmn=3
 # rhoup=6.66666666666667
 # rup=1306.66666666667
 # rlo=1293.33333333333
 # thup=0.148251858778119
-# elast=0
+# elast=1
 # file_geometry='./geometries/final_bentfiber_R1300_pmlcoat'
-# pref='final5_bentfiber_R1300_pmlcoat_lp01_elast0' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
+# pref='final4alt_bentfiber_R1300_pmlcoat_lp02_elast1_vislevel3' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
 
 # isol=101 # options: 101, 111, 1110, 121, 1210, 102
 # rbend=1300.0
@@ -149,16 +149,16 @@ pref='final3_bentfiber_R1300_pmlclad_lp01_elast0' # label accordingly with lp01,
 # file_geometry='./geometries/final_bentfiber_R2600_pmlclad'
 # pref='final5_bentfiber_R2600_pmlclad_lp01_elast0' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
 
-# isol=101 # options: 101, 111, 1110, 121, 1210, 102
-# rbend=1300.0
-# tordmn=3
-# rhoup=6.66666666666667
-# rup=2606.66666666667
-# rlo=2593.33333333333
-# thup=0.0741259293890595
-# elast=0
-# file_geometry='./geometries/final_bentfiber_R2600_pmlcoat'
-# pref='final5_bentfiber_R2600_pmlcoat_lp01_elast0' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
+isol=102 # options: 101, 111, 1110, 121, 1210, 102
+rbend=2600.0
+tordmn=3
+rhoup=6.66666666666667
+rup=2606.66666666667
+rlo=2593.33333333333
+thup=0.0741259293890595
+elast=1
+file_geometry='./geometries/final_bentfiber_R2600_pmlcoat'
+pref='final4alt_bentfiber_R2600_pmlcoat_lp02_elast1_vislevel3' # label accordingly with lp01, lp11a, lp11b, lp21a, lp21b, lp02, and with elast0 or elast1
 
 # isol=101 # options: 101, 111, 1110, 121, 1210, 102
 # rbend=2600.0
@@ -215,19 +215,20 @@ args+=" -pmlrhoup ${pmlrhoup} -pmlrholo ${pmlrholo}"
 args+=" -tordmn ${tordmn} -slab ${slab}" 
 args+=" -rcore ${rcore} -rclad ${rclad} -rcoat ${rcoat}"
 args+=" -ncore ${ncore} -nclad ${nclad} -ncoat ${ncoat} -attncoat ${attncoat}"
+args+=" -elast ${elast}"
 args+=" -ibc ${ibc}"
 args+=" -prefix ${pref} -vis_level ${vis_level} -dir_output ${dir_output}"
 
-### RUNNING ON PERSONAL LAPTOP
-# Set MPI Procs and OpenMP threads
-nproc=14
-nthreads=1
-mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
-###
-
-# ### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
+# ### RUNNING ON PERSONAL LAPTOP
 # # Set MPI Procs and OpenMP threads
-# nproc=32
-# nthreads=56
-# ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+# nproc=14
+# nthreads=1
+# mpirun -np ${nproc} ./bending ${args} -nthreads ${nthreads}
 # ###
+
+### RUNNING ON TACC'S FRONTERA'S CLX NODE (TACC)
+# Set MPI Procs and OpenMP threads
+nproc=256
+nthreads=56
+ibrun -n ${nproc} ./bending ${args} -nthreads ${nthreads}
+###

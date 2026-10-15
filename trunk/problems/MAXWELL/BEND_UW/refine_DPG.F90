@@ -312,12 +312,12 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
                      kref = 011     ! iso in yz
                      ! kref = 010     ! only in y
                   else 
-                     kref = 111     ! iso
-                     ! kref = 110     ! only in x and y
+                     ! kref = 111     ! iso
+                     kref = 110     ! only in x and y
                   endif
                case(MDLP)
-                  kref = 11      ! iso
-                  ! kref = 10      ! only in xy
+                  ! kref = 11      ! iso
+                  kref = 10      ! only in xy
                case(MDLN,MDLD)
                   call get_isoref(mdle, kref)
                case default

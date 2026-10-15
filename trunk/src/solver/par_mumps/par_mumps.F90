@@ -133,7 +133,7 @@ subroutine mumps_start(mumps,mumps_comm)
 !
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace
-   mumps%icntl(14) = 30
+   mumps%icntl(14) = 99
 !
 !..icntl(18): distribution strategy of the input matrix
 !     0: centralized on host
@@ -161,7 +161,7 @@ subroutine mumps_start(mumps,mumps_comm)
 !     0: automatic choice
 !     1: PT-Scotch
 !     2: ParMetis
-   mumps%icntl(29) = 1
+   mumps%icntl(29) = 2
    ! parmetis appears to cause 'integer divide by zero error'
    ! when using partitions for small problem
    ! (e.g., try 32 mpi ranks on 64 cubes)

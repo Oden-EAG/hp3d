@@ -82,3 +82,5 @@ test_mpi
 *.ps
 *.eps
 *.csv
+*.png
+*.svg

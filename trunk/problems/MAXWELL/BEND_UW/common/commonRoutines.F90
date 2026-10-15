@@ -127,7 +127,7 @@
 !------------------------------------------------------------------------------
    subroutine get_local_epsilon(Mdle,Xp,Zeps)
 !
-      use commonParam, only: EPSILON, ZERO, ZONE, ELASTOOPTIC 
+      use commonParam, only: EPSILON, ZERO, ZONE, ELASTOOPTIC , SLAB_GUIDE, TOROIDAL_DMN
 !
       implicit none
 !
@@ -135,9 +135,10 @@
       real(8),    intent(in)  :: Xp(3)
       complex(8), intent(out) :: Zeps(3,3)
 !
-      integer    :: i
+      integer    :: i, ndom
       complex(8) :: zrefr_orig, zrefr_corr(3)
       real(8)    :: qcyl(3,3), r
+      logical    :: isglass
 !
 !------------------------------------------------------------------------------
 !
@@ -149,19 +150,33 @@
       Zeps = ZERO
 !
 !  ...if elasto-optic effect is active, compute corrected refractive index tensor
-      if (ELASTOOPTIC.eq.1) then
-!     ...get radial coordinate 
-         r = sqrt(Xp(2)**2 + Xp(3)**2)
-!     ...get cylindrical rotation matrix Qcyl
-         call get_cylindrical_rotation(Mdle,Xp,qcyl)
-!     ...get elasto-optical corrected refractive index
-         call get_elastoopical_correction(r,zrefr_orig,zrefr_corr)
-         do i=1,3
-            Zeps(i,i) = zrefr_corr(i)**2 * EPSILON
-         enddo
-!     ... Eps = Qcyl^T * Eps_cyl * Qcyl
-         Zeps = matmul(Zeps,qcyl)
-         Zeps = matmul(transpose(qcyl),Zeps)
+      if (SLAB_GUIDE.eq.0 .and. ELASTOOPTIC.eq.1) then
+!
+         isglass = .false.
+         call find_domain(Mdle, ndom)
+         select case(TOROIDAL_DMN)
+            case(1,2)
+               isglass = .true.
+            case(3)
+               if (ndom.le.3) isglass = .true.
+            case(4)
+               if (ndom.le.2) isglass = .true.
+         end select
+!         
+         if (isglass) then
+!        ...get radial coordinate 
+            r = sqrt(Xp(2)**2 + Xp(3)**2)
+!        ...get cylindrical rotation matrix Qcyl
+            call get_cylindrical_rotation(Mdle,Xp,qcyl)
+!        ...get elasto-optical corrected refractive index
+            call get_elastoopical_correction(r,zrefr_orig,zrefr_corr)
+            do i=1,3
+               Zeps(i,i) = zrefr_corr(i)**2 * EPSILON
+            enddo
+!        ... Eps = Qcyl^T * Eps_cyl * Qcyl
+            Zeps = matmul(Zeps,qcyl)
+            Zeps = matmul(transpose(qcyl),Zeps)
+         endif
 !
 !  ...else, no elasto-optic effect
       else
@@ -437,7 +452,7 @@
       else
          ! if there is an actual PML, we compute the complex path with a polynomial curve
          !
-         n = 4       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
+         n = 2       !!! NEEDS TO BE AT LEAST 2 !!!      ! former results with n = 2
          c = 200.d0 /(Wnum* spml**n)                     !                     c = 100.d0...
          f   = c*sdif**n
          df  = c*sdif**(n-1) * n
